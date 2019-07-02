@@ -47,19 +47,19 @@ function word_hyphenation($word, $data){
         if ($begin){
             $pos = strpos($word, substr($no_counts, 1));
             if ($pos === 0){
-                save_pattern_to_result($result, $pattern, $pos);
+                save_pattern_to_result($result, str_replace('.','', $pattern), $pos);
             }
         }
         else if($end){
             $pos = strpos($word,substr($no_counts,0,strlen($no_counts) - 1));
             if ($pos === strlen($word) - strlen($no_counts) + 1){
-                save_pattern_to_result($result, $pattern, $pos);
+                save_pattern_to_result($result, str_replace('.','', $pattern), $pos);
             }
         }
         else{
             $pos = strpos($word, $no_counts);
             if ($pos !== false){
-                save_pattern_to_result($result, $pattern, $pos);
+                save_pattern_to_result($result, str_replace('.','', $pattern), $pos);
             }
         }
     }
