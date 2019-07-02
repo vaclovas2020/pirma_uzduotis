@@ -7,7 +7,7 @@ $data - hyphenation patterns
 require_once('function.read_data.php');
 require_once('function.print_result.php');
 
-function save_pattern_to_result(&$result, $pattern, $pos){
+function save_pattern_to_result(&$result, $pattern, $pos, $no_counts){
     $chars = array();
     $char_counts = array();
     $end_count = array();
@@ -25,7 +25,7 @@ function save_pattern_to_result(&$result, $pattern, $pos){
             $char_counts[''] = intval($char);
         }
     }
-    array_push($result, array('pattern'=>$pattern, 'pos'=>$pos, 'char_counts'=>$char_counts));
+    array_push($result, array('pos'=>$pos, 'char_counts'=>$char_counts, 'pattern_length'=>strlen($no_counts)));
 }
 
 function word_hyphenation($word, $data){ 
@@ -47,23 +47,47 @@ function word_hyphenation($word, $data){
         if ($begin){
             $pos = strpos($word, substr($no_counts, 1));
             if ($pos === 0){
-                save_pattern_to_result($result, str_replace('.','', $pattern), $pos);
+                save_pattern_to_result($result, str_replace('.','', $pattern), $pos,str_replace('.','', $no_counts));
             }
         }
         else if($end){
             $pos = strpos($word,substr($no_counts,0,strlen($no_counts) - 1));
             if ($pos === strlen($word) - strlen($no_counts) + 1){
-                save_pattern_to_result($result, str_replace('.','', $pattern), $pos);
+                save_pattern_to_result($result, str_replace('.','', $pattern), $pos,str_replace('.','', $no_counts));
             }
         }
         else{
             $pos = strpos($word, $no_counts);
             if ($pos !== false){
-                save_pattern_to_result($result, str_replace('.','', $pattern), $pos);
+                save_pattern_to_result($result, str_replace('.','', $pattern), $pos,str_replace('.','', $no_counts));
             }
         }
     }
-    return $result;
+    foreach ($result as $pattern_data){
+        $pos = $pattern_data['pos'];
+        $char_counts = $pattern_data['char_counts'];
+        for ($i = $pos; $i < $pos + $pattern_data['pattern_length']; $i++){
+            if (isset($word_struct[$i])){
+                $char = $word_struct[$i]['char'];
+                if (isset($char_counts[$char])){
+                    $count = $char_counts[$char];
+                    if ($count > $word_struct[$i]['count']){
+                        $word_struct[$i]['count'] = $count;
+                    }
+                }
+            }
+        }
+        if (isset($char_counts[''])){
+            $i = $pos + $pattern_data['pattern_length'];
+            if (isset($word_struct[$i])){
+                $count = $char_counts[''];
+                if ($count > $word_struct[$i]['count']){
+                    $word_struct[$i]['count'] = $count;
+                }
+            }
+        }
+    }
+    return $word_struct;
 }
 if ($argc == 2){
     $word = $argv[1];
