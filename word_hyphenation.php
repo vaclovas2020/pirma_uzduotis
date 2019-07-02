@@ -7,6 +7,10 @@ $data - hyphenation patterns
 require_once('function.read_data.php');
 require_once('function.print_result.php');
 
+function save_pattern_to_result(&$result, $pattern, $pos, $no_counts){
+    array_push($result, array('pattern'=>$pattern, 'pos'=>$pos, 'no_counts'=>$no_counts));
+}
+
 function word_hyphenation($word, $data){ 
     $result = array();
     foreach ($data as $pattern){
@@ -22,19 +26,19 @@ function word_hyphenation($word, $data){
         if ($begin){
             $pos = strpos($word, substr($no_counts, 1));
             if ($pos === 0){
-                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos, 'no_counts'=>$no_counts));
+                save_pattern_to_result($result, $pattern, $pos, $no_counts);
             }
         }
         else if($end){
             $pos = strpos($word,substr($no_counts,0,strlen($no_counts) - 1));
             if ($pos === strlen($word) - strlen($no_counts) + 1){
-                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos, 'no_counts'=>$no_counts));
+                save_pattern_to_result($result, $pattern, $pos, $no_counts);
             }
         }
         else{
             $pos = strpos($word, $no_counts);
             if ($pos !== false){
-                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos, 'no_counts'=>$no_counts));
+                save_pattern_to_result($result, $pattern, $pos, $no_counts);
             }
         }
     }
