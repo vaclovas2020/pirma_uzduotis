@@ -8,7 +8,24 @@ require_once('function.read_data.php');
 require_once('function.print_result.php');
 
 function save_pattern_to_result(&$result, $pattern, $pos, $no_counts){
-    array_push($result, array('pattern'=>$pattern, 'pos'=>$pos, 'no_counts'=>$no_counts));
+    $chars = array();
+    $char_counts = array();
+    $end_count = array();
+    preg_match_all('/[0-9]+[a-z]{1}/',$pattern,$chars);
+    preg_match_all('/[0-9]+$/',$pattern,$end_count);
+    foreach ($chars as $x => $y){
+        foreach ($y as $char){
+            $c = preg_replace('/[0-9]+/','',$char);
+            $n = intval(preg_replace('/[a-z]{1}/','',$char));
+            $char_counts[$c] = $n;
+        }
+    }
+    foreach ($end_count as $x => $y){
+        foreach ($y as $char){
+            $char_counts[''] = intval($char);
+        }
+    }
+    array_push($result, array('pattern'=>$pattern, 'pos'=>$pos, 'no_counts'=>$no_counts, 'char_counts'=>$char_counts));
 }
 
 function word_hyphenation($word, $data){ 
