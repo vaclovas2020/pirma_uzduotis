@@ -20,18 +20,21 @@ function word_hyphenation($word, $data){
             $end = true;
         }
         if ($begin){
-            if (strpos($word, substr($no_counts, 1)) === 0){
-                array_push($result, $pattern);
+            $pos = strpos($word, substr($no_counts, 1));
+            if ($pos === 0){
+                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos));
             }
         }
         else if($end){
-            if (strpos($word,substr($no_counts,0,strlen($no_counts) - 1)) === strlen($word) - strlen($no_counts) + 1){
-                array_push($result, $pattern);
+            $pos = strpos($word,substr($no_counts,0,strlen($no_counts) - 1));
+            if ($pos === strlen($word) - strlen($no_counts) + 1){
+                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos));
             }
         }
         else{
-            if (strpos($word, $no_counts) !== false){
-                array_push($result, $pattern);
+            $pos = strpos($word, $no_counts);
+            if ($pos !== false){
+                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos));
             }
         }
     }
