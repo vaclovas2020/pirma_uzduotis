@@ -42,9 +42,13 @@ function word_hyphenation($word, $data){
 }
 if ($argc == 2){
     $word = $argv[1];
+    $exec_begin = microtime(true);
     $data = read_data('tex-hyphenation-patterns.txt');
     $result_array = word_hyphenation($word, $data);
     print_result($result_array);
+    $exec_end = microtime(true);
+    $exec_duration = $exec_end - $exec_begin;
+    echo "\nExecution duration: $exec_duration seconds\n";
 }
 else{
     echo "Please give one word. Use command 'php word_hyphenation.php word'";
