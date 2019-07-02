@@ -30,6 +30,10 @@ function save_pattern_to_result(&$result, $pattern, $pos, $no_counts){
 
 function word_hyphenation($word, $data){ 
     $result = array();
+    $word_struct = array();
+    for($i = 0; $i < strlen($word); $i++){
+        array_push($word_struct, array('char'=>substr($word, $i, 1), 'count'=>0));
+    }
     foreach ($data as $pattern){
         $no_counts = preg_replace('/[0-9]+/', '',$pattern);
         $begin = false;
