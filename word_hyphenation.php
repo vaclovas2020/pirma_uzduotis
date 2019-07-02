@@ -22,19 +22,19 @@ function word_hyphenation($word, $data){
         if ($begin){
             $pos = strpos($word, substr($no_counts, 1));
             if ($pos === 0){
-                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos));
+                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos, 'no_counts'=>$no_counts));
             }
         }
         else if($end){
             $pos = strpos($word,substr($no_counts,0,strlen($no_counts) - 1));
             if ($pos === strlen($word) - strlen($no_counts) + 1){
-                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos));
+                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos, 'no_counts'=>$no_counts));
             }
         }
         else{
             $pos = strpos($word, $no_counts);
             if ($pos !== false){
-                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos));
+                array_push($result, array('pattern'=>$pattern, 'pos'=>$pos, 'no_counts'=>$no_counts));
             }
         }
     }
