@@ -1,23 +1,28 @@
 <?php 
 /*
 WORD HYPHENATION PHP CLI
-$word - given word
-$data - hyphenation patterns
+Vaclovas lapinskis
 */
+
 require_once('function.read_data.php');
 require_once('function.print_result.php');
 
+/* split full pattern to one number and one char and save all split parts to array */
 function extractPattern($pattern){
     $chars = array();
     preg_match_all('/[0-9]+[a-z]{1}/',$pattern,$chars);
     return $chars;
 }
+
+/* extract number from pattern end */
 function extractPatternEndCount($pattern){
     $end_count = array();
     preg_match_all('/[0-9]+$/',$pattern,$end_count);
     return $end_count;
 }
-function extractCharAndNumber($chars, &$char_counts){
+
+/* split number and char from given pattern parts and save to array */
+function saveCharAndNumber($chars, &$char_counts){
     foreach ($chars as $x => $y){
         foreach ($y as $char){
             $c = preg_replace('/[0-9]+/','',$char);
@@ -27,7 +32,8 @@ function extractCharAndNumber($chars, &$char_counts){
     }
 }
 
-function extractEndNumber($end_count, &$char_counts){
+/* get number from pattern end and save to array */
+function saveEndNumber($end_count, &$char_counts){
     foreach ($end_count as $x => $y){
         foreach ($y as $char){
             $char_counts[''] = intval($char);
@@ -35,23 +41,30 @@ function extractEndNumber($end_count, &$char_counts){
     }
 }
 
+/* 
+split pattern to parts (one number and one char), 
+save pattern position in the word and pattern length (without numbers)  
+*/
 function save_pattern_to_result(&$result, $pattern, $pos, $no_counts){
     $chars = extractPattern($pattern);
     $end_count = extractPatternEndCount($pattern);
     $char_counts = array();
-    extractCharAndNumber($chars, $char_counts);
-    extractEndNumber($end_count, $char_counts);
+    saveCharAndNumber($chars, $char_counts);
+    saveEndNumber($end_count, $char_counts);
     array_push($result, array('pos'=>$pos, 'char_counts'=>$char_counts, 'pattern_length'=>strlen($no_counts)));
 }
 
+/* check if pattern has dot at begin */
 function isDotAtBegin($pattern){
     return substr($pattern,0,1) == '.';
 }
 
+/* check if pattern has dot at end */
 function isDotAtEnd($pattern){
     return substr($pattern,strlen($pattern) - 1, 1) == '.';
 }
 
+/* find pattern position at word begin */
 function find_pattern_position_at_word_begin(&$result, $word, $no_counts, $pattern){
     $pos = strpos($word, substr($no_counts, 1));
     if ($pos === 0){
@@ -59,6 +72,7 @@ function find_pattern_position_at_word_begin(&$result, $word, $no_counts, $patte
     }
 }
 
+/* find pattern position at word end */
 function find_pattern_position_at_word_end(&$result, $word, $no_counts, $pattern){
     $pos = strpos($word,substr($no_counts,0,strlen($no_counts) - 1));
     if ($pos === strlen($word) - strlen($no_counts) + 1){
@@ -66,6 +80,7 @@ function find_pattern_position_at_word_end(&$result, $word, $no_counts, $pattern
     }
 }
 
+/* find pattern position at word */
 function find_pattern_position_at_word(&$result, $word, $no_counts, $pattern){
     $pos = strpos($word, $no_counts);
     if ($pos !== false){
@@ -73,6 +88,7 @@ function find_pattern_position_at_word(&$result, $word, $no_counts, $pattern){
     }
 }
 
+/* find which patterns is correct by given word and save to data array */
 function find_patterns(&$result, &$data, $word){
     foreach ($data as $pattern){
         $no_counts = preg_replace('/[0-9]+/', '',$pattern);
@@ -88,6 +104,7 @@ function find_patterns(&$result, &$data, $word){
     }
 }
 
+/* push correct number before every char of given word */
 function push_counts_to_word(&$word_struct, &$result){
     foreach ($result as $pattern_data){
         $pos = $pattern_data['pos'];
