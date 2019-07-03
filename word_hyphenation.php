@@ -148,7 +148,7 @@ function push_counts_to_word(&$word_struct, &$result){
 }
 
 /* main function of word hyphernation algorithm */
-function word_hyphenation($word, $data){ 
+function word_hyphenation($word, &$data){ 
     $result = array();
     $word_struct = array();
     for($i = 0; $i < strlen($word); $i++){
@@ -159,22 +159,38 @@ function word_hyphenation($word, $data){
     return $word_struct;
 }
 
+function hyphernate_text($text, &$data){
+    $words = array();
+    preg_match_all('/[a-zA-Z]+[.,!?;:]*/',$text, $words);
+    var_dump($words);
+    foreach ($words as $x => $y){
+        foreach($y as $word){
+            $word = preg_replace('/[.,!?;:]+/','', $word);
+            $result_array = word_hyphenation($word, $data);
+            $result_txt = print_result($result_array);
+            $text = str_replace($word, $result_txt, $text);
+        }
+    }
+    return $text;
+}
+
 /* main function of PHP CLI application */
 function main(){
     global $argc;
     global $argv;
     if ($argc >= 3){
         $choose = $argv[1]; // -w one word, -p paragraph, -f file
+        $data = read_data('tex-hyphenation-patterns.txt');
         $exec_begin = microtime(true);
         switch($choose){
             case '-w': // hyphenate one word
-            $word = $argv[2];
-            $data = read_data('tex-hyphenation-patterns.txt');
-            $result_array = word_hyphenation($word, $data);
-            print_result($result_array);
-            break;
+                $word = $argv[2];
+                $result_array = word_hyphenation($word, $data);
+                echo print_result($result_array);
+                break;
             case '-p': // hyphenate all paragraph or one sentence
-
+                $text = $argv[2];
+                echo hyphernate_text($text, $data);
             break;
             case '-f': // hyphenate all text from given file
 
