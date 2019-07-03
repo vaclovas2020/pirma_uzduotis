@@ -180,6 +180,11 @@ function save_result_to_file($filename, $result_str){
     else echo "Result saved to file '$filename'";
 }
 
+function hyphernate_from_file($filename, &$data){
+    $text = file_get_contents($filename);
+    return hyphernate_text($text, $data);
+}
+
 /* main function of PHP CLI application */
 function main(){
     global $argc;
@@ -200,7 +205,9 @@ function main(){
                 $result_str = hyphernate_text($text, $data);
             break;
             case '-f': // hyphenate all text from given file
-            break;
+                $filename = $argv[2];
+                $result_str = hyphernate_from_file($filename, $data);
+                break;
             default:
             echo "Unknown '$choose' parameter.";
             break;
