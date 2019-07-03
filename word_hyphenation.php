@@ -28,12 +28,7 @@ function save_pattern_to_result(&$result, $pattern, $pos, $no_counts){
     array_push($result, array('pos'=>$pos, 'char_counts'=>$char_counts, 'pattern_length'=>strlen($no_counts)));
 }
 
-function word_hyphenation($word, $data){ 
-    $result = array();
-    $word_struct = array();
-    for($i = 0; $i < strlen($word); $i++){
-        array_push($word_struct, array('char'=>substr($word, $i, 1), 'count'=>0));
-    }
+function find_patterns(&$result, &$data, $word){
     foreach ($data as $pattern){
         $no_counts = preg_replace('/[0-9]+/', '',$pattern);
         $begin = false;
@@ -63,6 +58,9 @@ function word_hyphenation($word, $data){
             }
         }
     }
+}
+
+function push_counts_to_word(&$word_struct, &$result){
     foreach ($result as $pattern_data){
         $pos = $pattern_data['pos'];
         $char_counts = $pattern_data['char_counts'];
@@ -87,6 +85,16 @@ function word_hyphenation($word, $data){
             }
         }
     }
+}
+
+function word_hyphenation($word, $data){ 
+    $result = array();
+    $word_struct = array();
+    for($i = 0; $i < strlen($word); $i++){
+        array_push($word_struct, array('char'=>substr($word, $i, 1), 'count'=>0));
+    }
+    find_patterns($result, $data, $word);
+    push_counts_to_word($word_struct, $result);
     return $word_struct;
 }
 if ($argc == 2){
