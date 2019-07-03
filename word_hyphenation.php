@@ -207,6 +207,12 @@ function choose_option($choose, &$data, &$result_str){
     }
 }
 
+function print_help(){
+    echo "Use command 'php word_hyphenation.php -w [word] [save_result_to_file(optional)]' if you want to hyphenate one word.\n";
+    echo "Use command 'php word_hyphenation.php -p [paragraph / sentence] [save_result_to_file(optional)]' if you want to hyphenate paragraph / sentence.\n";
+    echo "Use command 'php word_hyphenation.php -f [read_file] [save_result_to_file(optional)]' if you want to hyphenate all text from given file.\n";
+}
+
 /* main function of PHP CLI application */
 function main(){
     global $argc;
@@ -229,9 +235,7 @@ function main(){
         echo "\nExecution duration: $exec_duration seconds\n";
     }
     else{
-        echo "Use command 'php word_hyphenation.php -w [word] [save_result_to_file(optional)]' if you want to hyphenate one word.\n";
-        echo "Use command 'php word_hyphenation.php -p [paragraph / sentence] [save_result_to_file(optional)]' if you want to hyphenate paragraph / sentence.\n";
-        echo "Use command 'php word_hyphenation.php -f [read_file] [save_result_to_file(optional)]' if you want to hyphenate all text from given file.\n";
+        print_help();
     }
 }
 
