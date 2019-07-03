@@ -110,7 +110,7 @@ function push_pattern_data_to_word(&$word_struct, $pattern_data){
     $char_counts = $pattern_data['char_counts'];
     for ($i = $pos; $i < $pos + $pattern_data['pattern_length']; $i++){
         if (isset($word_struct[$i])){
-            $char = $word_struct[$i]['char'];
+            $char = strtolower($word_struct[$i]['char']);
             if (isset($char_counts[$char])){
                 $count = $char_counts[$char];
                 if ($count > $word_struct[$i]['count']){
@@ -154,7 +154,7 @@ function word_hyphenation($word, &$data){
     for($i = 0; $i < strlen($word); $i++){
         array_push($word_struct, array('char'=>substr($word, $i, 1), 'count'=>0));
     }
-    find_patterns($result, $data, $word);
+    find_patterns($result, $data, strtolower($word));
     push_counts_to_word($word_struct, $result);
     return $word_struct;
 }
