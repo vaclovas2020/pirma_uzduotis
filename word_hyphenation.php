@@ -28,24 +28,24 @@ function save_pattern_to_result(&$result, $pattern, $pos, $no_counts){
     array_push($result, array('pos'=>$pos, 'char_counts'=>$char_counts, 'pattern_length'=>strlen($no_counts)));
 }
 
+function isDotAtBegin($pattern){
+    return substr($pattern,0,1) == '.';
+}
+
+function isDotAtEnd($pattern){
+    return substr($pattern,strlen($pattern) - 1, 1) == '.';
+}
+
 function find_patterns(&$result, &$data, $word){
     foreach ($data as $pattern){
         $no_counts = preg_replace('/[0-9]+/', '',$pattern);
-        $begin = false;
-        $end = false;
-        if (substr($pattern,0,1) == '.'){
-            $begin = true;
-        }
-        else if (substr($pattern,strlen($pattern) - 1, 1) == '.'){
-            $end = true;
-        }
-        if ($begin){
+        if (isDotAtBegin($pattern)){
             $pos = strpos($word, substr($no_counts, 1));
             if ($pos === 0){
                 save_pattern_to_result($result, str_replace('.','', $pattern), $pos,str_replace('.','', $no_counts));
             }
         }
-        else if($end){
+        else if(isDotAtEnd($pattern)){
             $pos = strpos($word,substr($no_counts,0,strlen($no_counts) - 1));
             if ($pos === strlen($word) - strlen($no_counts) + 1){
                 save_pattern_to_result($result, str_replace('.','', $pattern), $pos,str_replace('.','', $no_counts));
