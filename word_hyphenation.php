@@ -104,26 +104,15 @@ function find_patterns(&$result, &$data, $word){
     }
 }
 
-/* push correct number before every char of given word */
-function push_counts_to_word(&$word_struct, &$result){
-    foreach ($result as $pattern_data){
-        $pos = $pattern_data['pos'];
-        $char_counts = $pattern_data['char_counts'];
-        for ($i = $pos; $i < $pos + $pattern_data['pattern_length']; $i++){
-            if (isset($word_struct[$i])){
-                $char = $word_struct[$i]['char'];
-                if (isset($char_counts[$char])){
-                    $count = $char_counts[$char];
-                    if ($count > $word_struct[$i]['count']){
-                        $word_struct[$i]['count'] = $count;
-                    }
-                }
-            }
-        }
-        if (isset($char_counts[''])){
-            $i = $pos + $pattern_data['pattern_length'];
-            if (isset($word_struct[$i])){
-                $count = $char_counts[''];
+/* write numbers from given pattern to right position in word */
+function push_pattern_data_to_word(&$word_struct, $pattern_data){
+    $pos = $pattern_data['pos'];
+    $char_counts = $pattern_data['char_counts'];
+    for ($i = $pos; $i < $pos + $pattern_data['pattern_length']; $i++){
+        if (isset($word_struct[$i])){
+            $char = $word_struct[$i]['char'];
+            if (isset($char_counts[$char])){
+                $count = $char_counts[$char];
                 if ($count > $word_struct[$i]['count']){
                     $word_struct[$i]['count'] = $count;
                 }
@@ -132,6 +121,33 @@ function push_counts_to_word(&$word_struct, &$result){
     }
 }
 
+/* 
+write last number from given pattern to right position in word
+(need only if last character of given pattern is number)
+*/
+function push_last_count_to_word(&$word_struct, $pattern_data){
+    $pos = $pattern_data['pos'];
+    $char_counts = $pattern_data['char_counts'];
+    if (isset($char_counts[''])){
+        $i = $pos + $pattern_data['pattern_length'];
+        if (isset($word_struct[$i])){
+            $count = $char_counts[''];
+            if ($count > $word_struct[$i]['count']){
+                $word_struct[$i]['count'] = $count;
+            }
+        }
+    }
+}
+
+/* push correct number before every char of given word */
+function push_counts_to_word(&$word_struct, &$result){
+    foreach ($result as $pattern_data){
+        push_pattern_data_to_word($word_struct, $pattern_data);
+        push_last_count_to_word($word_struct, $pattern_data);
+    }
+}
+
+/* main function of word hyphernation algorithm */
 function word_hyphenation($word, $data){ 
     $result = array();
     $word_struct = array();
@@ -142,17 +158,23 @@ function word_hyphenation($word, $data){
     push_counts_to_word($word_struct, $result);
     return $word_struct;
 }
-if ($argc == 2){
-    $word = $argv[1];
-    $exec_begin = microtime(true);
-    $data = read_data('tex-hyphenation-patterns.txt');
-    $result_array = word_hyphenation($word, $data);
-    print_result($result_array);
-    $exec_end = microtime(true);
-    $exec_duration = $exec_end - $exec_begin;
-    echo "\nExecution duration: $exec_duration seconds\n";
+
+/* main function of PHP CLI application */
+function main(){
+    if ($argc == 2){
+        $word = $argv[1];
+        $exec_begin = microtime(true);
+        $data = read_data('tex-hyphenation-patterns.txt');
+        $result_array = word_hyphenation($word, $data);
+        print_result($result_array);
+        $exec_end = microtime(true);
+        $exec_duration = $exec_end - $exec_begin;
+        echo "\nExecution duration: $exec_duration seconds\n";
+    }
+    else{
+        echo "Please give one word. Use command 'php word_hyphenation.php word'";
+    }
 }
-else{
-    echo "Please give one word. Use command 'php word_hyphenation.php word'";
-}
+
+main(); // start main function
 ?>
