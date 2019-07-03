@@ -7,12 +7,17 @@ $data - hyphenation patterns
 require_once('function.read_data.php');
 require_once('function.print_result.php');
 
-function save_pattern_to_result(&$result, $pattern, $pos, $no_counts){
+function extractPattern($pattern){
     $chars = array();
-    $char_counts = array();
-    $end_count = array();
     preg_match_all('/[0-9]+[a-z]{1}/',$pattern,$chars);
+    return $chars;
+}
+function extractPatternEndCount($pattern){
+    $end_count = array();
     preg_match_all('/[0-9]+$/',$pattern,$end_count);
+    return $end_count;
+}
+function extractCharAndNumber($chars, &$char_counts){
     foreach ($chars as $x => $y){
         foreach ($y as $char){
             $c = preg_replace('/[0-9]+/','',$char);
@@ -20,11 +25,22 @@ function save_pattern_to_result(&$result, $pattern, $pos, $no_counts){
             $char_counts[$c] = $n;
         }
     }
+}
+
+function extractEndNumber($end_count, &$char_counts){
     foreach ($end_count as $x => $y){
         foreach ($y as $char){
             $char_counts[''] = intval($char);
         }
     }
+}
+
+function save_pattern_to_result(&$result, $pattern, $pos, $no_counts){
+    $chars = extractPattern($pattern);
+    $end_count = extractPatternEndCount($pattern);
+    $char_counts = array();
+    extractCharAndNumber($chars, $char_counts);
+    extractEndNumber($end_count, $char_counts);
     array_push($result, array('pos'=>$pos, 'char_counts'=>$char_counts, 'pattern_length'=>strlen($no_counts)));
 }
 
