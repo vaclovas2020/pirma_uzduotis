@@ -56,12 +56,12 @@ function save_pattern_to_result(&$result, $pattern, $pos, $no_counts){
 
 /* check if pattern has dot at begin */
 function isDotAtBegin($pattern){
-    return substr($pattern,0,1) == '.';
+    return preg_match('/^[.]{1}/',$pattern) === 1;
 }
 
 /* check if pattern has dot at end */
 function isDotAtEnd($pattern){
-    return substr($pattern,strlen($pattern) - 1, 1) == '.';
+    return preg_match('/[.]{1}$/',$pattern) === 1;
 }
 
 /* find pattern position at word begin */
