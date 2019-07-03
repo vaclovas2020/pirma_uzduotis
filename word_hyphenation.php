@@ -161,6 +161,8 @@ function word_hyphenation($word, $data){
 
 /* main function of PHP CLI application */
 function main(){
+    global $argc;
+    global $argv;
     if ($argc == 2){
         $word = $argv[1];
         $exec_begin = microtime(true);
