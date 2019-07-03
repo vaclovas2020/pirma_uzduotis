@@ -185,6 +185,28 @@ function hyphernate_from_file($filename, &$data){
     return hyphernate_text($text, $data);
 }
 
+function choose_option($choose, &$data, &$result_str){
+    global $argv;
+    switch($choose){
+        case '-w': // hyphenate one word
+            $word = $argv[2];
+            $result_array = word_hyphenation($word, $data);
+            $result_str = print_result($result_array);
+            break;
+        case '-p': // hyphenate all paragraph or one sentence
+            $text = $argv[2];
+            $result_str = hyphernate_text($text, $data);
+        break;
+        case '-f': // hyphenate all text from given file
+            $filename = $argv[2];
+            $result_str = hyphernate_from_file($filename, $data);
+            break;
+        default:
+        echo "Unknown '$choose' parameter.";
+        break;
+    }
+}
+
 /* main function of PHP CLI application */
 function main(){
     global $argc;
@@ -194,24 +216,7 @@ function main(){
         $data = read_data('tex-hyphenation-patterns.txt');
         $exec_begin = microtime(true);
         $result_str = '';
-        switch($choose){
-            case '-w': // hyphenate one word
-                $word = $argv[2];
-                $result_array = word_hyphenation($word, $data);
-                $result_str = print_result($result_array);
-                break;
-            case '-p': // hyphenate all paragraph or one sentence
-                $text = $argv[2];
-                $result_str = hyphernate_text($text, $data);
-            break;
-            case '-f': // hyphenate all text from given file
-                $filename = $argv[2];
-                $result_str = hyphernate_from_file($filename, $data);
-                break;
-            default:
-            echo "Unknown '$choose' parameter.";
-            break;
-        }
+        choose_option($choose, $data, $result_str);
         $exec_end = microtime(true);
         $exec_duration = $exec_end - $exec_begin;
         if ($argc > 3){ // save result to file
