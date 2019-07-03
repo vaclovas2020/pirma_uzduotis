@@ -162,7 +162,6 @@ function word_hyphenation($word, &$data){
 function hyphernate_text($text, &$data){
     $words = array();
     preg_match_all('/[a-zA-Z]+[.,!?;:]*/',$text, $words);
-    var_dump($words);
     foreach ($words as $x => $y){
         foreach($y as $word){
             $word = preg_replace('/[.,!?;:]+/','', $word);
