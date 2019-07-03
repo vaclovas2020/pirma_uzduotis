@@ -173,6 +173,13 @@ function hyphernate_text($text, &$data){
     return $text;
 }
 
+function save_result_to_file($filename, $result_str){
+    if (file_put_contents($filename,$result_str) === false){
+        echo "Can not save result to file '$filename'";
+    }
+    else echo "Result saved to file '$filename'";
+}
+
 /* main function of PHP CLI application */
 function main(){
     global $argc;
@@ -181,18 +188,18 @@ function main(){
         $choose = $argv[1]; // -w one word, -p paragraph, -f file
         $data = read_data('tex-hyphenation-patterns.txt');
         $exec_begin = microtime(true);
+        $result_str = '';
         switch($choose){
             case '-w': // hyphenate one word
                 $word = $argv[2];
                 $result_array = word_hyphenation($word, $data);
-                echo print_result($result_array);
+                $result_str = print_result($result_array);
                 break;
             case '-p': // hyphenate all paragraph or one sentence
                 $text = $argv[2];
-                echo hyphernate_text($text, $data);
+                $result_str = hyphernate_text($text, $data);
             break;
             case '-f': // hyphenate all text from given file
-
             break;
             default:
             echo "Unknown '$choose' parameter.";
@@ -200,10 +207,19 @@ function main(){
         }
         $exec_end = microtime(true);
         $exec_duration = $exec_end - $exec_begin;
+        if ($argc > 3){ // save result to file
+            $filename = $argv[3];
+            save_result_to_file($filename, $result_str);
+        }
+        else{
+            echo $result_str;
+        }
         echo "\nExecution duration: $exec_duration seconds\n";
     }
     else{
-        echo "Use command 'php word_hyphenation.php -w [word]' if you want to hyphenate one word.\n";
+        echo "Use command 'php word_hyphenation.php -w [word] [save_result_to_file(optional)]' if you want to hyphenate one word.\n";
+        echo "Use command 'php word_hyphenation.php -p [paragraph / sentence] [save_result_to_file(optional)]' if you want to hyphenate paragraph / sentence.\n";
+        echo "Use command 'php word_hyphenation.php -f [read_file] [save_result_to_file(optional)]' if you want to hyphenate all text from given file.\n";
     }
 }
 
