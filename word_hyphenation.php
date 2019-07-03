@@ -163,18 +163,32 @@ function word_hyphenation($word, $data){
 function main(){
     global $argc;
     global $argv;
-    if ($argc == 2){
-        $word = $argv[1];
+    if ($argc >= 3){
+        $choose = $argv[1]; // -w one word, -p paragraph, -f file
         $exec_begin = microtime(true);
-        $data = read_data('tex-hyphenation-patterns.txt');
-        $result_array = word_hyphenation($word, $data);
-        print_result($result_array);
+        switch($choose){
+            case '-w': // hyphenate one word
+            $word = $argv[2];
+            $data = read_data('tex-hyphenation-patterns.txt');
+            $result_array = word_hyphenation($word, $data);
+            print_result($result_array);
+            break;
+            case '-p': // hyphenate all paragraph or one sentence
+
+            break;
+            case '-f': // hyphenate all text from given file
+
+            break;
+            default:
+            echo "Unknown '$choose' parameter.";
+            break;
+        }
         $exec_end = microtime(true);
         $exec_duration = $exec_end - $exec_begin;
         echo "\nExecution duration: $exec_duration seconds\n";
     }
     else{
-        echo "Please give one word. Use command 'php word_hyphenation.php word'";
+        echo "Use command 'php word_hyphenation.php -w [word]' if you want to hyphenate one word.\n";
     }
 }
 
