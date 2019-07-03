@@ -36,26 +36,38 @@ function isDotAtEnd($pattern){
     return substr($pattern,strlen($pattern) - 1, 1) == '.';
 }
 
+function find_pattern_position_at_word_begin(&$result, $word, $no_counts, $pattern){
+    $pos = strpos($word, substr($no_counts, 1));
+    if ($pos === 0){
+        save_pattern_to_result($result, str_replace('.','', $pattern), $pos,str_replace('.','', $no_counts));
+    }
+}
+
+function find_pattern_position_at_word_end(&$result, $word, $no_counts, $pattern){
+    $pos = strpos($word,substr($no_counts,0,strlen($no_counts) - 1));
+    if ($pos === strlen($word) - strlen($no_counts) + 1){
+        save_pattern_to_result($result, str_replace('.','', $pattern), $pos,str_replace('.','', $no_counts));
+    }
+}
+
+function find_pattern_position_at_word(&$result, $word, $no_counts, $pattern){
+    $pos = strpos($word, $no_counts);
+    if ($pos !== false){
+        save_pattern_to_result($result, str_replace('.','', $pattern), $pos,str_replace('.','', $no_counts));
+    }
+}
+
 function find_patterns(&$result, &$data, $word){
     foreach ($data as $pattern){
         $no_counts = preg_replace('/[0-9]+/', '',$pattern);
         if (isDotAtBegin($pattern)){
-            $pos = strpos($word, substr($no_counts, 1));
-            if ($pos === 0){
-                save_pattern_to_result($result, str_replace('.','', $pattern), $pos,str_replace('.','', $no_counts));
-            }
+            find_pattern_position_at_word_begin($result, $word, $no_counts, $pattern);
         }
         else if(isDotAtEnd($pattern)){
-            $pos = strpos($word,substr($no_counts,0,strlen($no_counts) - 1));
-            if ($pos === strlen($word) - strlen($no_counts) + 1){
-                save_pattern_to_result($result, str_replace('.','', $pattern), $pos,str_replace('.','', $no_counts));
-            }
+            find_pattern_position_at_word_end($result, $word, $no_counts, $pattern);
         }
         else{
-            $pos = strpos($word, $no_counts);
-            if ($pos !== false){
-                save_pattern_to_result($result, str_replace('.','', $pattern), $pos,str_replace('.','', $no_counts));
-            }
+            find_pattern_position_at_word($result, $word, $no_counts, $pattern);
         }
     }
 }
