@@ -8,7 +8,9 @@ require_once('function.read_data.php');
 require_once('function.print_result.php');
 
 function autoloader($class){
-    include "classes/$class/class.$class.php";
+    if (file_exists("classes/$class/class.$class.php")){
+        include "classes/$class/class.$class.php";
+    }
 }
 spl_autoload_register('autoloader');
 
@@ -218,13 +220,10 @@ function print_help(){
     echo "Use command 'php word_hyphenation.php -f [read_file] [save_result_to_file(optional)]' if you want to hyphenate all text from given file.\n";
 }
 
-/* main function of PHP CLI application */
-function main(){
-    global $argc;
-    global $argv;
     if ($argc >= 3){
         $choose = $argv[1]; // -w one word, -p paragraph, -f file
-        $data = read_data('tex-hyphenation-patterns.txt');
+        Hyphenation\PatternDataLoader::loadDataFromFile('tex-hyphenation-patterns.txt');
+        $data = Hyphenation\PatternDataLoader::getPatternData();
         $exec_begin = microtime(true);
         $result_str = '';
         choose_option($choose, $data, $result_str);
@@ -242,7 +241,4 @@ function main(){
     else{
         print_help();
     }
-}
-
-main(); // start main function
 ?>
