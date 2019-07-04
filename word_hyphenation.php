@@ -222,7 +222,7 @@ function print_help(){
 
     if ($argc >= 3){
         $choose = $argv[1]; // -w one word, -p paragraph, -f file
-        Hyphenation\PatternDataLoader::loadDataFromFile('tex-hyphenation-patterns.txt');
+        Hyphenation\PatternDataLoader::loadDataFromFile(Hyphenation\PatternDataLoader::DEFAULT_FILENAME);
         $data = Hyphenation\PatternDataLoader::getPatternData();
         $exec_begin = microtime(true);
         $result_str = '';
