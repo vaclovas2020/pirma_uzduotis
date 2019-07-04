@@ -7,6 +7,11 @@ Vaclovas lapinskis
 require_once('function.read_data.php');
 require_once('function.print_result.php');
 
+function autoloader($class){
+    include "classes/$class/class.$class.php";
+}
+spl_autoload_register('autoloader');
+
 /* split full pattern to one number and one char and save all split parts to array */
 function extractPattern(string $pattern){
     $chars = array();
