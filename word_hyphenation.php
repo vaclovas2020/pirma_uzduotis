@@ -8,7 +8,7 @@ require_once('function.read_data.php');
 require_once('function.print_result.php');
 
 function autoloader($class){
-    if (file_exists("classes/$class/class.$class.php")){
+    if (file_exists("classes/$class/$class.php")){
         include "classes/$class/$class.php";
     }
 }
