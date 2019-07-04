@@ -1,4 +1,4 @@
-<?php function read_data($filename){
+<?php function read_data(string $filename){
     $data = array();
     $file = new SplFileObject($filename, 'r');
     while (!$file->eof()){

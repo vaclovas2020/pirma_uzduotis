@@ -1,4 +1,4 @@
-<?php function print_result($result_array){
+<?php function print_result(array $result_array){
     $el_count = 0;
     $str = '';
     foreach ($result_array as $char_data){
