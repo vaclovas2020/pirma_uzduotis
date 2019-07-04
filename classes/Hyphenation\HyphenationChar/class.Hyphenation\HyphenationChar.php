@@ -3,8 +3,8 @@
 namespace Hyphenation;
 
 class HyphenationChar{
-    private $char;
-    private $count;
+    protected $char;
+    protected $count;
 
     public function __construct($char = '', $count = 0){
         $this->$char = $char;
