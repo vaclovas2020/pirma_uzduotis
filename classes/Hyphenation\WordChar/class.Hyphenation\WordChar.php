@@ -1,6 +1,7 @@
 <?php 
 
 namespace Hyphenation;
+
 class WordChar extends HyphenationChar{
     public function toString(): string{
         $str = '';
