@@ -4,7 +4,6 @@ class ResultPrinter implements iFileWriter{
     private $result_str = '';
 
     public function _construct(array $result_array){
-        $el_count = 0;
         foreach ($result_array as $char_data){
             $this->$result_str .= $char_data->toString();
         }
