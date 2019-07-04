@@ -5,7 +5,7 @@ class ResultPrinter implements iFileWriter{
 
     public function _construct(array $result_array){
         foreach ($result_array as $char_data){
-            $this->$result_str .= $char_data->toString();
+            $this->result_str .= $char_data->toString();
         }
     }
 
@@ -14,7 +14,7 @@ class ResultPrinter implements iFileWriter{
     }
 
     public function printToScreen(){
-        echo $this->$result_str;
+        echo $this->result_str;
     }
 
 }

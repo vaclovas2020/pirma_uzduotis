@@ -24,23 +24,23 @@ class Pattern{
             foreach ($y as $char){
                 $patternChar = new PatternChar();
                 $patternChar->splitCharAndNumber($char);
-                array_push($this->$pattern_chars, $patternChar);
+                array_push($this->pattern_chars, $patternChar);
             }
         }
     }
     
     public function __construct(string $pattern, int $position_at_word){
         $this->splitPattern();
-        $this->$position_at_word = $position_at_word;
+        $this->position_at_word = $position_at_word;
         $no_counts = preg_replace('/[0-9]+/', '',$pattern);
-        $this->$pattern_length = strlen($no_counts);
+        $this->pattern_length = strlen($no_counts);
     }
 
     public function getPatternChars(): array{
-        return $this->$pattern_chars;
+        return $this->pattern_chars;
     }
 
     public function getPatternLength(): int{
-        return $this->$pattern_length;
+        return $this->pattern_length;
     }
 }
