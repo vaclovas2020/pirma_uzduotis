@@ -3,5 +3,5 @@
 namespace IO;
 
 interface iFileWriter{
-    public function writeToFile(string $filename, string $data): bool;
+    public function writeToFile(string $filename): bool;
 }
