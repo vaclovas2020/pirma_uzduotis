@@ -4,7 +4,6 @@ WORD HYPHENATION PHP CLI
 Vaclovas lapinskis
 */
 
-require_once('function.read_data.php');
 require_once('function.print_result.php');
 
 function autoloader($class){
