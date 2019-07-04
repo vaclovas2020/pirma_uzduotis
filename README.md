@@ -5,4 +5,5 @@
  php word_hyphenation.php -f [read_file] [save_result_to_file(optional)]
 ```
 
+
 (c) Vaclovas Lapinskis 2019
