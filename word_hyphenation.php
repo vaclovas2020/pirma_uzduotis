@@ -217,11 +217,12 @@ function choose_option(string $choose, array &$data, string &$result_str){
         $choose = $argv[1]; // -w one word, -p paragraph, -f file
         Hyphenation\PatternDataLoader::loadDataFromFile(Hyphenation\PatternDataLoader::DEFAULT_FILENAME);
         $data = Hyphenation\PatternDataLoader::getPatternData();
-        $exec_begin = microtime(true);
+        $exec_calc = new CLI\ExecDurationCalculator();
+        $exec_calc->start();
         $result_str = '';
         choose_option($choose, $data, $result_str);
-        $exec_end = microtime(true);
-        $exec_duration = $exec_end - $exec_begin;
+        $exec_calc->finish();
+        $exec_duration = $exec_calc->getDuration();
         if ($argc > 3){ // save result to file
             $filename = $argv[3];
             save_result_to_file($filename, $result_str);
