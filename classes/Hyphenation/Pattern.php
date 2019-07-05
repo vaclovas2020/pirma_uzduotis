@@ -30,7 +30,7 @@ class Pattern{
     }
     
     public function __construct(string $pattern, int $position_at_word){
-        $this->splitPattern();
+        $this->splitPattern($pattern);
         $this->position_at_word = $position_at_word;
         $no_counts = preg_replace('/[0-9]+/', '',$pattern);
         $this->pattern_length = strlen($no_counts);

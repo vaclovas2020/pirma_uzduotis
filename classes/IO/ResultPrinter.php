@@ -10,7 +10,7 @@ class ResultPrinter implements iFileWriter{
     }
 
     public function writeToFile(string $filename): bool{
-        return file_put_contents($filename,$result_str) !== false;
+        return file_put_contents($filename,$this->result_str) !== false;
     }
 
     public function printToScreen(){
