@@ -221,4 +221,3 @@ function choose_option(string $choose, array &$data, string &$result_str){
     else{
         CLI\Helper::printHelp();
     }
-?>
