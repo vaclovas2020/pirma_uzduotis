@@ -6,12 +6,8 @@ Vaclovas lapinskis
 
 require_once('function.print_result.php');
 
-function autoloader($class){
-    if (file_exists("classes/$class/$class.php")){
-        include "classes/$class/$class.php";
-    }
-}
-spl_autoload_register('autoloader');
+require_once('classes/Core\AutoLoader/Core\AutoLoader.php');
+Core\AutoLoader::register();
 
 /* split full pattern to one number and one char and save all split parts to array */
 function extractPattern(string $pattern){
