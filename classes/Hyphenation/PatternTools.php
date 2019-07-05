@@ -60,9 +60,12 @@ class PatternTools{
         $pattern_chars = $pattern_data->getPatternChars();
         for($i = 0; $i < count($pattern_chars); $i++){
             $count = $pattern_chars[$i]->getCount();
-            $current_count = self::$result[$i + $pos]->getCount();
-            if ($count > $current_count){
-                self::$result[$i + $pos]->setCount($count);
+            $char_num = $pattern_chars[$i]->getCharNum();
+            if ($pos + $char_num < count(self::$result)) {
+                $current_count = self::$result[$pos + $char_num]->getCount();
+                if ($count > $current_count) {
+                    self::$result[$pos + $char_num]->setCount($count);
+                }
             }
         }
     }
