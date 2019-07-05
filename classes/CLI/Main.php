@@ -3,7 +3,6 @@
 
 namespace CLI;
 
-use Hyphenation\PatternDataLoader;
 use IO\FileWriter;
 
 class Main
