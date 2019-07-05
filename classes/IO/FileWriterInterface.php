@@ -2,6 +2,7 @@
 
 namespace IO;
 
-interface FileWriterInterface{
+interface FileWriterInterface
+{
     public function writeToFile(string $filename, string $data): bool;
 }

@@ -14,11 +14,11 @@ class Main
         if ($argc >= 3) {
             $choose = $argv[1]; // -w one word, -p paragraph, -f file
             PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME);
-            $exec_calc = new ExecDurationCalculator();
-            $exec_calc->start();
+            $execCalc = new ExecDurationCalculator();
+            $execCalc->start();
             $resultStr = UserInput::textHyphenationUI($choose, $argv[2]);
-            $exec_calc->finish();
-            $exec_duration = $exec_calc->getDuration();
+            $execCalc->finish();
+            $execDuration = $execCalc->getDuration();
             if ($argc > 3) { // save result to file
                 $filename = $argv[3];
                 if ((new FileWriter())->writeToFile($filename, $resultStr)) {
@@ -29,7 +29,7 @@ class Main
             } else {
                 echo $resultStr;
             }
-            echo "\nExecution duration: $exec_duration seconds\n";
+            echo "\nExecution duration: $execDuration seconds\n";
         } else {
             Helper::printHelp();
         }

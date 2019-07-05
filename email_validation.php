@@ -1,4 +1,5 @@
 <?php
+
 namespace Validation;
 
 class EmailValidator
@@ -20,4 +21,5 @@ class EmailValidator
         }
     }
 }
+
 EmailValidator::main($argc, $argv);

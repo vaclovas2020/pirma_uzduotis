@@ -4,21 +4,21 @@ namespace CLI;
 
 class ExecDurationCalculator
 {
-    private $begin_time = 0.0;
-    private $end_time = 0.0;
+    private $beginTime = 0.0;
+    private $endTime = 0.0;
 
     public function start(): void
     {
-        $this->begin_time = microtime(true);
+        $this->beginTime = microtime(true);
     }
 
     public function finish(): void
     {
-        $this->end_time = microtime(true);
+        $this->endTime = microtime(true);
     }
 
     function getDuration(): float
     {
-        return $this->end_time - $this->begin_time;
+        return $this->endTime - $this->beginTime;
     }
 }
