@@ -3,7 +3,6 @@ namespace Hyphenation;
 
 class Pattern{
     private $pattern_chars = array();
-    private $pattern_length = 0;
     private $position_at_word = 0;
 
     private function extractPattern(string $pattern): array{
@@ -32,15 +31,22 @@ class Pattern{
     public function __construct(string $pattern, int $position_at_word){
         $this->splitPattern($pattern);
         $this->position_at_word = $position_at_word;
-        $no_counts = preg_replace('/[0-9]+/', '',$pattern);
-        $this->pattern_length = strlen($no_counts);
+    }
+
+    public function putCountToPatternChar(string $char, int $count){
+        foreach ($this->pattern_chars as $pattern_char){
+            if ($pattern_char->getChar() == $char){
+                $pattern_char->setCount($count);
+                break;
+            }
+        }
     }
 
     public function getPatternChars(): array{
         return $this->pattern_chars;
     }
 
-    public function getPatternLength(): int{
-        return $this->pattern_length;
+    public function getPositionAtWord(): int{
+        return $this->position_at_word;
     }
 }

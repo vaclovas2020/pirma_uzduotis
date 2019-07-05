@@ -4,26 +4,32 @@
 namespace CLI;
 
 use Hyphenation\PatternDataLoader;
+use Hyphenation\PatternTools;
+use IO\FileReader;
 use IO\ResultPrinter;
 
 class Main
 {
     private static $resultPrinter;
+    private static $result_str = '';
 
     private static function choose_option(string $choose){
         global $argv;
+        global $argc;
         switch($choose){
             case '-w': // hyphenate one word
                 $word = $argv[2];
-                self::$resultPrinter = new ResultPrinter();
+                PatternTools::word_hyphenation($word);
+                self::$result_str = PatternTools::get_word_hyphenation_result_string();
                 break;
             case '-p': // hyphenate all paragraph or one sentence
                 $text = $argv[2];
-                self::$resultPrinter = new ResultPrinter();
+                self::$result_str = PatternTools::hyphernate_text($text);
                 break;
             case '-f': // hyphenate all text from given file
                 $filename = $argv[2];
-                self::$resultPrinter = new ResultPrinter();
+                $text = FileReader::readTextFromFile($filename);
+                self::$result_str = PatternTools::hyphernate_text($text);
                 break;
             default:
                 echo "Unknown '$choose' parameter.";
@@ -40,6 +46,7 @@ class Main
             $exec_calc = new ExecDurationCalculator();
             $exec_calc->start();
             self::choose_option($choose);
+            self::$resultPrinter = new ResultPrinter(self::$result_str);
             $exec_calc->finish();
             $exec_duration = $exec_calc->getDuration();
             if ($argc > 3){ // save result to file
