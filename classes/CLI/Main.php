@@ -15,7 +15,6 @@ class Main
 
     private static function choose_option(string $choose){
         global $argv;
-        global $argc;
         switch($choose){
             case '-w': // hyphenate one word
                 $word = $argv[2];
