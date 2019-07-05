@@ -51,7 +51,12 @@ class Main
             $exec_duration = $exec_calc->getDuration();
             if ($argc > 3){ // save result to file
                 $filename = $argv[3];
-                self::$resultPrinter->writeToFile($filename);
+                if (self::$resultPrinter->writeToFile($filename)){
+                    echo "Result saved to file '$filename'\n";
+                }
+                else{
+                    echo "Error: can not save result to file '$filename'";
+                }
             }
             else{
                 self::$resultPrinter->printToScreen();
