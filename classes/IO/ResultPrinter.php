@@ -3,10 +3,8 @@
 class ResultPrinter implements iFileWriter{
     private $result_str = '';
 
-    public function _construct(array $result_array){
-        foreach ($result_array as $char_data){
-            $this->result_str .= $char_data->toString();
-        }
+    public function __construct(string $result_str){
+            $this->result_str = $result_str;
     }
 
     public function writeToFile(string $filename): bool{
