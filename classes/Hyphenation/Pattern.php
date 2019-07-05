@@ -7,6 +7,22 @@ class Pattern
     private $patternChars = array();
     private $positionAtWord = 0;
 
+    public function __construct(string $pattern, int $positionAtWord)
+    {
+        $this->splitPattern($pattern);
+        $this->positionAtWord = $positionAtWord;
+    }
+
+    public function getPatternChars(): array
+    {
+        return $this->patternChars;
+    }
+
+    public function getPositionAtWord(): int
+    {
+        return $this->positionAtWord;
+    }
+
     private function extractPattern(string $pattern): array
     {
         $chars = array();
@@ -17,7 +33,7 @@ class Pattern
     private function extractPatternEndCount(string $pattern): array
     {
         $endCount = array();
-        preg_match_all('/[0-9]+$/', $pattern, $end_count);
+        preg_match_all('/[0-9]+$/', $pattern, $endCount);
         return $endCount;
     }
 
@@ -35,21 +51,5 @@ class Pattern
                 array_push($this->patternChars, $patternChar);
             }
         }
-    }
-
-    public function __construct(string $pattern, int $positionAtWord)
-    {
-        $this->splitPattern($pattern);
-        $this->positionAtWord = $positionAtWord;
-    }
-
-    public function getPatternChars(): array
-    {
-        return $this->patternChars;
-    }
-
-    public function getPositionAtWord(): int
-    {
-        return $this->positionAtWord;
     }
 }

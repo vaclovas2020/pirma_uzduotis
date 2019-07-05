@@ -18,7 +18,7 @@ class HyphenationChar
         return $this->char;
     }
 
-    public function setCount(int $count)
+    public function setCount(int $count): void
     {
         $this->count = $count;
     }

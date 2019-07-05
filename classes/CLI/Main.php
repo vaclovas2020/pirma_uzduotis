@@ -13,7 +13,6 @@ class Main
     {
         if ($argc >= 3) {
             $choose = $argv[1]; // -w one word, -p paragraph, -f file
-            PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME);
             $execCalc = new ExecDurationCalculator();
             $execCalc->start();
             $resultStr = UserInput::textHyphenationUI($choose, $argv[2]);

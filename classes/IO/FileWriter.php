@@ -1,4 +1,6 @@
-<?php namespace IO;
+<?php
+
+namespace IO;
 
 class FileWriter implements FileWriterInterface
 {

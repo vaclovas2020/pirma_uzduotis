@@ -5,26 +5,26 @@ namespace Hyphenation;
 class WordHyphenationTool
 {
 
-    public function oneWordHyphenation(string $word): string
+    public function oneWordHyphenation(array &$allPatterns, string $word): string
     {
-        $patterns = $this->findPatternsAtWord(strtolower($word));
+        $patterns = $this->findPatternsAtWord($allPatterns, strtolower($word));
         $result = $this->pushAllPatternsToWord($word, $patterns);
-        $result_str = '';
-        foreach ($result as $char_data) {
-            $result_str .= $char_data->toString();
+        $resultStr = '';
+        foreach ($result as $charData) {
+            $resultStr .= $charData->toString();
         }
-        return $result_str;
+        return $resultStr;
     }
 
-    public function hyphenateAllText(string $text): string
+    public function hyphenateAllText(array &$allPatterns, string $text): string
     {
         $words = array();
         preg_match_all('/[a-zA-Z]+[.,!?;:]*/', $text, $words);
         foreach ($words as $x => $y) {
             foreach ($y as $word) {
                 $word = preg_replace('/[.,!?;:]+/', '', $word);
-                $hyphenated_word = $this->oneWordHyphenation($word);
-                $text = str_replace($word, $hyphenated_word, $text);
+                $hyphenatedWord = $this->oneWordHyphenation($allPatterns, $word);
+                $text = str_replace($word, $hyphenatedWord, $text);
             }
         }
         return $text;
@@ -42,7 +42,7 @@ class WordHyphenationTool
 
     private function saveToPatternObjArray(array & $patterns, string $pattern, int $positionAtWord): void
     {
-        $patternObj = new Pattern($pattern, $positionAtWord);
+        $patternObj = new Pattern(str_replace('.', '', $pattern), $positionAtWord);
         array_push($patterns, $patternObj);
     }
 
@@ -67,10 +67,10 @@ class WordHyphenationTool
         return $pos;
     }
 
-    private function findPatternsAtWord(string $word): array
+    private function findPatternsAtWord(array &$allPatterns, string $word): array
     {
         $patterns = array();
-        foreach (PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME) as $pattern) {
+        foreach ($allPatterns as $pattern) {
             $noCounts = preg_replace('/[0-9]+/', '', $pattern);
             $pos = $this->findPatternPositionAtWord($word, $noCounts);
             if ($this->isDotAtBegin($pattern)) {

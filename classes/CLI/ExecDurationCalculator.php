@@ -17,7 +17,7 @@ class ExecDurationCalculator
         $this->endTime = microtime(true);
     }
 
-    function getDuration(): float
+    public function getDuration(): float
     {
         return $this->endTime - $this->beginTime;
     }
