@@ -6,7 +6,7 @@ Vaclovas lapinskis
 
 require_once('function.print_result.php');
 
-require_once('classes/Core\AutoLoader/Core\AutoLoader.php');
+require_once('classes/Core/AutoLoader.php');
 Core\AutoLoader::register();
 
 /* split full pattern to one number and one char and save all split parts to array */
