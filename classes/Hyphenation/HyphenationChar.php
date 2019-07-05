@@ -6,7 +6,7 @@ class HyphenationChar{
     protected $char;
     protected $count;
 
-    public function __construct(string $char = '', int $count = 0){
+    public function __construct(string $char, int $count){
         $this->char = $char;
         $this->count = $count;
     }

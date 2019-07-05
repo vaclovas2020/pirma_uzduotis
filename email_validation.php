@@ -8,10 +8,8 @@ class EmailValidator
         return preg_match('/[a-z._0-9]+[@]{1}[a-z._0-9]+[.]{1}[a-z0-9]{2,}/i', $email) === 1;
     }
 
-    public static function main()
+    public static function main(int $argc, array $argv)
     {
-        global $argc;
-        global $argv;
         if ($argc == 2) {
             $email = $argv[1];
             if (self::email_validation($email)) {
@@ -22,4 +20,4 @@ class EmailValidator
         }
     }
 }
-EmailValidator::main();
+EmailValidator::main($argc, $argv);

@@ -2,8 +2,8 @@
 namespace Hyphenation;
 
 class Pattern{
-    private $pattern_chars = array();
-    private $position_at_word = 0;
+    private $patternChars = array();
+    private $positionAtWord = 0;
 
     private function extractPattern(string $pattern): array{
         $chars = array();
@@ -18,31 +18,30 @@ class Pattern{
     }
 
     private function splitPattern(string $pattern){
-        $no_counts = preg_replace('/[0-9]+/','',$pattern);
+        $noCounts = preg_replace('/[0-9]+/','',$pattern);
         $chars = array_merge($this->extractPattern($pattern), $this->extractPatternEndCount($pattern));
         foreach ($chars as $x => $y){
             foreach ($y as $char){
-                $char_no_counts = preg_replace('/[0-9]+/','',$char);
-                $char_num = (!empty($char_no_counts))?
-                    strpos($no_counts, $char_no_counts):
-                    strlen($no_counts);
-                $patternChar = new PatternChar($char_num);
-                $patternChar->splitCharAndNumber($char);
-                array_push($this->pattern_chars, $patternChar);
+                $charNoCounts = preg_replace('/[0-9]+/','',$char);
+                $charNum = (!empty($charNoCounts))?
+                    strpos($noCounts, $charNoCounts):
+                    strlen($noCounts);
+                $patternChar = new PatternChar($char, $charNum);
+                array_push($this->patternChars, $patternChar);
             }
         }
     }
     
-    public function __construct(string $pattern, int $position_at_word){
+    public function __construct(string $pattern, int $positionAtWord){
         $this->splitPattern($pattern);
-        $this->position_at_word = $position_at_word;
+        $this->positionAtWord = $positionAtWord;
     }
 
     public function getPatternChars(): array{
-        return $this->pattern_chars;
+        return $this->patternChars;
     }
 
     public function getPositionAtWord(): int{
-        return $this->position_at_word;
+        return $this->positionAtWord;
     }
 }
