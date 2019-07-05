@@ -56,16 +56,6 @@ function save_pattern_to_result(array &$result, string $pattern, int $pos, strin
     array_push($result, array('pos'=>$pos, 'char_counts'=>$char_counts, 'pattern_length'=>strlen($no_counts)));
 }
 
-/* check if pattern has dot at begin */
-function isDotAtBegin(string $pattern){
-    return preg_match('/^[.]{1}/',$pattern) === 1;
-}
-
-/* check if pattern has dot at end */
-function isDotAtEnd(string $pattern){
-    return preg_match('/[.]{1}$/',$pattern) === 1;
-}
-
 /* find pattern position at word begin */
 function find_pattern_position_at_word_begin(array &$result, string $word, string $no_counts, string $pattern){
     $pos = strpos($word, substr($no_counts, 1));
@@ -94,10 +84,10 @@ function find_pattern_position_at_word(array &$result, string $word, string $no_
 function find_patterns(array &$result, array &$data, string $word){
     foreach ($data as $pattern){
         $no_counts = preg_replace('/[0-9]+/', '',$pattern);
-        if (isDotAtBegin($pattern)){
+        if (Hyphenation\PatternTools::isDotAtBegin($pattern)){
             find_pattern_position_at_word_begin($result, $word, $no_counts, $pattern);
         }
-        else if(isDotAtEnd($pattern)){
+        else if(Hyphenation\PatternTools::isDotAtEnd($pattern)){
             find_pattern_position_at_word_end($result, $word, $no_counts, $pattern);
         }
         else{
