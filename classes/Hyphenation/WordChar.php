@@ -8,6 +8,7 @@ class WordChar extends HyphenationChar
 
     public function __construct(string $char, int $count, int $positionAtWord)
     {
+        /** @noinspection PhpParamsInspection */
         parent::__construct($char, $count);
         $this->positionAtWord = $positionAtWord;
     }
