@@ -24,7 +24,7 @@ class UserInput
                 $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $input);
                 break;
             case '-f': // hyphenate all text from given file
-                $text = (new FileReader)->readTextFromFile($input);
+                $text = (new FileReader)->readTextFromFile($input, $logger);
                 if ($text === false) {
                     return false;
                 }

@@ -5,19 +5,21 @@ namespace IO;
 
 
 use ErrorException;
+use Log\LoggerInterface;
+use Log\LogLevel;
 
 class FileReader
 {
-    public function readTextFromFile(string $fileName): string
+    public function readTextFromFile(string $fileName, LoggerInterface $logger): string
     {
         try {
             $text = @file_get_contents($fileName);
             if ($text === false) {
-                throw new ErrorException("ERROR: Cannot read file '$fileName'!");
+                throw new ErrorException("Cannot read text file '$fileName'!");
             }
             return $text;
         } catch (ErrorException $e) {
-            echo $e->getMessage();
+            $logger->log(LogLevel::ERROR, $e->getMessage());
         }
         return false;
     }
