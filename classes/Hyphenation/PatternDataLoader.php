@@ -8,7 +8,7 @@ class PatternDataLoader
 {
     public const DEFAULT_FILENAME = 'tex-hyphenation-patterns.txt';
 
-    static public function loadDataFromFile(string $filename): array
+    public static function loadDataFromFile(string $filename): array
     {
         $patternData = array();
         $file = new SplFileObject($filename, 'r');
