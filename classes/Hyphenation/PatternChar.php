@@ -14,11 +14,6 @@ class PatternChar extends HyphenationChar
         $this->charNum = $charNum;
     }
 
-    public function __toString(): string
-    {
-        return (($this->charNum > 0)?$this->charNum:'') .$this->char;
-    }
-
     public function getCharNum(): int
     {
         return $this->charNum;
