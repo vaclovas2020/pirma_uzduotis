@@ -66,7 +66,7 @@ class Logger implements LoggerInterface
 
     public function log(string $level, string $message, array $context = array()): void
     {
-        switch($level){
+        switch ($level) {
             case LogLevel::EMERGENCY:
                 $this->emergency($message, $context);
                 break;
