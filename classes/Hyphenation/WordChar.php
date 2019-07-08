@@ -12,6 +12,11 @@ class WordChar extends HyphenationChar
         $this->positionAtWord = $positionAtWord;
     }
 
+    public function __debugInfo()
+    {
+        return (($this->char > 0)?$this->char:'') .$this->char;
+    }
+
     public function __toString(): string
     {
         $str = '';
