@@ -22,6 +22,10 @@ class WordHyphenationTool
         foreach ($result as $charData) {
             $resultStr .= $charData;
         }
+        $this->logger->info("Word '{word}' hyphenate to '{hyphenateWord}'", array(
+            'word' => $word,
+            'hyphenateWord' => $resultStr
+        ));
         return $resultStr;
     }
 
@@ -134,7 +138,7 @@ class WordHyphenationTool
         foreach ($result as $wordPattern) {
             $resultStr .= $wordPattern->__debugInfo();
         }
-        $this->logger->notice("Word '{word}' transformed to '{resultStr}",
+        $this->logger->notice("Word '{word}' transformed to '{resultStr}'",
             array(
                 'resultStr' => $resultStr,
                 'word' => $word
