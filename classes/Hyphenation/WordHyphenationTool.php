@@ -128,6 +128,18 @@ class WordHyphenationTool
         }
     }
 
+    private function printResultArrayToLog(array &$result, string $word){
+        $resultStr = '';
+        foreach ($result as $wordPattern){
+            $resultStr .= $wordPattern->__debugInfo();
+        }
+        $this->logger->notice("Word '{word}' transformed to '{resultStr}",
+            array(
+                'resultStr' => $resultStr,
+                'word' => $word
+            ));
+    }
+
     private function pushAllPatternsToWord(string $word, array &$patterns): array
     {
         $result = array();
@@ -137,6 +149,7 @@ class WordHyphenationTool
         foreach ($patterns as $patternData) {
             $this->pushPatternDataToWord($result, $patternData);
         }
+        $this->printResultArrayToLog($result, $word);
         return $result;
     }
 }
