@@ -22,7 +22,7 @@ class WordHyphenationTool
         foreach ($result as $charData) {
             $resultStr .= $charData;
         }
-        $this->logger->info("Word '{word}' hyphenate to '{hyphenateWord}'", array(
+        $this->logger->info("Word '{word}' hyphenated to '{hyphenateWord}'", array(
             'word' => $word,
             'hyphenateWord' => $resultStr
         ));
