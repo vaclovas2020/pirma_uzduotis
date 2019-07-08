@@ -14,7 +14,7 @@ class WordChar extends HyphenationChar
 
     public function __debugInfo()
     {
-        return (($this->char > 0)?$this->char:'') .$this->char;
+        return (($this->count > 0)?$this->count:'') .$this->char;
     }
 
     public function __toString(): string
