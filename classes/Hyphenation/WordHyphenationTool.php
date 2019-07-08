@@ -20,7 +20,7 @@ class WordHyphenationTool
         $result = $this->pushAllPatternsToWord($word, $patterns);
         $resultStr = '';
         foreach ($result as $charData) {
-            $resultStr .= $charData->toString();
+            $resultStr .= $charData;
         }
         return $resultStr;
     }
