@@ -94,7 +94,21 @@ class WordHyphenationTool
                 $this->saveToPatternObjArray($patterns, $pattern, $pos);
             }
         }
+        $this->printFoundedPatternsToLog($patterns, $word);
         return $patterns;
+    }
+
+    private function printFoundedPatternsToLog(array &$patterns, string $word): void
+    {
+        $patternsListStr = "\n";
+        foreach ($patterns as $pattern) {
+            $patternsListStr .= "$pattern\n";
+        }
+        $this->logger->notice("Founded patterns for word '{word}': {patterns}",
+            array(
+                'patterns' => $patternsListStr,
+                'word' => $word
+            ));
     }
 
     private function pushPatternDataToWord(array &$result, Pattern $patternData): void
