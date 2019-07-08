@@ -18,11 +18,14 @@ class UserInput
         switch ($choice) {
             case '-w': // hyphenate one word
                 $resultStr = $hyphenationTool->oneWordHyphenation($allPatterns, $input);
+                $logger->info("Chosen hyphenate one word '{word}'", array('word'=>$input));
                 break;
             case '-p': // hyphenate all paragraph or one sentence
                 $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $input);
+                $logger->info("Chosen hyphenate paragraph /sentence '{text}'", array('text'=>$input));
                 break;
             case '-f': // hyphenate all text from given file
+                $logger->info("Chosen hyphenate from text file '{filename}'", array('filename'=>$input));
                 $status = (new FileReader)->readTextFromFile($input, $resultStr, $logger);
                 if ($status === false) {
                     return false;
