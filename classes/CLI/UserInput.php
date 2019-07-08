@@ -17,12 +17,12 @@ class UserInput
         $allPatterns = PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME);
         switch ($choice) {
             case '-w': // hyphenate one word
-                $resultStr = $hyphenationTool->oneWordHyphenation($allPatterns, $input);
                 $logger->info("Chosen hyphenate one word '{word}'", array('word'=>$input));
+                $resultStr = $hyphenationTool->oneWordHyphenation($allPatterns, $input);
                 break;
             case '-p': // hyphenate all paragraph or one sentence
-                $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $input);
                 $logger->info("Chosen hyphenate paragraph /sentence '{text}'", array('text'=>$input));
+                $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $input);
                 break;
             case '-f': // hyphenate all text from given file
                 $logger->info("Chosen hyphenate from text file '{filename}'", array('filename'=>$input));

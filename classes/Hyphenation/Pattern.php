@@ -13,15 +13,6 @@ class Pattern
         $this->positionAtWord = $positionAtWord;
     }
 
-    public function __toString(): string
-    {
-        $str = '';
-        foreach ($this->patternChars as $patternChar){
-            $str .= $patternChar;
-        }
-        return $str;
-    }
-
     public function getPatternChars(): array
     {
         return $this->patternChars;
