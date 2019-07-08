@@ -12,7 +12,7 @@ class WordChar extends HyphenationChar
         $this->positionAtWord = $positionAtWord;
     }
 
-    public function toString(): string
+    public function __toString(): string
     {
         $str = '';
         if ($this->count % 2 > 0 && $this->positionAtWord > 0) {
