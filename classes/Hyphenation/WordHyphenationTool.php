@@ -79,31 +79,32 @@ class WordHyphenationTool
     private function findPatternsAtWord(array &$allPatterns, string $word): array
     {
         $patterns = array();
+        $patternsListStr = "\n";
         foreach ($allPatterns as $pattern) {
             $noCounts = preg_replace('/[0-9]+/', '', $pattern);
             $pos = $this->findPatternPositionAtWord($word, $noCounts);
             if ($this->isDotAtBegin($pattern)) {
                 if ($this->isPatternAtWordBegin($word, $noCounts)) {
                     $this->saveToPatternObjArray($patterns, $pattern, $pos);
+                    $patternsListStr .= "$pattern\n";
                 }
             } else if ($this->isDotAtEnd($pattern)) {
                 if ($this->isPatternAtWordEnd($word, $noCounts)) {
                     $this->saveToPatternObjArray($patterns, $pattern, $pos);
+                    $patternsListStr .= "$pattern\n";
                 }
             } else if ($pos !== -1) {
                 $this->saveToPatternObjArray($patterns, $pattern, $pos);
+                $patternsListStr .= "$pattern\n";
             }
         }
-        $this->printFoundedPatternsToLog($patterns, $word);
+        $this->printFoundedPatternsToLog($patternsListStr, $word);
         return $patterns;
     }
 
-    private function printFoundedPatternsToLog(array &$patterns, string $word): void
+    private function printFoundedPatternsToLog(string $patternsListStr, string $word): void
     {
-        $patternsListStr = "\n";
-        foreach ($patterns as $pattern) {
-            $patternsListStr .= "$pattern\n";
-        }
+
         $this->logger->notice("Founded patterns for word '{word}': {patterns}",
             array(
                 'patterns' => $patternsListStr,
