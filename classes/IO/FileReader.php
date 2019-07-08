@@ -11,7 +11,7 @@ class FileReader
     public function readTextFromFile(string $fileName): string
     {
         try {
-            $text = file_get_contents($fileName);
+            $text = @file_get_contents($fileName);
             if ($text === false) {
                 throw new ErrorException("ERROR: Cannot read file '$fileName'!");
             }
