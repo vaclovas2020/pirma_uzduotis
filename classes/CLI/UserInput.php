@@ -7,13 +7,14 @@ namespace CLI;
 use Hyphenation\PatternDataLoader;
 use Hyphenation\WordHyphenationTool;
 use IO\FileReader;
+use Log\LoggerInterface;
 
 class UserInput
 {
-    public function textHyphenationUI(string $choice, string $input): string
+    public function textHyphenationUI(string $choice, string $input, LoggerInterface $logger): string
     {
         $resultStr = '';
-        $hyphenationTool = new WordHyphenationTool();
+        $hyphenationTool = new WordHyphenationTool($logger);
         $allPatterns = PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME);
         switch ($choice) {
             case '-w': // hyphenate one word

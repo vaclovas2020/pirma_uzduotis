@@ -2,8 +2,17 @@
 
 namespace Hyphenation;
 
+use Log\LoggerInterface;
+
 class WordHyphenationTool
 {
+
+    private $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     public function oneWordHyphenation(array &$allPatterns, string $word): string
     {

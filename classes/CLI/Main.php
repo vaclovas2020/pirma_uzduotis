@@ -4,6 +4,7 @@
 namespace CLI;
 
 use IO\FileWriter;
+use Log\Logger;
 
 class Main
 {
@@ -11,10 +12,11 @@ class Main
     public function main(int $argc, array $argv): void
     {
         if ($argc >= 3) {
+            $logger = new Logger();
             $choose = $argv[1]; // -w one word, -p paragraph, -f file
             $execCalc = new ExecDurationCalculator();
             $execCalc->start();
-            $resultStr = (new UserInput)->textHyphenationUI($choose, $argv[2]);
+            $resultStr = (new UserInput)->textHyphenationUI($choose, $argv[2], $logger);
             if ($resultStr !== false) {
                 $execCalc->finish();
                 $execDuration = $execCalc->getDuration();
@@ -28,8 +30,10 @@ class Main
                 } else {
                     echo $resultStr;
                 }
+                $logger->info("Program execution duration: {execDuration} seconds", array(
+                    'execDuration' => $execDuration
+                ));
             }
-            echo "\nExecution duration: $execDuration seconds\n";
         } else {
             (new Helper())->printHelp();
         }
