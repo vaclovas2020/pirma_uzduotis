@@ -107,7 +107,7 @@ class Logger implements LoggerInterface
     private function formatMessage(string $level, string $message, array $context = array())
     {
         $levelUpperCase = strtoupper($level);
-        $dateTimeStr = (new DateTime())->format('Y-m-d H:i:s');
+        $dateTimeStr = (new DateTime())->format('Y-m-d H:i:s,u');
         $message = $this->interpolate($message, $context);
         return "$dateTimeStr [$levelUpperCase]: $message\n";
     }
