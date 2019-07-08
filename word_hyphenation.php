@@ -10,4 +10,4 @@ require_once('classes/Core/AutoLoader.php');
 Core\AutoLoader::register();
 
 
-Main::main($argc, $argv);
+(new Main())->main($argc, $argv);
