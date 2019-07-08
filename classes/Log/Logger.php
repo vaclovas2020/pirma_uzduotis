@@ -4,6 +4,7 @@
 namespace Log;
 
 
+use DateTime;
 use InvalidArgumentException;
 use SplFileObject;
 
@@ -106,7 +107,9 @@ class Logger implements LoggerInterface
     private function formatMessage(string $level, string $message, array $context = array())
     {
         $levelUpperCase = strtoupper($level);
-        return "$levelUpperCase: " . $this->interpolate($message, $context);
+        $dateTimeStr = (new DateTime())->format('Y-m-d H:i:s');
+        $message = $this->interpolate($message, $context);
+        return "$dateTimeStr [$levelUpperCase]: $message\n";
     }
 
     private function interpolate(string $message, array $context = array()): string
