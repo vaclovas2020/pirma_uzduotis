@@ -11,9 +11,8 @@ use Log\LoggerInterface;
 
 class UserInput
 {
-    public function textHyphenationUI(string $choice, string $input, LoggerInterface $logger): string
+    public function textHyphenationUI(string $choice, string $input, string &$resultStr, LoggerInterface $logger): bool
     {
-        $resultStr = '';
         $hyphenationTool = new WordHyphenationTool($logger);
         $allPatterns = PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME);
         switch ($choice) {
@@ -24,16 +23,17 @@ class UserInput
                 $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $input);
                 break;
             case '-f': // hyphenate all text from given file
-                $text = (new FileReader)->readTextFromFile($input, $logger);
-                if ($text === false) {
+                $status = (new FileReader)->readTextFromFile($input, $resultStr, $logger);
+                if ($status === false) {
                     return false;
                 }
-                $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $text);
+                $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $resultStr);
                 break;
             default:
-                echo "Unknown '$choice' parameter.";
+                $logger->warning("Unknown {choice} parameter.", array('choice' => $choice));
+                return false;
                 break;
         }
-        return $resultStr;
+        return true;
     }
 }

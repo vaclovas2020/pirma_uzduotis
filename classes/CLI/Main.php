@@ -16,8 +16,9 @@ class Main
             $choose = $argv[1]; // -w one word, -p paragraph, -f file
             $execCalc = new ExecDurationCalculator();
             $execCalc->start();
-            $resultStr = (new UserInput)->textHyphenationUI($choose, $argv[2], $logger);
-            if ($resultStr !== false) {
+            $resultStr = '';
+            $status = (new UserInput)->textHyphenationUI($choose, $argv[2], $resultStr, $logger);
+            if ($status !== false) {
                 $execCalc->finish();
                 $execDuration = $execCalc->getDuration();
                 if ($argc > 3) { // save result to file
