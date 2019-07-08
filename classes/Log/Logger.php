@@ -111,12 +111,11 @@ class Logger implements LoggerInterface
 
     private function interpolate(string $message, array $context = array()): string
     {
-        $replace = array();
         foreach ($context as $key => $value) {
             if (!is_array($value) && !is_object($value) || method_exists($value, '__toString')) {
-                $replace['{' . $key . '}'] = $value;
+                $message = str_replace('{' . $key . '}', $value, $message);
             }
         }
-        return strstr($message, $replace);
+        return $message;
     }
 }
