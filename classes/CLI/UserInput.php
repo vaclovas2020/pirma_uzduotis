@@ -10,12 +10,12 @@ use IO\FileReader;
 
 class UserInput
 {
-    public static function textHyphenationUI(string $choose, string $input): string
+    public function textHyphenationUI(string $choice, string $input): string
     {
         $resultStr = '';
         $hyphenationTool = new WordHyphenationTool();
         $allPatterns = PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME);
-        switch ($choose) {
+        switch ($choice) {
             case '-w': // hyphenate one word
                 $resultStr = $hyphenationTool->oneWordHyphenation($allPatterns, $input);
                 break;
@@ -23,11 +23,11 @@ class UserInput
                 $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $input);
                 break;
             case '-f': // hyphenate all text from given file
-                $text = FileReader::readTextFromFile($input);
+                $text = (new FileReader)->readTextFromFile($input);
                 $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $text);
                 break;
             default:
-                echo "Unknown '$choose' parameter.";
+                echo "Unknown '$choice' parameter.";
                 break;
         }
         return $resultStr;

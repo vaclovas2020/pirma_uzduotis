@@ -8,13 +8,13 @@ use IO\FileWriter;
 class Main
 {
 
-    public static function main(int $argc, array $argv): void
+    public function main(int $argc, array $argv): void
     {
         if ($argc >= 3) {
             $choose = $argv[1]; // -w one word, -p paragraph, -f file
             $execCalc = new ExecDurationCalculator();
             $execCalc->start();
-            $resultStr = UserInput::textHyphenationUI($choose, $argv[2]);
+            $resultStr = (new UserInput)->textHyphenationUI($choose, $argv[2]);
             $execCalc->finish();
             $execDuration = $execCalc->getDuration();
             if ($argc > 3) { // save result to file
