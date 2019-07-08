@@ -128,9 +128,10 @@ class WordHyphenationTool
         }
     }
 
-    private function printResultArrayToLog(array &$result, string $word){
+    private function printResultArrayToLog(array &$result, string $word)
+    {
         $resultStr = '';
-        foreach ($result as $wordPattern){
+        foreach ($result as $wordPattern) {
             $resultStr .= $wordPattern->__debugInfo();
         }
         $this->logger->notice("Word '{word}' transformed to '{resultStr}",
