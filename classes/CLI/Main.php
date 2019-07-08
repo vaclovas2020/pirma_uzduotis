@@ -29,7 +29,7 @@ class Main
             }
             echo "\nExecution duration: $execDuration seconds\n";
         } else {
-            Helper::printHelp();
+            (new Helper())->printHelp();
         }
     }
 }

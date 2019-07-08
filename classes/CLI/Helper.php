@@ -4,7 +4,7 @@ namespace CLI;
 
 class Helper
 {
-    static public function printHelp(): void
+    public function printHelp(): void
     {
         echo "Use command 'php word_hyphenation.php -w [word] [save_result_to_file(optional)]' if you want to hyphenate one word.\n";
         echo "Use command 'php word_hyphenation.php -p [paragraph / sentence] [save_result_to_file(optional)]' if you want to hyphenate paragraph / sentence.\n";
