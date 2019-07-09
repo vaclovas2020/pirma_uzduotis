@@ -23,28 +23,17 @@ class Config
         $configStr = @file_get_contents($configFileName);
         if ($configStr !== false) {
             $configData = json_decode($configStr, true);
-            if (isset($configData['logPrintToScreen'])) {
-                $this->logPrintToScreen = $configData['logPrintToScreen'];
-            }
-            if (isset($configData['logWriteToFile'])) {
-                $this->logWriteToFile = $configData['logWriteToFile'];
-            }
-            if (isset($configData['logFilePath'])) {
-                $this->logFilePath = $configData['logFilePath'];
-            }
-            if (isset($configData['cachePath'])) {
-                $this->cachePath = $configData['cachePath'];
-            }
-            if (isset($configData['cacheDefaultTtl'])) {
-                $this->cacheDefaultTtl = $configData['cacheDefaultTtl'];
-            }
-            if (isset($configData['patternsFilePath'])) {
-                $this->patternsFilePath = $configData['patternsFilePath'];
+            if (!$this->applyConfigFileData($configData, array(
+                'logPrintToScreen',
+                'logWriteToFile',
+                'logFilePath',
+                'cachePath',
+                'cacheDefaultTtl',
+                'patternFilePath'))) {
+                $this->createDefaultConfigFile($configFileName);
             }
         } else {
-            if (!$this->createDefaultConfigFile($configFileName)) {
-                throw new RuntimeException("Cannot create default config file '$configFileName'!");
-            }
+            $this->createDefaultConfigFile($configFileName);
         }
     }
 
@@ -75,7 +64,7 @@ class Config
         return $this->patternsFilePath;
     }
 
-    private function createDefaultConfigFile($configFileName): bool
+    private function createDefaultConfigFile($configFileName): void
     {
         $jsonConfig = array(
             'logPrintToScreen' => $this->logPrintToScreen,
@@ -85,7 +74,20 @@ class Config
             'cacheDefaultTtl' => $this->cacheDefaultTtl,
             'patternFilePath' => $this->patternsFilePath
         );
-        return (new FileWriter())->writeToFile($configFileName, json_encode($jsonConfig));
+        if (!(new FileWriter())->writeToFile($configFileName, json_encode($jsonConfig))) {
+            throw new RuntimeException("Cannot create default config file '$configFileName'!");
+        }
+    }
+
+    private function applyConfigFileData(array $configData, array $params): bool
+    {
+        $notAllDataStored = false;
+        foreach ($params as $param) {
+            if (isset($configData[$param])) {
+                $this->{$param} = $configData[$param];
+            } else $notAllDataStored = true;
+        }
+        return !$notAllDataStored;
     }
 
 }
