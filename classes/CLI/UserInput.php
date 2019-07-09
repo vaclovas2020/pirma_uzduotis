@@ -9,7 +9,6 @@ use Hyphenation\WordHyphenationTool;
 use IO\FileReader;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
-use SimpleCache\FileCache;
 
 class UserInput
 {
