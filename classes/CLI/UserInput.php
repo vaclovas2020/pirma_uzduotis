@@ -15,7 +15,7 @@ class UserInput
     public function textHyphenationUI(string $choice, string $input, string &$resultStr, LoggerInterface $logger, CacheInterface $cache): bool
     {
         $hyphenationTool = new WordHyphenationTool($logger, $cache);
-        $allPatterns = PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME,$cache);
+        $allPatterns = PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME, $cache);
         $execCalc = new ExecDurationCalculator();
         $execCalc->start();
         switch ($choice) {

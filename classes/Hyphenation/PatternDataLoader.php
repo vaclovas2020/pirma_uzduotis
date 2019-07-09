@@ -20,9 +20,8 @@ class PatternDataLoader
                 array_push($patternData, str_replace("\n", '', $file->fgets()));
             }
             $file = null;
-            $cache->set($hash,$patternData);
-        }
-        else{
+            $cache->set($hash, $patternData);
+        } else {
             $patternData = $cachedData;
         }
         return $patternData;
