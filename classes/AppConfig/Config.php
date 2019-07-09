@@ -5,6 +5,7 @@ namespace AppConfig;
 
 
 use IO\FileWriter;
+use Log\Logger;
 use RuntimeException;
 
 class Config
@@ -33,6 +34,12 @@ class Config
                 throw new RuntimeException("Cannot create default config file '$configFileName'!");
             }
         }
+    }
+
+    public function applyLoggerConfig(Logger $logger): bool{
+        $logger->setPrintToScreen($this->logPrintToScreen);
+        $logger->setWriteToFile($this->logWriteToFile);
+        return true;
     }
 
     public function isLogPrintToScreen(): bool
