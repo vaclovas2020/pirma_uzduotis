@@ -15,7 +15,6 @@ class PatternDataLoader
     {
         $patternData = array();
         $execCalc = new ExecDurationCalculator();
-        $execCalc->start();
         $hash = @sha1_file($fileName);
         $cachedData = $cache->get($hash);
         $source = "from file '$fileName'";
@@ -30,8 +29,7 @@ class PatternDataLoader
             $patternData = $cachedData;
             $source = 'from cache';
         }
-        $execCalc->finish();
-        $execDuration = $execCalc->getDuration();
+        $execDuration = $execCalc->finishAndGetDuration();
         $logger->notice("Patterns list read {from} time: {execDuration} seconds", array(
             'execDuration' => $execDuration,
             'from' => $source

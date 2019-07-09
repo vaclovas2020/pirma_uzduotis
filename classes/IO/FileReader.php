@@ -15,7 +15,6 @@ class FileReader
     public function readTextFromFile(string $fileName, string &$text, LoggerInterface $logger, CacheInterface $cache): bool
     {
         $execCalc = new ExecDurationCalculator();
-        $execCalc->start();
         $hash = @sha1_file($fileName);
         $cachedText = $cache->get($hash);
         $source = "from file '$fileName'";
@@ -34,8 +33,7 @@ class FileReader
             $text = $cachedText;
             $source = 'from cache';
         }
-        $execCalc->finish();
-        $execDuration = $execCalc->getDuration();
+        $execDuration = $execCalc->finishAndGetDuration();
         $logger->notice("Text read {from} time: {execDuration} seconds", array(
             'execDuration' => $execDuration,
             'from' => $source

@@ -20,7 +20,6 @@ class UserInput
         $allPatterns = PatternDataLoader::loadDataFromFile($config->getPatternsFilePath(),
             $cache, $logger);
         $execCalc = new ExecDurationCalculator();
-        $execCalc->start();
         switch ($choice) {
             case '-w': // hyphenate one word
                 $logger->info("Chosen hyphenate one word '{word}'", array('word' => $input));
@@ -53,8 +52,7 @@ class UserInput
                 return false;
                 break;
         }
-        $execCalc->finish();
-        $execDuration = $execCalc->getDuration();
+        $execDuration = $execCalc->finishAndGetDuration();
         $logger->info("Text hyphenation algorithm execution duration: {execDuration} seconds", array(
             'execDuration' => $execDuration
         ));
