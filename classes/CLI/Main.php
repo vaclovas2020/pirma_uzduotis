@@ -3,6 +3,7 @@
 
 namespace CLI;
 
+use AppConfig\Config;
 use IO\FileWriter;
 use Log\Logger;
 use SimpleCache\FileCache;
@@ -10,10 +11,11 @@ use SimpleCache\FileCache;
 class Main
 {
 
-    public function main(int $argc, array $argv): void
+    public function main(int $argc, array $argv, Config $config): void
     {
         if ($argc >= 3) {
-            $logger = new Logger();
+            $logger = new Logger($config->getLogFilePath());
+            $config->applyLoggerConfig($logger);
             $cache = new FileCache();
             $choose = $argv[1]; // -w one word, -p paragraph, -f file
             $execCalc = new ExecDurationCalculator();
