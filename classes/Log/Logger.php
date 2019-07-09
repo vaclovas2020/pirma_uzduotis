@@ -11,15 +11,20 @@ use SplFileObject;
 class Logger implements LoggerInterface
 {
     private $fileName;
-    private $printToScreenAlso = false;
+    private $printToScreen = false;
+    private $writeToFile = true;
 
     public function __construct(string $fileName = 'word_hyphenation.log')
     {
         $this->fileName = $fileName;
     }
 
-    public function setPrintToScreenAlso(bool $printToAScreenAlso){
-        $this->printToScreenAlso = $printToAScreenAlso;
+    public function setPrintToScreen(bool $printToAScreen){
+        $this->printToScreen = $printToAScreen;
+    }
+
+    public function setWriteToFile(bool $writeToFile){
+        $this->writeToFile = $writeToFile;
     }
 
     public function emergency(string $message, array $context = array()): void
@@ -105,15 +110,17 @@ class Logger implements LoggerInterface
 
     private function writeToLogFile(string $message): void
     {
-        $file = new SplFileObject($this->fileName, 'a');
-        $file->fwrite($message);
-        $file = null;
+        if ($this->writeToFile) {
+            $file = new SplFileObject($this->fileName, 'a');
+            $file->fwrite($message);
+            $file = null;
+        }
         $this->printToScreenIfNeeded($message);
     }
 
     private function printToScreenIfNeeded(string $message): void{
-        if ($this->printToScreenAlso){
-            echo "$message\n";
+        if ($this->printToScreen){
+            echo $message;
         }
     }
 
