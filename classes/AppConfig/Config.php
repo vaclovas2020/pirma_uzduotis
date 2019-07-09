@@ -34,7 +34,7 @@ class Config
                 $this->cachePath = $configData['cachePath'];
             }
             if (isset($configData['cacheDefaultTtl'])) {
-                $this->cachePath = $configData['cacheDefaultTtl'];
+                $this->cacheDefaultTtl = $configData['cacheDefaultTtl'];
             }
         } else {
             if (!$this->createDefaultConfigFile($configFileName)) {
