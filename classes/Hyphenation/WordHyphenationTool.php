@@ -3,29 +3,40 @@
 namespace Hyphenation;
 
 use Log\LoggerInterface;
+use SimpleCache\CacheInterface;
 
 class WordHyphenationTool
 {
 
     private $logger;
+    private $cache;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, CacheInterface $cache)
     {
         $this->logger = $logger;
+        $this->cache = $cache;
     }
 
     public function oneWordHyphenation(array &$allPatterns, string $word): string
     {
-        $patterns = $this->findPatternsAtWord($allPatterns, strtolower($word));
-        $result = $this->pushAllPatternsToWord($word, $patterns);
+        $hash = sha1($word);
+        $resultCache = $this->cache->get($hash);
         $resultStr = '';
-        foreach ($result as $charData) {
-            $resultStr .= $charData;
+        if ($resultCache === null) {
+            $patterns = $this->findPatternsAtWord($allPatterns, strtolower($word));
+            $result = $this->pushAllPatternsToWord($word, $patterns);
+            foreach ($result as $charData) {
+                $resultStr .= $charData;
+            }
+            $this->logger->info("Word '{word}' hyphenated to '{hyphenateWord}'", array(
+                'word' => $word,
+                'hyphenateWord' => $resultStr
+            ));
+            $this->cache->set($hash, $resultStr);
         }
-        $this->logger->info("Word '{word}' hyphenated to '{hyphenateWord}'", array(
-            'word' => $word,
-            'hyphenateWord' => $resultStr
-        ));
+        else{
+            $resultStr = $resultCache;
+        }
         return $resultStr;
     }
 

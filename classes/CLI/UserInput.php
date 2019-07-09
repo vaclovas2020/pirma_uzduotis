@@ -8,12 +8,13 @@ use Hyphenation\PatternDataLoader;
 use Hyphenation\WordHyphenationTool;
 use IO\FileReader;
 use Log\LoggerInterface;
+use SimpleCache\FileCache;
 
 class UserInput
 {
     public function textHyphenationUI(string $choice, string $input, string &$resultStr, LoggerInterface $logger): bool
     {
-        $hyphenationTool = new WordHyphenationTool($logger);
+        $hyphenationTool = new WordHyphenationTool($logger, new FileCache());
         $allPatterns = PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME);
         switch ($choice) {
             case '-w': // hyphenate one word
