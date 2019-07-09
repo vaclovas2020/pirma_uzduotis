@@ -13,7 +13,7 @@ class FileCache implements CacheInterface
     private const INVALID_KEY_MESSAGE = "Wrong cache key given. Key support only these characters [0-9A-Za-z_.]\n 
     Key length must be not longer than 64 characters.";
 
-    public function __construct(string $cachePath = "cache", int $defaultTtl = 300)
+    public function __construct(string $cachePath = "cache", int $defaultTtl = 3600)
     {
         $this->cachePath = $cachePath;
         $this->defaultTtl = $defaultTtl;
