@@ -12,10 +12,12 @@ use SimpleCache\CacheInterface;
 
 class UserInput
 {
-    public function textHyphenationUI(string $choice, string $input, string &$resultStr, LoggerInterface $logger, CacheInterface $cache): bool
+    public function textHyphenationUI(string $choice, string $input, string &$resultStr,
+                                      LoggerInterface $logger, CacheInterface $cache): bool
     {
         $hyphenationTool = new WordHyphenationTool($logger, $cache);
-        $allPatterns = PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME, $cache, $logger);
+        $allPatterns = PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME,
+            $cache, $logger);
         $execCalc = new ExecDurationCalculator();
         $execCalc->start();
         switch ($choice) {
