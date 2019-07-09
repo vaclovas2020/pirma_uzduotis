@@ -15,6 +15,7 @@ class PatternDataLoader
         while (!$file->eof()) {
             array_push($patternData, str_replace("\n", '', $file->fgets()));
         }
+        $file = null;
         return $patternData;
     }
 }

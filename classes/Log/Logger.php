@@ -102,6 +102,7 @@ class Logger implements LoggerInterface
     {
         $file = new SplFileObject($this->fileName, 'a');
         $file->fwrite($message);
+        $file = null;
     }
 
     private function formatMessage(string $level, string $message, array $context = array())
