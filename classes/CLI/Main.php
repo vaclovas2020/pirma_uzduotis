@@ -29,7 +29,7 @@ class Main
                         echo "Error: can not save result to file '$filename'";
                     }
                 } else {
-                    echo $resultStr;
+                    echo "$resultStr\n";
                 }
                 $logger->info("Program execution duration: {execDuration} seconds", array(
                     'execDuration' => $execDuration
