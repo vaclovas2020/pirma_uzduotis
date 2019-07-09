@@ -26,8 +26,7 @@ class FileReader
                 return false;
             }
             $cache->set($hash, $text);
-        }
-        else{
+        } else {
             $text = $cachedText;
         }
         return true;
