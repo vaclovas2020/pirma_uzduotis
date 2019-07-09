@@ -16,6 +16,8 @@ class UserInput
     {
         $hyphenationTool = new WordHyphenationTool($logger, $cache);
         $allPatterns = PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME);
+        $execCalc = new ExecDurationCalculator();
+        $execCalc->start();
         switch ($choice) {
             case '-w': // hyphenate one word
                 $logger->info("Chosen hyphenate one word '{word}'", array('word' => $input));
@@ -48,6 +50,11 @@ class UserInput
                 return false;
                 break;
         }
+        $execCalc->finish();
+        $execDuration = $execCalc->getDuration();
+        $logger->info("Program execution duration: {execDuration} seconds", array(
+            'execDuration' => $execDuration
+        ));
         return true;
     }
 }
