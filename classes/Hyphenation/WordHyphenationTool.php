@@ -33,8 +33,7 @@ class WordHyphenationTool
                 'hyphenateWord' => $resultStr
             ));
             $this->cache->set($hash, $resultStr);
-        }
-        else{
+        } else {
             $resultStr = $resultCache;
             $this->logger->notice("Word '{word}' hyphenated to '{hyphenateWord}' from cache", array(
                 'word' => $word,
@@ -47,12 +46,18 @@ class WordHyphenationTool
     public function hyphenateAllText(array &$allPatterns, string $text): string
     {
         $words = array();
-        preg_match_all('/[a-zA-Z]+[.,!?;:]*/', $text, $words);
+        $count = preg_match_all('/[a-zA-Z]+[.,!?;:]*/', $text, $words);
+        $currentWord = 1;
         foreach ($words as $x => $y) {
             foreach ($y as $word) {
+                $this->logger->info("Processing word {current} / {total}", array(
+                    'current' => $currentWord,
+                    'total' => $count
+                ));
                 $word = preg_replace('/[.,!?;:]+/', '', $word);
                 $hyphenatedWord = $this->oneWordHyphenation($allPatterns, $word);
                 $text = str_replace($word, $hyphenatedWord, $text);
+                $currentWord++;
             }
         }
         return $text;
