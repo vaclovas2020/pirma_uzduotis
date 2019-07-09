@@ -34,15 +34,13 @@ class UserInput
                 $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $resultStr);
                 break;
             case '--clear':
-                if ($input == 'cache'){
-                    if ($cache->clear()){
+                if ($input == 'cache') {
+                    if ($cache->clear()) {
                         $logger->notice('Cache Storage was cleaned.');
-                    }
-                    else{
+                    } else {
                         $logger->error('Cannot clean Cache Storage');
                     }
-                }
-                else $logger->warning("Unknown storage named '{input}'.", array('input' => $input));
+                } else $logger->warning("Unknown storage named '{input}'.", array('input' => $input));
                 return false;
                 break;
             default:
