@@ -18,10 +18,9 @@ class FileCache implements CacheInterface
         }
     }
 
-
     public function get(string $key, $default = null)
     {
-        $path = $this->cachePath . DIRECTORY_SEPARATOR . $key;
+        $path = $this->getCacheFilePathByKey($key);
         if (file_exists($path)) {
             $expiresAt = @filemtime($path);
             if ($expiresAt === false) {
@@ -38,7 +37,7 @@ class FileCache implements CacheInterface
     public function set(string $key, $value, int $ttl = null): bool
     {
         $serializedValue = serialize($value);
-        $path = $this->cachePath . DIRECTORY_SEPARATOR . $key;
+        $path = $this->getCacheFilePathByKey($key);
         if ($ttl === null) {
             $ttl = $this->defaultTtl;
         }
@@ -55,7 +54,7 @@ class FileCache implements CacheInterface
 
     public function delete(string $key): bool
     {
-        $path = $this->cachePath . DIRECTORY_SEPARATOR . $key;
+        $path = $this->getCacheFilePathByKey($key);
         if (file_exists($path)) {
             return @unlink($path);
         } else return true;
@@ -106,7 +105,7 @@ class FileCache implements CacheInterface
 
     public function has(string $key): bool
     {
-        $path = $this->cachePath . DIRECTORY_SEPARATOR . $key;
+        $path = $this->getCacheFilePathByKey($key);
         if (file_exists($path)) {
             $expiresAt = @filemtime($path);
             if ($expiresAt === false) {
@@ -118,5 +117,10 @@ class FileCache implements CacheInterface
             }
             return true;
         } else return false;
+    }
+
+    private function getCacheFilePathByKey(string $key): string
+    {
+        return $this->cachePath . DIRECTORY_SEPARATOR . $key;
     }
 }
