@@ -15,7 +15,7 @@ class Config
     private $logWriteToFile = true;
     private $logFilePath = 'word_hyphenation.log';
     private $cachePath = 'cache';
-    private $cacheDefaultTtl = 3600;
+    private $cacheDefaultTtl = 2592000;
     private $patternsFilePath = PatternDataLoader::DEFAULT_FILENAME;
 
     public function __construct(string $configFileName = "app_config.json")
