@@ -7,6 +7,13 @@ class ExecDurationCalculator
     private $beginTime = 0.0;
     private $endTime = 0.0;
 
+    public function __construct(bool $autoStart = true)
+    {
+        if ($autoStart){
+            $this->start();
+        }
+    }
+
     public function start(): void
     {
         $this->beginTime = microtime(true);
