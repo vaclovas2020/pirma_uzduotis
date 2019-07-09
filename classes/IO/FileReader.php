@@ -30,5 +30,6 @@ class FileReader
         else{
             $text = $cachedText;
         }
+        return true;
     }
 }
