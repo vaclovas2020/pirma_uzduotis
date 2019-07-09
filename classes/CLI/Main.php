@@ -4,7 +4,6 @@
 namespace CLI;
 
 use AppConfig\Config;
-use IO\FileWriter;
 use Log\Logger;
 use SimpleCache\FileCache;
 
@@ -24,16 +23,7 @@ class Main
             $resultStr = '';
             $status = (new UserInput)->textHyphenationUI($choose, $argv[2], $resultStr, $logger, $cache, $config);
             if ($status !== false) {
-                if ($argc > 3) { // save result to file
-                    $filename = $argv[3];
-                    if ((new FileWriter())->writeToFile($filename, $resultStr)) {
-                        echo "Result saved to file '$filename'\n";
-                    } else {
-                        echo "Error: can not save result to file '$filename'";
-                    }
-                } else {
-                    echo "$resultStr\n";
-                }
+                (new UserOutput())->outputToUser($argc, $argv, $resultStr);
             }
             $execDuration = $execCalc->finishAndGetDuration();
             $logger->notice("Program execution duration: {execDuration} seconds", array(
