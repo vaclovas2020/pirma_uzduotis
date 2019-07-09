@@ -36,6 +36,10 @@ class WordHyphenationTool
         }
         else{
             $resultStr = $resultCache;
+            $this->logger->notice("Word '{word}' hyphenated to '{hyphenateWord}' from cache", array(
+                'word' => $word,
+                'hyphenateWord' => $resultStr
+            ));
         }
         return $resultStr;
     }
