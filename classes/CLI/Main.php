@@ -19,7 +19,7 @@ class Main
             $cache = new FileCache($config->getCachePath(), $config->getCacheDefaultTtl());
             $choose = $argv[1]; // -w one word, -p paragraph, -f file
             $resultStr = '';
-            $status = (new UserInput)->textHyphenationUI($choose, $argv[2], $resultStr, $logger, $cache);
+            $status = (new UserInput)->textHyphenationUI($choose, $argv[2], $resultStr, $logger, $cache, $config);
             if ($status !== false) {
                 if ($argc > 3) { // save result to file
                     $filename = $argv[3];

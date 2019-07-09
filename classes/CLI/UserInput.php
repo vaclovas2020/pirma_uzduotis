@@ -4,6 +4,7 @@
 namespace CLI;
 
 
+use AppConfig\Config;
 use Hyphenation\PatternDataLoader;
 use Hyphenation\WordHyphenationTool;
 use IO\FileReader;
@@ -13,10 +14,10 @@ use SimpleCache\CacheInterface;
 class UserInput
 {
     public function textHyphenationUI(string $choice, string $input, string &$resultStr,
-                                      LoggerInterface $logger, CacheInterface $cache): bool
+                                      LoggerInterface $logger, CacheInterface $cache, Config $config): bool
     {
         $hyphenationTool = new WordHyphenationTool($logger, $cache);
-        $allPatterns = PatternDataLoader::loadDataFromFile(PatternDataLoader::DEFAULT_FILENAME,
+        $allPatterns = PatternDataLoader::loadDataFromFile($config->getPatternsFilePath(),
             $cache, $logger);
         $execCalc = new ExecDurationCalculator();
         $execCalc->start();
