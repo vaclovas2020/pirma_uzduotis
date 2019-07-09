@@ -13,6 +13,9 @@ class FileCache implements CacheInterface
     {
         $this->cachePath = $cachePath;
         $this->defaultTtl = $defaultTtl;
+        if (!file_exists($this->cachePath) && file_exists(dirname($cachePath))){
+            mkdir($cachePath);
+        }
     }
 
 
