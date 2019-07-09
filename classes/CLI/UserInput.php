@@ -52,7 +52,7 @@ class UserInput
         }
         $execCalc->finish();
         $execDuration = $execCalc->getDuration();
-        $logger->info("Program execution duration: {execDuration} seconds", array(
+        $logger->info("Text hyphenation algorithm execution duration: {execDuration} seconds", array(
             'execDuration' => $execDuration
         ));
         return true;
