@@ -17,6 +17,9 @@ class Main
             $logger = new Logger($config->getLogFilePath());
             $config->applyLoggerConfig($logger);
             $cache = new FileCache($config->getCachePath(), $config->getCacheDefaultTtl());
+            $logger->info('Program started with arguments: {arguments}',
+                array('arguments' => print_r($argv, true)));
+            $execCalc = new ExecDurationCalculator();
             $choose = $argv[1]; // -w one word, -p paragraph, -f file
             $resultStr = '';
             $status = (new UserInput)->textHyphenationUI($choose, $argv[2], $resultStr, $logger, $cache, $config);
@@ -32,6 +35,10 @@ class Main
                     echo "$resultStr\n";
                 }
             }
+            $execDuration = $execCalc->finishAndGetDuration();
+            $logger->notice("Program execution duration: {execDuration} seconds", array(
+                'execDuration' => $execDuration
+            ));
         } else {
             (new Helper())->printHelp();
         }
