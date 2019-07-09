@@ -11,16 +11,16 @@ class PatternDataLoader
 {
     public const DEFAULT_FILENAME = 'tex-hyphenation-patterns.txt';
 
-    public static function loadDataFromFile(string $filename, CacheInterface $cache, LoggerInterface $logger): array
+    public static function loadDataFromFile(string $fileName, CacheInterface $cache, LoggerInterface $logger): array
     {
         $patternData = array();
         $execCalc = new ExecDurationCalculator();
         $execCalc->start();
-        $hash = sha1_file($filename);
+        $hash = @sha1_file($fileName);
         $cachedData = $cache->get($hash);
-        $source = "from file '$filename'";
+        $source = "from file '$fileName'";
         if ($cachedData === null) {
-            $file = new SplFileObject($filename, 'r');
+            $file = new SplFileObject($fileName, 'r');
             while (!$file->eof()) {
                 array_push($patternData, str_replace("\n", '', $file->fgets()));
             }
