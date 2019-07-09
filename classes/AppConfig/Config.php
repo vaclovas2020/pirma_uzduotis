@@ -4,6 +4,7 @@
 namespace AppConfig;
 
 
+use Hyphenation\PatternDataLoader;
 use IO\FileWriter;
 use Log\Logger;
 use RuntimeException;
@@ -15,6 +16,7 @@ class Config
     private $logFilePath = 'word_hyphenation.log';
     private $cachePath = 'cache';
     private $cacheDefaultTtl = 3600;
+    private $patternsFilePath = PatternDataLoader::DEFAULT_FILENAME;
 
     public function __construct(string $configFileName = "app_config.json")
     {
@@ -35,6 +37,9 @@ class Config
             }
             if (isset($configData['cacheDefaultTtl'])) {
                 $this->cacheDefaultTtl = $configData['cacheDefaultTtl'];
+            }
+            if (isset($configData['patternsFilePath'])) {
+                $this->patternsFilePath = $configData['patternsFilePath'];
             }
         } else {
             if (!$this->createDefaultConfigFile($configFileName)) {
@@ -65,6 +70,11 @@ class Config
         return $this->cacheDefaultTtl;
     }
 
+    public function getPatternsFilePath(): string
+    {
+        return $this->patternsFilePath;
+    }
+
     private function createDefaultConfigFile($configFileName): bool
     {
         $jsonConfig = array(
@@ -72,7 +82,8 @@ class Config
             'logWriteToFile' => $this->logWriteToFile,
             'logFilePath' => $this->logFilePath,
             'cachePath' => $this->cachePath,
-            'cacheDefaultTtl' => $this->cacheDefaultTtl
+            'cacheDefaultTtl' => $this->cacheDefaultTtl,
+            'patternFilePath' => $this->patternsFilePath
         );
         return (new FileWriter())->writeToFile($configFileName, json_encode($jsonConfig));
     }
