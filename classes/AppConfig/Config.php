@@ -13,8 +13,10 @@ class Config
     private $logPrintToScreen = false;
     private $logWriteToFile = true;
     private $logFilePath = 'word_hyphenation.log';
+    private $cachePath = 'cache';
+    private $cacheDefaultTtl = 3600;
 
-    function __construct(string $configFileName = "app_config.json")
+    public function __construct(string $configFileName = "app_config.json")
     {
         $configStr = @file_get_contents($configFileName);
         if ($configStr !== false) {
@@ -28,28 +30,24 @@ class Config
             if (isset($configData['logFilePath'])) {
                 $this->logFilePath = $configData['logFilePath'];
             }
-        }
-        else{
-            if (!$this->createDefaultConfigFile($configFileName)){
+            if (isset($configData['cachePath'])) {
+                $this->cachePath = $configData['cachePath'];
+            }
+            if (isset($configData['cacheDefaultTtl'])) {
+                $this->cachePath = $configData['cacheDefaultTtl'];
+            }
+        } else {
+            if (!$this->createDefaultConfigFile($configFileName)) {
                 throw new RuntimeException("Cannot create default config file '$configFileName'!");
             }
         }
     }
 
-    public function applyLoggerConfig(Logger $logger): bool{
+    public function applyLoggerConfig(Logger $logger): bool
+    {
         $logger->setPrintToScreen($this->logPrintToScreen);
         $logger->setWriteToFile($this->logWriteToFile);
         return true;
-    }
-
-    public function isLogPrintToScreen(): bool
-    {
-        return $this->logPrintToScreen;
-    }
-
-    public function isLogWriteToFile(): bool
-    {
-        return $this->logWriteToFile;
     }
 
     public function getLogFilePath(): string
@@ -57,12 +55,24 @@ class Config
         return $this->logFilePath;
     }
 
+    public function getCachePath(): string
+    {
+        return $this->cachePath;
+    }
+
+    public function getCacheDefaultTtl(): int
+    {
+        return $this->cacheDefaultTtl;
+    }
+
     private function createDefaultConfigFile($configFileName): bool
     {
         $jsonConfig = array(
             'logPrintToScreen' => $this->logPrintToScreen,
             'logWriteToFile' => $this->logWriteToFile,
-            'logFilePath' => $this->logFilePath
+            'logFilePath' => $this->logFilePath,
+            'cachePath' => $this->cachePath,
+            'cacheDefaultTtl' => $this->cacheDefaultTtl
         );
         return (new FileWriter())->writeToFile($configFileName, json_encode($jsonConfig));
     }

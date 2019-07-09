@@ -16,7 +16,7 @@ class Main
         if ($argc >= 3) {
             $logger = new Logger($config->getLogFilePath());
             $config->applyLoggerConfig($logger);
-            $cache = new FileCache();
+            $cache = new FileCache($config->getCachePath(), $config->getCacheDefaultTtl());
             $choose = $argv[1]; // -w one word, -p paragraph, -f file
             $resultStr = '';
             $status = (new UserInput)->textHyphenationUI($choose, $argv[2], $resultStr, $logger, $cache);
