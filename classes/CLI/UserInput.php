@@ -29,7 +29,7 @@ class UserInput
                 break;
             case '-f': // hyphenate all text from given file
                 $logger->info("Chosen hyphenate from text file '{filename}'", array('filename' => $input));
-                $status = (new FileReader)->readTextFromFile($input, $resultStr, $logger);
+                $status = (new FileReader)->readTextFromFile($input, $resultStr, $logger, $cache);
                 if ($status === false) {
                     return false;
                 }
