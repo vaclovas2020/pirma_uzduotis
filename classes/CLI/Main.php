@@ -5,6 +5,7 @@ namespace CLI;
 
 use IO\FileWriter;
 use Log\Logger;
+use SimpleCache\FileCache;
 
 class Main
 {
@@ -13,11 +14,12 @@ class Main
     {
         if ($argc >= 3) {
             $logger = new Logger();
+            $cache = new FileCache();
             $choose = $argv[1]; // -w one word, -p paragraph, -f file
             $execCalc = new ExecDurationCalculator();
             $execCalc->start();
             $resultStr = '';
-            $status = (new UserInput)->textHyphenationUI($choose, $argv[2], $resultStr, $logger);
+            $status = (new UserInput)->textHyphenationUI($choose, $argv[2], $resultStr, $logger, $cache);
             if ($status !== false) {
                 $execCalc->finish();
                 $execDuration = $execCalc->getDuration();
