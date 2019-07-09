@@ -4,10 +4,14 @@
 namespace SimpleCache;
 
 
+use InvalidArgumentException;
+
 class FileCache implements CacheInterface
 {
     private $defaultTtl;
     private $cachePath;
+    private const INVALID_KEY_MESSAGE = "Wrong cache key given. Key support only these characters [0-9A-Za-z_.]\n 
+    Key length must be not longer than 64 characters.";
 
     public function __construct(string $cachePath = "cache", int $defaultTtl = 300)
     {
@@ -20,6 +24,9 @@ class FileCache implements CacheInterface
 
     public function get(string $key, $default = null)
     {
+        if (!$this->isKeyValid($key)) {
+            throw new InvalidArgumentException(self::INVALID_KEY_MESSAGE);
+        }
         $path = $this->getCacheFilePathByKey($key);
         if (file_exists($path)) {
             $expiresAt = @filemtime($path);
@@ -36,6 +43,9 @@ class FileCache implements CacheInterface
 
     public function set(string $key, $value, int $ttl = null): bool
     {
+        if (!$this->isKeyValid($key)) {
+            throw new InvalidArgumentException(self::INVALID_KEY_MESSAGE);
+        }
         $serializedValue = serialize($value);
         $path = $this->getCacheFilePathByKey($key);
         if ($ttl === null) {
@@ -54,6 +64,9 @@ class FileCache implements CacheInterface
 
     public function delete(string $key): bool
     {
+        if (!$this->isKeyValid($key)) {
+            throw new InvalidArgumentException(self::INVALID_KEY_MESSAGE);
+        }
         $path = $this->getCacheFilePathByKey($key);
         if (file_exists($path)) {
             return @unlink($path);
@@ -105,6 +118,9 @@ class FileCache implements CacheInterface
 
     public function has(string $key): bool
     {
+        if (!$this->isKeyValid($key)) {
+            throw new InvalidArgumentException(self::INVALID_KEY_MESSAGE);
+        }
         $path = $this->getCacheFilePathByKey($key);
         if (file_exists($path)) {
             $expiresAt = @filemtime($path);
@@ -122,5 +138,13 @@ class FileCache implements CacheInterface
     private function getCacheFilePathByKey(string $key): string
     {
         return $this->cachePath . DIRECTORY_SEPARATOR . $key;
+    }
+
+    private function isKeyValid(string $key): bool
+    {
+        if (strlen($key) > 64) {
+            return false;
+        }
+        return preg_match('/^[0-9A-Za-z_.]+$/', $key) == 1;
     }
 }
