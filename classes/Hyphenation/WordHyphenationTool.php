@@ -29,10 +29,18 @@ class WordHyphenationTool
         return $this->cache->get($key);
     }
 
-    public function saveHyphenatedTextFileToCache(string $fileName, string $hyphenatedText): bool
+    public function saveHyphenatedTextFileToCache(string $fileName, string $hyphenatedText): void
     {
         $key = @sha1_file($fileName) . '_hyphenated';
-        return $this->cache->set($key, $hyphenatedText);
+        if ($this->cache->set($key, $hyphenatedText)) {
+            $this->logger->notice("Saved hyphenated text file '{fileName}' to cache", array(
+                'fileName' => $fileName
+            ));
+        } else {
+            $this->logger->error(">Cannot save hyphenated text file '{fileName}' to cache", array(
+                'fileName' => $fileName
+            ));
+        }
     }
 
     public function oneWordHyphenation(array &$allPatterns, string $word): string
