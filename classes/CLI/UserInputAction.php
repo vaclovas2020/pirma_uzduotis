@@ -14,43 +14,45 @@ class UserInputAction
 
     private $logger;
     private $cache;
+    private $allPatterns;
+    private $hyphenationTool;
 
-    public function __construct(LoggerInterface $logger, CacheInterface $cache)
+    public function __construct(array &$allPatterns, WordHyphenationTool $hyphenationTool,
+                                LoggerInterface $logger, CacheInterface $cache)
     {
         $this->logger = $logger;
         $this->cache = $cache;
+        $this->allPatterns = $allPatterns;
+        $this->hyphenationTool = $hyphenationTool;
     }
 
-    public function hyphenateOneWord(array &$allPatterns, WordHyphenationTool $hyphenationTool, string $word,
-                                     string &$resultStr): void
+    public function hyphenateOneWord(string $word, string &$resultStr): void
     {
         $this->logger->info("Chosen hyphenate one word '{word}'", array('word' => $word));
-        $resultStr = $hyphenationTool->oneWordHyphenation($allPatterns, $word);
+        $resultStr = $this->hyphenationTool->oneWordHyphenation($this->allPatterns, $word);
     }
 
-    public function hyphenateParagraph(array &$allPatterns, WordHyphenationTool $hyphenationTool, string $text,
-                                       string &$resultStr): void
+    public function hyphenateParagraph(string $text, string &$resultStr): void
     {
         $this->logger->info("Chosen hyphenate paragraph /sentence '{text}'", array('text' => $text));
-        $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $text);
+        $resultStr = $this->hyphenationTool->hyphenateAllText($this->allPatterns, $text);
     }
 
-    public function hyphenateFromTextFile(array &$allPatterns, WordHyphenationTool $hyphenationTool, string $fileName,
-                                          string &$resultStr): bool
+    public function hyphenateFromTextFile(string $fileName, string &$resultStr): bool
     {
         $this->logger->info("Chosen hyphenate from text file '{filename}'", array('filename' => $fileName));
         $status = (new FileReader)->readTextFromFile($fileName, $resultStr, $this->logger, $this->cache);
         if ($status === false) {
             return false;
         }
-        if ($hyphenationTool->isHyphenatedTextFileCacheExist($fileName)) {
-            $resultStr = $hyphenationTool->getHyphenatedTextFileCache($fileName);
+        if ($this->hyphenationTool->isHyphenatedTextFileCacheExist($fileName)) {
+            $resultStr = $this->hyphenationTool->getHyphenatedTextFileCache($fileName);
             $this->logger->notice("Loaded hyphenated text from file '{fileName}' cache", array(
                 'fileName' => $fileName
             ));
         } else {
-            $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $resultStr);
-            $hyphenationTool->saveHyphenatedTextFileToCache($fileName, $resultStr);
+            $resultStr = $this->hyphenationTool->hyphenateAllText($this->allPatterns, $resultStr);
+            $this->hyphenationTool->saveHyphenatedTextFileToCache($fileName, $resultStr);
         }
         return true;
     }
@@ -63,7 +65,7 @@ class UserInputAction
             } else {
                 $this->logger->error('Cannot clean Cache Storage');
             }
-        } else $this->logger->warning("Unknown storage named '{input}'.", array('input' => $input));
+        } else $this->logger->warning("Unknown storage named '{input}'.", array('input' => $storageName));
     }
 
 }
