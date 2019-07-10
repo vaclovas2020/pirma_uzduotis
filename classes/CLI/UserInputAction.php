@@ -6,7 +6,7 @@ namespace CLI;
 
 use Hyphenation\WordHyphenationTool;
 use IO\FileReader;
-use Log\LoggerInterface;
+use Log\Logger;
 use SimpleCache\CacheInterface;
 
 class UserInputAction
@@ -18,7 +18,7 @@ class UserInputAction
     private $hyphenationTool;
 
     public function __construct(array &$allPatterns, WordHyphenationTool $hyphenationTool,
-                                LoggerInterface $logger, CacheInterface $cache)
+                                Logger $logger, CacheInterface $cache)
     {
         $this->logger = $logger;
         $this->cache = $cache;
@@ -59,13 +59,25 @@ class UserInputAction
 
     public function clearStorage(string $storageName): void
     {
-        if ($storageName == 'cache') {
-            if ($this->cache->clear()) {
-                $this->logger->notice('Cache Storage was cleaned.');
-            } else {
-                $this->logger->error('Cannot clean Cache Storage');
-            }
-        } else $this->logger->warning("Unknown storage named '{input}'.", array('input' => $storageName));
+        switch ($storageName) {
+            case 'cache':
+                if ($this->cache->clear()) {
+                    $this->logger->notice('Cache Storage was cleaned.');
+                } else {
+                    $this->logger->error('Cannot clean Cache Storage');
+                }
+                break;
+            case 'log':
+                if ($this->logger->deleteLogFile()) {
+                    $this->logger->notice('Log file was deleted.');
+                } else {
+                    $this->logger->error('Cannot delete log file.');
+                }
+                break;
+            default:
+                $this->logger->warning("Unknown storage named '{input}'.", array('input' => $storageName));
+                break;
+        }
     }
 
 }
