@@ -101,7 +101,7 @@ class WordHyphenationTool
 
     private function saveToPatternObjArray(array & $patterns, string $pattern, int $positionAtWord): void
     {
-        $patternObj = new Pattern(str_replace('.', '', $pattern), $positionAtWord);
+        $patternObj = new Pattern(str_replace('.', '', $pattern), $positionAtWord, $this->cache);
         array_push($patterns, $patternObj);
     }
 
