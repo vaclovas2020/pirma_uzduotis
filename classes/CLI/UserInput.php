@@ -19,17 +19,16 @@ class UserInput
         $allPatterns = PatternDataLoader::loadDataFromFile($config->getPatternsFilePath(),
             $cache, $logger);
         $execCalc = new ExecDurationCalculator();
-        $userInputAction = new UserInputAction($logger, $cache);
+        $userInputAction = new UserInputAction($allPatterns, $hyphenationTool, $logger, $cache);
         switch ($choice) {
             case '-w': // hyphenate one word
-                $userInputAction->hyphenateOneWord($allPatterns, $hyphenationTool, $input, $resultStr);
+                $userInputAction->hyphenateOneWord($input, $resultStr);
                 break;
             case '-p': // hyphenate all paragraph or one sentence
-                $userInputAction->hyphenateParagraph($allPatterns, $hyphenationTool, $input, $resultStr);
+                $userInputAction->hyphenateParagraph($input, $resultStr);
                 break;
             case '-f': // hyphenate all text from given file
-                if (!$userInputAction->hyphenateFromTextFile($allPatterns, $hyphenationTool,
-                    $input, $resultStr)) {
+                if (!$userInputAction->hyphenateFromTextFile($input, $resultStr)) {
                     return false;
                 }
                 break;
