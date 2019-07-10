@@ -69,7 +69,7 @@ class UserInputAction
                 break;
             case 'log':
                 if ($this->logger->deleteLogFile()) {
-                    $this->logger->notice('Log file was deleted.');
+                    $this->logger->notice('Log file was cleaned.');
                 } else {
                     $this->logger->error('Cannot delete log file.');
                 }

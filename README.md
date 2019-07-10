@@ -9,7 +9,7 @@
  php word_hyphenation.php --clear cache
  #clean Cache Storage
  php word_hyphenation.php --clear log
- #clean Cache Storage
+ #clean log file
 ```
 
 
