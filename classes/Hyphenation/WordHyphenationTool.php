@@ -17,6 +17,18 @@ class WordHyphenationTool
         $this->cache = $cache;
     }
 
+    public function isHyphenatedTextFileCacheExist(string $fileName): bool
+    {
+        $key = @sha1_file($fileName) . '_hyphenated';
+        return $this->cache->has($key);
+    }
+
+    public function getHyphenatedTextFileCache(string $fileName): string
+    {
+        $key = @sha1_file($fileName) . '_hyphenated';
+        return $this->cache->get($key);
+    }
+
     public function oneWordHyphenation(array &$allPatterns, string $word): string
     {
         $hash = sha1($word);
