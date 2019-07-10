@@ -7,7 +7,6 @@ namespace CLI;
 use AppConfig\Config;
 use Hyphenation\PatternDataLoader;
 use Hyphenation\WordHyphenationTool;
-use IO\FileReader;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
 
@@ -20,47 +19,22 @@ class UserInput
         $allPatterns = PatternDataLoader::loadDataFromFile($config->getPatternsFilePath(),
             $cache, $logger);
         $execCalc = new ExecDurationCalculator();
+        $userInputAction = new UserInputAction($logger, $cache);
         switch ($choice) {
             case '-w': // hyphenate one word
-                $logger->info("Chosen hyphenate one word '{word}'", array('word' => $input));
-                $resultStr = $hyphenationTool->oneWordHyphenation($allPatterns, $input);
+                $userInputAction->hyphenateOneWord($allPatterns, $hyphenationTool, $input, $resultStr);
                 break;
             case '-p': // hyphenate all paragraph or one sentence
-                $logger->info("Chosen hyphenate paragraph /sentence '{text}'", array('text' => $input));
-                $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $input);
+                $userInputAction->hyphenateParagraph($allPatterns, $hyphenationTool, $input, $resultStr);
                 break;
             case '-f': // hyphenate all text from given file
-                $logger->info("Chosen hyphenate from text file '{filename}'", array('filename' => $input));
-                $status = (new FileReader)->readTextFromFile($input, $resultStr, $logger, $cache);
-                if ($status === false) {
+                if (!$userInputAction->hyphenateFromTextFile($allPatterns, $hyphenationTool,
+                    $input, $resultStr)) {
                     return false;
-                }
-                if ($hyphenationTool->isHyphenatedTextFileCacheExist($input)) {
-                    $resultStr = $hyphenationTool->getHyphenatedTextFileCache($input);
-                    $logger->notice("Loaded hyphenated text from file '{fileName}' cache", array(
-                        'fileName' => $input
-                    ));
-                } else {
-                    $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $resultStr);
-                    if ($hyphenationTool->saveHyphenatedTextFileToCache($input, $resultStr)) {
-                        $logger->notice("Saved hyphenated text file '{fileName}' to cache", array(
-                            'fileName' => $input
-                        ));
-                    } else {
-                        $logger->error(">Cannot save hyphenated text file '{fileName}' to cache", array(
-                            'fileName' => $input
-                        ));
-                    }
                 }
                 break;
             case '--clear':
-                if ($input == 'cache') {
-                    if ($cache->clear()) {
-                        $logger->notice('Cache Storage was cleaned.');
-                    } else {
-                        $logger->error('Cannot clean Cache Storage');
-                    }
-                } else $logger->warning("Unknown storage named '{input}'.", array('input' => $input));
+                $userInputAction->clearStorage($input);
                 return false;
                 break;
             default:
