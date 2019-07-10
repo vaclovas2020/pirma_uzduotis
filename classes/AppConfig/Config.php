@@ -11,7 +11,7 @@ use RuntimeException;
 
 class Config
 {
-    private $logPrintToScreen = false;
+    private $logPrintToScreen = true;
     private $logWriteToFile = true;
     private $logFilePath = 'word_hyphenation.log';
     private $cachePath = 'cache';
