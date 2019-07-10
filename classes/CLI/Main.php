@@ -23,7 +23,7 @@ class Main
             $resultStr = '';
             $status = (new UserInput)->textHyphenationUI($choose, $argv[2], $resultStr, $logger, $cache, $config);
             if ($status !== false) {
-                (new UserOutput())->outputToUser($argc, $argv, $resultStr);
+                (new UserOutput())->outputToUser($argc, $argv, $resultStr, $logger);
             }
             $execDuration = $execCalc->finishAndGetDuration();
             $logger->notice("Program execution duration: {execDuration} seconds", array(
