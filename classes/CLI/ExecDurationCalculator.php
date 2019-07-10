@@ -9,7 +9,7 @@ class ExecDurationCalculator
 
     public function __construct(bool $autoStart = true)
     {
-        if ($autoStart){
+        if ($autoStart) {
             $this->start();
         }
     }
