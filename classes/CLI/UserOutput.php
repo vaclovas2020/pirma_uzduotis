@@ -5,18 +5,23 @@ namespace CLI;
 
 
 use IO\FileWriter;
+use Log\LoggerInterface;
 
 class UserOutput
 {
 
-    public function outputToUser(int $argc, array $argv, string $resultStr)
+    public function outputToUser(int $argc, array $argv, string $resultStr, LoggerInterface $logger)
     {
         if ($argc > 3) { // save result to file
-            $filename = $argv[3];
-            if ((new FileWriter())->writeToFile($filename, $resultStr)) {
-                echo "Result saved to file '$filename'\n";
+            $fileName = $argv[3];
+            if ((new FileWriter())->writeToFile($fileName, $resultStr)) {
+                $logger->notice("Result saved to file {fileName}", array(
+                    'fileName' => $fileName
+                ));
             } else {
-                echo "Error: can not save result to file '$filename'";
+                $logger->error("Cannot save result to file {fileName}!", array(
+                    'fileName' => $fileName
+                ));
             }
         } else {
             echo "$resultStr\n";
