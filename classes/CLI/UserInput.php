@@ -7,13 +7,13 @@ namespace CLI;
 use AppConfig\Config;
 use Hyphenation\PatternDataLoader;
 use Hyphenation\WordHyphenationTool;
-use Log\LoggerInterface;
+use Log\Logger;
 use SimpleCache\CacheInterface;
 
 class UserInput
 {
     public function textHyphenationUI(string $choice, string $input, string &$resultStr,
-                                      LoggerInterface $logger, CacheInterface $cache, Config $config): bool
+                                      Logger $logger, CacheInterface $cache, Config $config): bool
     {
         $hyphenationTool = new WordHyphenationTool($logger, $cache);
         $allPatterns = PatternDataLoader::loadDataFromFile($config->getPatternsFilePath(),

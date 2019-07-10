@@ -19,6 +19,10 @@ class Logger implements LoggerInterface
         $this->fileName = $fileName;
     }
 
+    public function deleteLogFile(): bool{
+        return @unlink($this->fileName);
+    }
+
     public function setPrintToScreen(bool $printToAScreen){
         $this->printToScreen = $printToAScreen;
     }
