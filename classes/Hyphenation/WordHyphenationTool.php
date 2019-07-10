@@ -29,6 +29,12 @@ class WordHyphenationTool
         return $this->cache->get($key);
     }
 
+    public function saveHyphenatedTextFileToCache(string $fileName, string $hyphenatedText): bool
+    {
+        $key = @sha1_file($fileName) . '_hyphenated';
+        return $this->cache->set($key, $hyphenatedText);
+    }
+
     public function oneWordHyphenation(array &$allPatterns, string $word): string
     {
         $hash = sha1($word);
