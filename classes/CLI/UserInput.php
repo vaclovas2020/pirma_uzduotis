@@ -35,7 +35,10 @@ class UserInput
                 if ($status === false) {
                     return false;
                 }
-                $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $resultStr);
+                if ($hyphenationTool->isHyphenatedTextFileCacheExist($input)){
+                    $resultStr = $hyphenationTool->getHyphenatedTextFileCache($input);
+                }
+                else $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $resultStr);
                 break;
             case '--clear':
                 if ($input == 'cache') {
