@@ -37,7 +37,21 @@ class UserInput
                 }
                 if ($hyphenationTool->isHyphenatedTextFileCacheExist($input)) {
                     $resultStr = $hyphenationTool->getHyphenatedTextFileCache($input);
-                } else $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $resultStr);
+                    $logger->notice("Loaded hyphenated text from file '{fileName}' cache", array(
+                        'fileName' => $input
+                    ));
+                } else {
+                    $resultStr = $hyphenationTool->hyphenateAllText($allPatterns, $resultStr);
+                    if ($hyphenationTool->saveHyphenatedTextFileToCache($input, $resultStr)) {
+                        $logger->notice("Saved hyphenated text file '{fileName}' to cache", array(
+                            'fileName' => $input
+                        ));
+                    } else {
+                        $logger->error(">Cannot save hyphenated text file '{fileName}' to cache", array(
+                            'fileName' => $input
+                        ));
+                    }
+                }
                 break;
             case '--clear':
                 if ($input == 'cache') {
