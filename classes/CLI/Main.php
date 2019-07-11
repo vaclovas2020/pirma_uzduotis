@@ -19,19 +19,7 @@ class Main
         $logger->info('Program started with arguments: {arguments}',
             array('arguments' => print_r($argv, true)));
         if ($argc == 6 && $argv[1] === '--config-db'){
-            if ((new DbConfig($argv[2],$argv[3],$argv[4], $argv[5], $logger))->createDbTables()){
-                $logger->notice('Database tables created successful!');
-                $config->setDbHost($argv[2]);
-                $config->setDbName($argv[3]);
-                $config->setDbUser($argv[4]);
-                $config->setDbPassword($argv[5]);
-                $config->setEnabledDbSource(true);
-                if ($config->createConfigFile()) {
-                    $logger->notice('Database configuration saved to app_config.json file!');
-                }
-                else $logger->error('Cannot save app_config.json file!');
-            }
-            else $logger->critical('Cannot create database tables!');
+            $config->configureDatabase($argv, $logger);
         }
         else if ($argc >= 3) {
             $execCalc = new ExecDurationCalculator();
