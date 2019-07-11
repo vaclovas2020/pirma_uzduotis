@@ -28,10 +28,16 @@ class DbPatternsImporter
         $pdo->beginTransaction();
         $query = $pdo->prepare('REPLACE INTO `hyphenation_patterns`(`pattern`, `pattern_chars`) 
 VALUES(:pattern, :pattern_chars);');
+        $current = 1;
         foreach ($patternsArray as $pattern) {
             $patternObj = new Pattern($pattern);
             $patternCharArray = $patternObj->getPatternCharArray();
             $serializedPatternCharArray = serialize($patternCharArray);
+            $this->logger->info('Importing pattern {current} / {total} to database',
+                array(
+                    'current' => $current,
+                    'total' => count($patternsArray)
+                ));
             if (!$query->execute(array(
                 'pattern' => $pattern,
                 'pattern_chars' => $serializedPatternCharArray
@@ -39,6 +45,7 @@ VALUES(:pattern, :pattern_chars);');
                 $pdo->rollBack();
                 return false;
             }
+            $current++;
         }
         $pdo->commit();
         return true;
