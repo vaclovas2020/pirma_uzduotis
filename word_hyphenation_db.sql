@@ -13,7 +13,7 @@ CREATE TABLE `hyphenated_word_patterns` (
 CREATE TABLE `hyphenation_patterns` (
   `pattern_id` int(11) NOT NULL,
   `pattern` varchar(255) COLLATE utf8_bin NOT NULL,
-  `pattern_chars` json NOT NULL
+  `pattern_chars` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 ALTER TABLE `hyphenated_words`
