@@ -21,6 +21,7 @@ class Config
     private $dbName = "";
     private $dbUser = "";
     private $dbPassword = "";
+    private $enableDbSource = false;
 
     public function __construct(string $configFileName = "app_config.json")
     {
@@ -37,7 +38,8 @@ class Config
                 'dbHost',
                 'dbName',
                 'dbUser',
-                'dbPassword'))) {
+                'dbPassword',
+                'enableDbSource'))) {
                 $this->createConfigFile($configFileName);
             }
         } else {
@@ -128,7 +130,8 @@ class Config
             'dbHost' => $this->dbUser,
             'dbName' => $this->dbName,
             'dbUser' => $this->dbUser,
-            'dbPassword' => $this->dbPassword
+            'dbPassword' => $this->dbPassword,
+            'enableDbSource' => $this->enableDbSource
         );
         if (!(new FileWriter())->writeToFile($configFileName, json_encode($jsonConfig))) {
             throw new RuntimeException("Cannot create default config file '$configFileName'!");
