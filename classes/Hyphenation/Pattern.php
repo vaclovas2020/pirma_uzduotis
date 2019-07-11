@@ -18,7 +18,7 @@ class Pattern
     {
 
         $noCounts = preg_replace('/[0-9]+/', '', $this->pattern);
-        $chars = array_merge($this->extractPattern($this->pattern), $this->extractPatternEndCount($this->pattern));
+        $chars = array_merge($this->extractPattern(), $this->extractPatternEndCount());
         foreach ($chars as $x => $y) {
             foreach ($y as $char) {
                 $charNoCounts = preg_replace('/[0-9]+/', '', $char);
@@ -37,17 +37,35 @@ class Pattern
         }
     }
 
-    private function extractPattern(string $pattern): array
+    public function getPatternCharArray(): array
+    {
+        $patternCharArray = array();
+        $noCounts = preg_replace('/[0-9]+/', '', $this->pattern);
+        $chars = array_merge($this->extractPattern(), $this->extractPatternEndCount());
+        foreach ($chars as $x => $y) {
+            foreach ($y as $char) {
+                $charNoCounts = preg_replace('/[0-9]+/', '', $char);
+                $charNum = (!empty($charNoCounts)) ?
+                    strpos($noCounts, $charNoCounts) :
+                    strlen($noCounts);
+                $patternChar = new PatternChar($char, $charNum);
+                array_push($patternCharArray, $patternChar);
+            }
+        }
+        return $patternCharArray;
+    }
+
+    private function extractPattern(): array
     {
         $chars = array();
-        preg_match_all('/[0-9]+[a-z]{1}/', $pattern, $chars);
+        preg_match_all('/[0-9]+[a-z]{1}/', $this->pattern, $chars);
         return $chars;
     }
 
-    private function extractPatternEndCount(string $pattern): array
+    private function extractPatternEndCount(): array
     {
         $endCount = array();
-        preg_match_all('/[0-9]+$/', $pattern, $endCount);
+        preg_match_all('/[0-9]+$/', $this->pattern, $endCount);
         return $endCount;
     }
 
