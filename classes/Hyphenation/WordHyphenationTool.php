@@ -43,17 +43,14 @@ class WordHyphenationTool
         }
     }
 
-    public function oneWordHyphenation(array &$allPatterns, string $word): string
+    public function hyphenateWord(array &$allPatterns, string $word): string
     {
         $hash = sha1($word);
         $resultCache = $this->cache->get($hash);
         $resultStr = '';
         if ($resultCache === null) {
-            $patterns = $this->findPatternsAtWord($allPatterns, strtolower($word));
-            $result = $this->pushAllPatternsToWord($word, $patterns);
-            foreach ($result as $charData) {
-                $resultStr .= $charData;
-            }
+            $result = $this->findPatternsAndPushToWord($allPatterns, strtolower($word));
+            $resultStr = $this->getResultStrFromResultArray($result);
             $this->logger->info("Word '{word}' hyphenated to '{hyphenateWord}'", array(
                 'word' => $word,
                 'hyphenateWord' => $resultStr
@@ -81,7 +78,7 @@ class WordHyphenationTool
                     'total' => $count
                 ));
                 $word = preg_replace('/[.,!?;:]+/', '', $word);
-                $hyphenatedWord = $this->oneWordHyphenation($allPatterns, $word);
+                $hyphenatedWord = $this->hyphenateWord($allPatterns, $word);
                 $text = str_replace($word, $hyphenatedWord, $text);
                 $currentWord++;
             }
@@ -97,12 +94,6 @@ class WordHyphenationTool
     private function isDotAtEnd(string $pattern): bool
     {
         return preg_match('/[.]{1}$/', $pattern) === 1;
-    }
-
-    private function saveToPatternObjArray(array & $patterns, string $pattern, int $positionAtWord): void
-    {
-        $patternObj = new Pattern(str_replace('.', '', $pattern), $positionAtWord, $this->cache);
-        array_push($patterns, $patternObj);
     }
 
     private function isPatternAtWordBegin(string $word, string $noCounts): bool
@@ -126,30 +117,30 @@ class WordHyphenationTool
         return $pos;
     }
 
-    private function findPatternsAtWord(array &$allPatterns, string $word): array
+    private function findPatternsAndPushToWord(array &$allPatterns, string $word): array
     {
-        $patterns = array();
+        $result = $this->createResultArray($word);
         $patternsListStr = "\n";
         foreach ($allPatterns as $pattern) {
             $noCounts = preg_replace('/[0-9]+/', '', $pattern);
             $pos = $this->findPatternPositionAtWord($word, $noCounts);
             if ($this->isDotAtBegin($pattern)) {
                 if ($this->isPatternAtWordBegin($word, $noCounts)) {
-                    $this->saveToPatternObjArray($patterns, $pattern, $pos);
+                    $this->pushPatternDataToWord($result, $pattern, $pos);
                     $patternsListStr .= "$pattern\n";
                 }
             } else if ($this->isDotAtEnd($pattern)) {
                 if ($this->isPatternAtWordEnd($word, $noCounts)) {
-                    $this->saveToPatternObjArray($patterns, $pattern, $pos);
+                    $this->pushPatternDataToWord($result, $pattern, $pos);
                     $patternsListStr .= "$pattern\n";
                 }
             } else if ($pos !== -1) {
-                $this->saveToPatternObjArray($patterns, $pattern, $pos);
+                $this->pushPatternDataToWord($result, $pattern, $pos);
                 $patternsListStr .= "$pattern\n";
             }
         }
         $this->printFoundedPatternsToLog($patternsListStr, $word);
-        return $patterns;
+        return $result;
     }
 
     private function printFoundedPatternsToLog(string $patternsListStr, string $word): void
@@ -162,45 +153,27 @@ class WordHyphenationTool
             ));
     }
 
-    private function pushPatternDataToWord(array &$result, Pattern $patternData): void
+    private function pushPatternDataToWord(array &$result, string $pattern, int $positionAtWord): void
     {
-        $pos = $patternData->getPositionAtWord();
-        $pattern_chars = $patternData->getPatternChars();
-        for ($i = 0; $i < count($pattern_chars); $i++) {
-            $count = $pattern_chars[$i]->getCount();
-            $charNum = $pattern_chars[$i]->getCharNum();
-            if ($pos + $charNum < count($result)) {
-                $current_count = $result[$pos + $charNum]->getCount();
-                if ($count > $current_count) {
-                    $result[$pos + $charNum]->setCount($count);
-                }
-            }
-        }
+        $patternObj = new Pattern(str_replace('.', '', $pattern), $positionAtWord);
+        $patternObj->pushPatternToWord($result);
     }
 
-    private function printResultArrayToLog(array &$result, string $word)
+    private function getResultStrFromResultArray(array &$result): string
     {
-        $resultStr = '';
-        foreach ($result as $wordPattern) {
-            $resultStr .= $wordPattern->__debugInfo();
+        $resultStr = "";
+        foreach ($result as $charData) {
+            $resultStr .= $charData;
         }
-        $this->logger->notice("Word '{word}' transformed to '{resultStr}'",
-            array(
-                'resultStr' => $resultStr,
-                'word' => $word
-            ));
+        return $resultStr;
     }
 
-    private function pushAllPatternsToWord(string $word, array &$patterns): array
+    private function createResultArray(string $word): array
     {
         $result = array();
         for ($i = 0; $i < strlen($word); $i++) {
             array_push($result, new WordChar(substr($word, $i, 1), 0, $i));
         }
-        foreach ($patterns as $patternData) {
-            $this->pushPatternDataToWord($result, $patternData);
-        }
-        $this->printResultArrayToLog($result, $word);
         return $result;
     }
 }

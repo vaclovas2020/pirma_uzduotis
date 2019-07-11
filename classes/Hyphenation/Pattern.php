@@ -2,27 +2,39 @@
 
 namespace Hyphenation;
 
-use SimpleCache\CacheInterface;
 
 class Pattern
 {
-    private $patternChars = array();
+    private $pattern = "";
     private $positionAtWord = 0;
 
-    public function __construct(string $pattern, int $positionAtWord, CacheInterface $cache)
+    public function __construct(string $pattern, int $positionAtWord)
     {
-        $this->splitPattern($pattern, $cache);
         $this->positionAtWord = $positionAtWord;
+        $this->pattern = $pattern;
     }
 
-    public function getPatternChars(): array
+    public function pushPatternToWord(array &$result): void
     {
-        return $this->patternChars;
-    }
 
-    public function getPositionAtWord(): int
-    {
-        return $this->positionAtWord;
+        $noCounts = preg_replace('/[0-9]+/', '', $this->pattern);
+        $chars = array_merge($this->extractPattern($this->pattern), $this->extractPatternEndCount($this->pattern));
+        foreach ($chars as $x => $y) {
+            foreach ($y as $char) {
+                $charNoCounts = preg_replace('/[0-9]+/', '', $char);
+                $charNum = (!empty($charNoCounts)) ?
+                    strpos($noCounts, $charNoCounts) :
+                    strlen($noCounts);
+                $patternChar = new PatternChar($char, $charNum);
+                $count =$patternChar->getCount();
+                if ($this->positionAtWord + $charNum < count($result)) {
+                    $current_count = $result[$this->positionAtWord + $charNum]->getCount();
+                    if ($count > $current_count) {
+                        $result[$this->positionAtWord + $charNum]->setCount($count);
+                    }
+                }
+            }
+        }
     }
 
     private function extractPattern(string $pattern): array
@@ -39,27 +51,4 @@ class Pattern
         return $endCount;
     }
 
-    private function splitPattern(string $pattern, CacheInterface $cache)
-    {
-        $key = sha1($pattern);
-        $cachedPatternChars = $cache->get($key);
-        if ($cachedPatternChars === null) {
-            $noCounts = preg_replace('/[0-9]+/', '', $pattern);
-            $chars = array_merge($this->extractPattern($pattern), $this->extractPatternEndCount($pattern));
-            foreach ($chars as $x => $y) {
-                foreach ($y as $char) {
-                    $charNoCounts = preg_replace('/[0-9]+/', '', $char);
-                    $charNum = (!empty($charNoCounts)) ?
-                        strpos($noCounts, $charNoCounts) :
-                        strlen($noCounts);
-                    $patternChar = new PatternChar($char, $charNum);
-                    array_push($this->patternChars, $patternChar);
-                }
-            }
-            $cache->set($key, $this->patternChars);
-        }
-        else{
-            $this->patternChars = $cachedPatternChars;
-        }
-    }
 }

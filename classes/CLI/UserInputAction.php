@@ -29,7 +29,7 @@ class UserInputAction
     public function hyphenateOneWord(string $word, string &$resultStr): void
     {
         $this->logger->info("Chosen hyphenate one word '{word}'", array('word' => $word));
-        $resultStr = $this->hyphenationTool->oneWordHyphenation($this->allPatterns, $word);
+        $resultStr = $this->hyphenationTool->hyphenateWord($this->allPatterns, $word);
     }
 
     public function hyphenateParagraph(string $text, string &$resultStr): void
