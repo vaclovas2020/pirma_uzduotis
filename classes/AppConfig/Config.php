@@ -21,7 +21,7 @@ class Config
     private $dbName = "";
     private $dbUser = "";
     private $dbPassword = "";
-    private $enableDbSource = false;
+    private $enabledDbSource = false;
 
     public function __construct(string $configFileName = "app_config.json")
     {
@@ -67,9 +67,16 @@ class Config
         return $this->dbPassword;
     }
 
-    /**
-     * @param string $dbHost
-     */
+    public function isEnabledDbSource(): bool
+    {
+        return $this->enabledDbSource;
+    }
+
+    public function setEnabledDbSource(bool $enabledDbSource): void
+    {
+        $this->enabledDbSource = $enabledDbSource;
+    }
+
     public function setDbHost(string $dbHost): void
     {
         $this->dbHost = $dbHost;
