@@ -125,7 +125,7 @@ class Config
         return $this->patternsFilePath;
     }
 
-    public function createConfigFile(string $configFileName = "app_config.json"): void
+    public function createConfigFile(string $configFileName = "app_config.json"): bool
     {
         $jsonConfig = array(
             'logPrintToScreen' => $this->logPrintToScreen,
@@ -141,8 +141,9 @@ class Config
             'enabledDbSource' => $this->enabledDbSource
         );
         if (!(new FileWriter())->writeToFile($configFileName, json_encode($jsonConfig))) {
-            throw new RuntimeException("Cannot create default config file '$configFileName'!");
+            return false;
         }
+        return true;
     }
 
     private function applyConfigFileData(array $configData, array $params): bool
