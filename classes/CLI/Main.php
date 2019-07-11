@@ -4,7 +4,6 @@
 namespace CLI;
 
 use AppConfig\Config;
-use AppConfig\DbConfig;
 use Log\Logger;
 use SimpleCache\FileCache;
 
