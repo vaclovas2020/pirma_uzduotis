@@ -10,33 +10,43 @@ use PDOException;
 
 class DbConfig
 {
-
-    private $dbHost = "localhost";
-    private $dbName = "word_hyphenation_db";
-    private $dbUser = "root";
-    private $dbPassword = "Q1w5e9r7t5y3@";
     private $logger;
+    private $pdo = null;
 
     public function __construct(string $dbHost, string $dbName, string $dbUser, string $dbPassword,
                                 LoggerInterface $logger)
     {
-        $this->dbHost = $dbHost;
-        $this->dbName = $dbName;
-        $this->dbUser = $dbUser;
-        $this->dbPassword = $dbPassword;
         $this->logger = $logger;
-    }
-
-    public function getPDOConnector(): PDO
-    {
-        $pdo = null;
-        $dsn = "mysql:dbname={$this->dbName};host={$this->dbHost}";
+        $dsn = "mysql:dbname={$dbName};host={$dbHost}";
         try {
-            $pdo = new PDO($dsn, $this->dbUser, $this->dbPassword);
+            $this->pdo = new PDO($dsn, $dbUser, $dbPassword);
         } catch (PDOException $e){
             $this->logger->critical('Cannot connect to database {dsn}', array('dsn'=>$dsn));
+            exit();
         }
-        return $pdo;
     }
 
+    public function getPdo(): PDO
+    {
+        return $this->pdo;
+    }
+
+
+    public function createDbTables(): bool{
+        $queries = @file_get_contents('word_hyphenation_db.sql');
+        if ($queries === false){
+            return false;
+        }
+        $queriesArr = explode(';', $queries);
+        $this->pdo->beginTransaction();
+        foreach ($queriesArr as $query){
+            if (!$this->pdo->exec($query) === false){
+                $this->logger->critical("Cannot execute SQL query: '{sql}' Rollback changes.", array('sql'=>$query));
+                $this->pdo->rollBack();
+                return false;
+            }
+        }
+        $this->pdo->commit();
+        return true;
+    }
 }
