@@ -17,6 +17,10 @@ class Config
     private $cachePath = 'cache';
     private $cacheDefaultTtl = 2592000;
     private $patternsFilePath = PatternDataLoader::DEFAULT_FILENAME;
+    private $dbHost = "";
+    private $dbName = "";
+    private $dbUser = "";
+    private $dbPassword = "";
 
     public function __construct(string $configFileName = "app_config.json")
     {
@@ -29,13 +33,61 @@ class Config
                 'logFilePath',
                 'cachePath',
                 'cacheDefaultTtl',
-                'patternFilePath'))) {
-                $this->createDefaultConfigFile($configFileName);
+                'patternFilePath',
+                'dbHost',
+                'dbName',
+                'dbUser',
+                'dbPassword'))) {
+                $this->createConfigFile($configFileName);
             }
         } else {
-            $this->createDefaultConfigFile($configFileName);
+            $this->createConfigFile($configFileName);
         }
     }
+
+    public function getDbHost(): string
+    {
+        return $this->dbHost;
+    }
+
+    public function getDbName(): string
+    {
+        return $this->dbName;
+    }
+
+    public function getDbUser(): string
+    {
+        return $this->dbUser;
+    }
+
+    public function getDbPassword(): string
+    {
+        return $this->dbPassword;
+    }
+
+    /**
+     * @param string $dbHost
+     */
+    public function setDbHost(string $dbHost): void
+    {
+        $this->dbHost = $dbHost;
+    }
+
+    public function setDbName(string $dbName): void
+    {
+        $this->dbName = $dbName;
+    }
+
+    public function setDbUser(string $dbUser): void
+    {
+        $this->dbUser = $dbUser;
+    }
+
+    public function setDbPassword(string $dbPassword): void
+    {
+        $this->dbPassword = $dbPassword;
+    }
+
 
     public function applyLoggerConfig(Logger $logger): bool
     {
@@ -64,7 +116,7 @@ class Config
         return $this->patternsFilePath;
     }
 
-    private function createDefaultConfigFile($configFileName): void
+    public function createConfigFile(string $configFileName = "app_config.json"): void
     {
         $jsonConfig = array(
             'logPrintToScreen' => $this->logPrintToScreen,
@@ -72,7 +124,11 @@ class Config
             'logFilePath' => $this->logFilePath,
             'cachePath' => $this->cachePath,
             'cacheDefaultTtl' => $this->cacheDefaultTtl,
-            'patternFilePath' => $this->patternsFilePath
+            'patternFilePath' => $this->patternsFilePath,
+            'dbHost' => $this->dbUser,
+            'dbName' => $this->dbName,
+            'dbUser' => $this->dbUser,
+            'dbPassword' => $this->dbPassword
         );
         if (!(new FileWriter())->writeToFile($configFileName, json_encode($jsonConfig))) {
             throw new RuntimeException("Cannot create default config file '$configFileName'!");
