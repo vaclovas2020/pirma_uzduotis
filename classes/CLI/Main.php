@@ -4,6 +4,7 @@
 namespace CLI;
 
 use AppConfig\Config;
+use DB\DbPatternsImporter;
 use Log\Logger;
 use SimpleCache\FileCache;
 
@@ -19,6 +20,16 @@ class Main
             array('arguments' => print_r($argv, true)));
         if ($argc == 6 && $argv[1] === '--config-db'){
             $config->configureDatabase($argv, $logger);
+        }
+        else if ($argc == 3 && $argv[1] === '--db-import-patterns-file'){
+            if ((new DbPatternsImporter($config->getDbConfig($logger), $logger))->importFromFile($argv[2], $cache)){
+                $logger->notice('Patterns file {fileName} successfully imported to database!',
+                    array('fileName' => $argv[2]));
+            }
+            else{
+                $logger->error('Patterns file {fileName} was not imported to database because error occurred!',
+                    array('fileName' => $argv[2]));
+            }
         }
         else if ($argc >= 3) {
             $execCalc = new ExecDurationCalculator();
