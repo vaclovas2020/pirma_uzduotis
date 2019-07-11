@@ -1,5 +1,11 @@
 # WORD HYPHENATION PHP CLI
-``` sh
+## Database Configuration
+```bash
+ php word_hyphenation.php --config-db [db_host] [db_name] [db_user] [db_password]
+ #cofigure database and enable database source
+```
+## More CLI commands
+```bash
  php word_hyphenation.php -w [word] [save_result_to_file(optional)] 
  #hyphenate one word
  php word_hyphenation.php -p [paragraph / sentence] [save_result_to_file(optional)]
