@@ -39,7 +39,7 @@ class Config
                 'dbName',
                 'dbUser',
                 'dbPassword',
-                'enableDbSource'))) {
+                'enabledDbSource'))) {
                 $this->createConfigFile($configFileName);
             }
         } else {
@@ -138,7 +138,7 @@ class Config
             'dbName' => $this->dbName,
             'dbUser' => $this->dbUser,
             'dbPassword' => $this->dbPassword,
-            'enableDbSource' => $this->enableDbSource
+            'enabledDbSource' => $this->enabledDbSource
         );
         if (!(new FileWriter())->writeToFile($configFileName, json_encode($jsonConfig))) {
             throw new RuntimeException("Cannot create default config file '$configFileName'!");
