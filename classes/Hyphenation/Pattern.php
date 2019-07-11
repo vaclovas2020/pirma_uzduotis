@@ -8,7 +8,7 @@ class Pattern
     private $pattern = "";
     private $positionAtWord = 0;
 
-    public function __construct(string $pattern, int $positionAtWord)
+    public function __construct(string $pattern, int $positionAtWord = 0)
     {
         $this->positionAtWord = $positionAtWord;
         $this->pattern = $pattern;
@@ -16,7 +16,6 @@ class Pattern
 
     public function pushPatternToWord(array &$result): void
     {
-
         $noCounts = preg_replace('/[0-9]+/', '', $this->pattern);
         $chars = array_merge($this->extractPattern(), $this->extractPatternEndCount());
         foreach ($chars as $x => $y) {
@@ -26,7 +25,7 @@ class Pattern
                     strpos($noCounts, $charNoCounts) :
                     strlen($noCounts);
                 $patternChar = new PatternChar($char, $charNum);
-                $count =$patternChar->getCount();
+                $count = $patternChar->getCount();
                 if ($this->positionAtWord + $charNum < count($result)) {
                     $current_count = $result[$this->positionAtWord + $charNum]->getCount();
                     if ($count > $current_count) {
