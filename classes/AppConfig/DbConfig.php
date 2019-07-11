@@ -17,7 +17,7 @@ class DbConfig
                                 LoggerInterface $logger)
     {
         $this->logger = $logger;
-        $dsn = "mysql:dbname={$dbName};host={$dbHost}";
+        $dsn = "mysql:dbname={$dbName};host={$dbHost};charset=utf8";
         try {
             $this->pdo = new PDO($dsn, $dbUser, $dbPassword);
         } catch (PDOException $e){
