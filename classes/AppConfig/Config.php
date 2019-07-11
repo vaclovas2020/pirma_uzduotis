@@ -131,7 +131,7 @@ class Config
             'cachePath' => $this->cachePath,
             'cacheDefaultTtl' => $this->cacheDefaultTtl,
             'patternFilePath' => $this->patternsFilePath,
-            'dbHost' => $this->dbUser,
+            'dbHost' => $this->dbHost,
             'dbName' => $this->dbName,
             'dbUser' => $this->dbUser,
             'dbPassword' => $this->dbPassword,
