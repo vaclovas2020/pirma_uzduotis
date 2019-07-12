@@ -2,6 +2,7 @@
 
 namespace Hyphenation;
 
+use AppConfig\Config;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
 
@@ -10,11 +11,13 @@ class WordHyphenationTool
 
     private $logger;
     private $cache;
+    private $config;
 
-    public function __construct(LoggerInterface $logger, CacheInterface $cache)
+    public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config)
     {
         $this->logger = $logger;
         $this->cache = $cache;
+        $this->config = $config;
     }
 
     public function isHyphenatedTextFileCacheExist(string $fileName): bool

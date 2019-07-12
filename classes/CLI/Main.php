@@ -4,7 +4,7 @@
 namespace CLI;
 
 use AppConfig\Config;
-use DB\DbPatternsImporter;
+use DB\DbPatterns;
 use Log\Logger;
 use SimpleCache\FileCache;
 
@@ -22,7 +22,7 @@ class Main
             $config->configureDatabase($argv, $logger);
         }
         else if ($argc == 3 && $argv[1] === '--db-import-patterns-file'){
-            if ((new DbPatternsImporter($config->getDbConfig($logger), $logger))->importFromFile($argv[2], $cache)){
+            if ((new DbPatterns($config->getDbConfig($logger), $logger))->importFromFile($argv[2], $cache)){
                 $logger->notice('Patterns file {fileName} successfully imported to database!',
                     array('fileName' => $argv[2]));
             }

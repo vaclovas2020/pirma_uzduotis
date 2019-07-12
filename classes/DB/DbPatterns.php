@@ -8,9 +8,10 @@ use AppConfig\DbConfig;
 use Hyphenation\Pattern;
 use Hyphenation\PatternDataLoader;
 use Log\LoggerInterface;
+use PDO;
 use SimpleCache\CacheInterface;
 
-class DbPatternsImporter
+class DbPatterns
 {
     private $dbConfig;
     private $logger;
@@ -41,7 +42,7 @@ VALUES(:pattern, :pattern_chars);');
             if (!$query->execute(array(
                 'pattern' => $pattern,
                 'pattern_chars' => $serializedPatternCharArray
-            ))){
+            ))) {
                 $pdo->rollBack();
                 return false;
             }
@@ -49,5 +50,17 @@ VALUES(:pattern, :pattern_chars);');
         }
         $pdo->commit();
         return true;
+    }
+
+    public function getPatternsArray(): array
+    {
+        $patternsArray = array();
+        $pdo = $this->dbConfig->getPdo();
+        $result = $pdo->query('SELECT `pattern` FROM `hyphenation_patterns`;');
+        if ($result) {
+            $patternsArray = $result->fetchAll(PDO::FETCH_COLUMN, 0);
+            $this->logger->notice('Loaded patterns from database.');
+        } else $this->logger->critical('Cannot get patterns from database!');
+        return $patternsArray;
     }
 }

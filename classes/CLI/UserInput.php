@@ -5,6 +5,7 @@ namespace CLI;
 
 
 use AppConfig\Config;
+use DB\DbPatterns;
 use Hyphenation\PatternDataLoader;
 use Hyphenation\WordHyphenationTool;
 use Log\Logger;
@@ -15,9 +16,11 @@ class UserInput
     public function textHyphenationUI(string $choice, string $input, string &$resultStr,
                                       Logger $logger, CacheInterface $cache, Config $config): bool
     {
-        $hyphenationTool = new WordHyphenationTool($logger, $cache);
-        $allPatterns = PatternDataLoader::loadDataFromFile($config->getPatternsFilePath(),
-            $cache, $logger);
+        $hyphenationTool = new WordHyphenationTool($logger, $cache, $config);
+        $allPatterns = ($config->isEnabledDbSource()) ?
+            (new DbPatterns($config->getDbConfig($logger), $logger))->getPatternsArray() :
+            PatternDataLoader::loadDataFromFile($config->getPatternsFilePath(),
+                $cache, $logger);
         $execCalc = new ExecDurationCalculator();
         $userInputAction = new UserInputAction($allPatterns, $hyphenationTool, $logger, $cache);
         switch ($choice) {
