@@ -34,7 +34,7 @@ VALUES(:word,:hyphenated_word);');
 VALUES(:word_id, (SELECT `pattern_id` FROM `hyphenation_patterns` WHERE `pattern` = :pattern));');
         foreach ($patternList as $pattern) {
             if (!empty($pattern)) {
-                if (!$sql1->execute(array('word_id' => $wordId, 'pattern' => $pattern))) {
+                if (!$sql2->execute(array('word_id' => $wordId, 'pattern' => $pattern))) {
                     $pdo->rollBack();
                     return false;
                 }
