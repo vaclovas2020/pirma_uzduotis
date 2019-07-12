@@ -68,7 +68,7 @@ class App
             $this->logger->notice("Program execution duration: {execDuration} seconds", array(
                 'execDuration' => $execDuration
             ));
-        } else if(!$checkConfigurationCli) {
+        } else if (!$checkConfigurationCli) {
             (new Helper())->printHelp();
         }
     }
