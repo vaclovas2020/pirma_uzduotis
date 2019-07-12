@@ -20,7 +20,7 @@ class WordHyphenationTool
         $this->logger = $logger;
         $this->cache = $cache;
         $this->config = $config;
-        $this->dbWordSaver = new DbWord($this->config->getDbConfig($this->logger));
+        $this->dbWordSaver = new DbWord($this->config->getDbConfig());
     }
 
     public function isHyphenatedTextFileCacheExist(string $fileName): bool
