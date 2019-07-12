@@ -3,6 +3,7 @@
 namespace Hyphenation;
 
 use AppConfig\Config;
+use DB\DbWordSaver;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
 
@@ -12,12 +13,14 @@ class WordHyphenationTool
     private $logger;
     private $cache;
     private $config;
+    private $dbWordSaver;
 
     public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config)
     {
         $this->logger = $logger;
         $this->cache = $cache;
         $this->config = $config;
+        $this->dbWordSaver = new DbWordSaver($this->config->getDbConfig($this->logger));
     }
 
     public function isHyphenatedTextFileCacheExist(string $fileName): bool
@@ -46,21 +49,36 @@ class WordHyphenationTool
         }
     }
 
-    public function hyphenateWord(array &$allPatterns, string $word): string
+    public function hyphenateWord(array &$allPatterns, string $word, bool $saveToDb = true): string
     {
         $hash = sha1($word);
+        $wordSavedToDb = ($this->config->isEnabledDbSource())?
+            $this->dbWordSaver->isWordSavedToDb($word): false;
         $resultCache = $this->cache->get($hash);
-        if ($resultCache === null) {
-            $result = $this->findPatternsAndPushToWord($allPatterns, strtolower($word));
+        $resultStr = '';
+        if ($resultCache === null || ($saveToDb && $this->config->isEnabledDbSource() && !$wordSavedToDb)) {
+            $patternListStr = '';
+            $result = $this->findPatternsAndPushToWord($allPatterns, strtolower($word), $patternListStr);
             $resultStr = $this->getResultStrFromResultArray($result);
             $this->logger->info("Word '{word}' hyphenated to '{hyphenateWord}'", array(
                 'word' => $word,
                 'hyphenateWord' => $resultStr
             ));
             $this->cache->set($hash, $resultStr);
-        } else {
+            if ($this->config->isEnabledDbSource() && $saveToDb) {
+                $this->saveWordDataToDb($word, $resultStr, $patternListStr);
+            }
+        }
+        else if ($resultCache !== null){
             $resultStr = $resultCache;
             $this->logger->notice("Word '{word}' hyphenated to '{hyphenateWord}' from cache", array(
+                'word' => $word,
+                'hyphenateWord' => $resultStr
+            ));
+        }
+        else if ($this->config->isEnabledDbSource() && $wordSavedToDb){
+            $resultStr = $this->dbWordSaver->getHyphenatedWordFromDb($word);
+            $this->logger->notice("Word '{word}' hyphenated to '{hyphenateWord}' from database source", array(
                 'word' => $word,
                 'hyphenateWord' => $resultStr
             ));
@@ -80,7 +98,7 @@ class WordHyphenationTool
                     'total' => $count
                 ));
                 $word = preg_replace('/[.,!?;:]+/', '', $word);
-                $hyphenatedWord = $this->hyphenateWord($allPatterns, $word);
+                $hyphenatedWord = $this->hyphenateWord($allPatterns, $word, false);
                 $text = str_replace($word, $hyphenatedWord, $text);
                 $currentWord++;
             }
@@ -119,7 +137,7 @@ class WordHyphenationTool
         return $pos;
     }
 
-    private function findPatternsAndPushToWord(array &$allPatterns, string $word): array
+    private function findPatternsAndPushToWord(array &$allPatterns, string $word, string & $patternsListStr): array
     {
         $result = $this->createResultArray($word);
         $patternsListStr = "\n";
@@ -179,4 +197,16 @@ class WordHyphenationTool
         }
         return $result;
     }
+
+    private function saveWordDataToDb(string $word, string $hyphenatedWord, string $patternListStr): void
+    {
+        if ($this->dbWordSaver->saveWordAndFoundPatterns($word, $hyphenatedWord, $patternListStr)) {
+            $this->logger->notice("Word '{word}', hyphenation result '{hyphenatedWord}' 
+                    and founded patterns saved to database", array('word' => $word, 'hyphenatedWord' => $hyphenatedWord));
+        } else {
+            $this->logger->error("Cannot save word '{word}', hyphenation result '{hyphenatedWord}' 
+                    and founded patterns to database", array('word' => $word, 'hyphenatedWord' => $hyphenatedWord));
+        }
+    }
+
 }

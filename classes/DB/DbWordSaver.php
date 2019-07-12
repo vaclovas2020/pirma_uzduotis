@@ -5,17 +5,35 @@ namespace DB;
 
 
 use AppConfig\DbConfig;
-use Log\LoggerInterface;
+use PDO;
 
 class DbWordSaver
 {
     private $dbConfig;
-    private $logger;
 
-    public function __construct(DbConfig $dbConfig, LoggerInterface $logger)
+    public function __construct(DbConfig $dbConfig)
     {
         $this->dbConfig = $dbConfig;
-        $this->logger = $logger;
+    }
+
+    public function isWordSavedToDb(string $word): bool
+    {
+        $pdo = $this->dbConfig->getPdo();
+        $query = $pdo->prepare('SELECT `word_id` FROM `hyphenated_words` WHERE `word` = :word;');
+        if (!$query->execute(array('word' => $word))) {
+            return false;
+        }
+        return $query->rowCount() == 1;
+    }
+
+    public function getHyphenatedWordFromDb(string $word): string
+    {
+        $pdo = $this->dbConfig->getPdo();
+        $query = $pdo->prepare('SELECT `hyphenated_word` FROM `hyphenated_words` WHERE `word` = :word;');
+        if (!$query->execute(array('word' => $word))) {
+            return '';
+        }
+        return $query->fetch(PDO::FETCH_ASSOC)['hyphenated_word'];
     }
 
     public function saveWordAndFoundPatterns(string $word, string $hyphenatedWord, string $patternListStr): bool
