@@ -52,77 +52,64 @@ class Config
         return new DbConfig($this->dbHost, $this->dbName, $this->dbUser, $this->dbPassword, $logger);
     }
 
-    public
-    function isEnabledDbSource(): bool
+    public function isEnabledDbSource(): bool
     {
         return $this->enabledDbSource;
     }
 
-    public
-    function setEnabledDbSource(bool $enabledDbSource): void
+    public function setEnabledDbSource(bool $enabledDbSource): void
     {
         $this->enabledDbSource = $enabledDbSource;
     }
 
-    public
-    function setDbHost(string $dbHost): void
+    public function setDbHost(string $dbHost): void
     {
         $this->dbHost = $dbHost;
     }
 
-    public
-    function setDbName(string $dbName): void
+    public function setDbName(string $dbName): void
     {
         $this->dbName = $dbName;
     }
 
-    public
-    function setDbUser(string $dbUser): void
+    public function setDbUser(string $dbUser): void
     {
         $this->dbUser = $dbUser;
     }
 
-    public
-    function setDbPassword(string $dbPassword): void
+    public function setDbPassword(string $dbPassword): void
     {
         $this->dbPassword = $dbPassword;
     }
 
-
-    public
-    function applyLoggerConfig(Logger $logger): bool
+    public function applyLoggerConfig(Logger $logger): bool
     {
         $logger->setPrintToScreen($this->logPrintToScreen);
         $logger->setWriteToFile($this->logWriteToFile);
         return true;
     }
 
-    public
-    function getLogFilePath(): string
+    public function getLogFilePath(): string
     {
         return $this->logFilePath;
     }
 
-    public
-    function getCachePath(): string
+    public function getCachePath(): string
     {
         return $this->cachePath;
     }
 
-    public
-    function getCacheDefaultTtl(): int
+    public function getCacheDefaultTtl(): int
     {
         return $this->cacheDefaultTtl;
     }
 
-    public
-    function getPatternsFilePath(): string
+    public function getPatternsFilePath(): string
     {
         return $this->patternsFilePath;
     }
 
-    public
-    function createConfigFile(string $thisFileName = "app_config.json"): bool
+    public function createConfigFile(string $thisFileName = "app_config.json"): bool
     {
         $jsonConfig = array(
             'logPrintToScreen' => $this->logPrintToScreen,
@@ -143,8 +130,7 @@ class Config
         return true;
     }
 
-    public
-    function configureDatabase(array &$argv, LoggerInterface $logger): void
+    public function configureDatabase(array &$argv, LoggerInterface $logger): void
     {
         if ((new DbConfig($argv[2], $argv[3], $argv[4], $argv[5], $logger))->createDbTables()) {
             $logger->notice('Database tables created successful!');
@@ -159,8 +145,7 @@ class Config
         } else $logger->critical('Cannot create database tables!');
     }
 
-    private
-    function applyConfigFileData(array $configData, array $params): bool
+    private function applyConfigFileData(array $configData, array $params): bool
     {
         $notAllDataStored = false;
         foreach ($params as $param) {
