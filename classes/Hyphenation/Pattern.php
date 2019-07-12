@@ -3,6 +3,10 @@
 namespace Hyphenation;
 
 
+use AppConfig\Config;
+use DB\DbPatterns;
+use Log\LoggerInterface;
+
 class Pattern
 {
     private $pattern = "";
@@ -14,23 +18,18 @@ class Pattern
         $this->pattern = $pattern;
     }
 
-    public function pushPatternToWord(array &$result): void
+    public function pushPatternToWord(array &$result, Config $config, LoggerInterface $logger): void
     {
-        $noCounts = preg_replace('/[0-9]+/', '', $this->pattern);
-        $chars = array_merge($this->extractPattern(), $this->extractPatternEndCount());
-        foreach ($chars as $x => $y) {
-            foreach ($y as $char) {
-                $charNoCounts = preg_replace('/[0-9]+/', '', $char);
-                $charNum = (!empty($charNoCounts)) ?
-                    strpos($noCounts, $charNoCounts) :
-                    strlen($noCounts);
-                $patternChar = new PatternChar($char, $charNum);
-                $count = $patternChar->getCount();
-                if ($this->positionAtWord + $charNum < count($result)) {
-                    $current_count = $result[$this->positionAtWord + $charNum]->getCount();
-                    if ($count > $current_count) {
-                        $result[$this->positionAtWord + $charNum]->setCount($count);
-                    }
+        $patterns = ($config->isEnabledDbSource()) ?
+            (new DbPatterns($config->getDbConfig($logger), $logger))->getPatternChars($this->pattern) :
+            $this->getPatternCharArray();
+        foreach ($patterns as $patternChar) {
+            $count = $patternChar->getCount();
+            $charNum = $patternChar->getCharNum();
+            if ($this->positionAtWord + $charNum < count($result)) {
+                $current_count = $result[$this->positionAtWord + $charNum]->getCount();
+                if ($count > $current_count) {
+                    $result[$this->positionAtWord + $charNum]->setCount($count);
                 }
             }
         }
