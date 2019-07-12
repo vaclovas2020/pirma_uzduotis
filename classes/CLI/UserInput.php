@@ -39,6 +39,14 @@ class UserInput
                 $userInputAction->clearStorage($input);
                 return false;
                 break;
+            case '--patterns':
+                if ($config->isEnabledDbSource()) {
+                    $userInputAction->getFoundPatternsOfWord($input, $config->getDbConfig($logger));
+                }
+                else{
+                    $logger->warning("Cannot get patterns list of word '{word}' because 
+                    database source is not enabled.", array('word' => $input));
+                }
             default:
                 $logger->warning("Unknown {choice} parameter.", array('choice' => $choice));
                 return false;
