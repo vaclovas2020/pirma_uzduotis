@@ -47,6 +47,7 @@ class UserInput
                     $logger->warning("Cannot get patterns list of word '{word}' because 
                     database source is not enabled.", array('word' => $input));
                 }
+                return false;
                 break;
             default:
                 $logger->warning("Unknown {choice} parameter.", array('choice' => $choice));
