@@ -7,7 +7,7 @@ namespace DB;
 use AppConfig\DbConfig;
 use PDO;
 
-class DbWordSaver
+class DbWord
 {
     private $dbConfig;
 

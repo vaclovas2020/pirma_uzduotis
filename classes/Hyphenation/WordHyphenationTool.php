@@ -3,7 +3,7 @@
 namespace Hyphenation;
 
 use AppConfig\Config;
-use DB\DbWordSaver;
+use DB\DbWord;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
 
@@ -20,7 +20,7 @@ class WordHyphenationTool
         $this->logger = $logger;
         $this->cache = $cache;
         $this->config = $config;
-        $this->dbWordSaver = new DbWordSaver($this->config->getDbConfig($this->logger));
+        $this->dbWordSaver = new DbWord($this->config->getDbConfig($this->logger));
     }
 
     public function isHyphenatedTextFileCacheExist(string $fileName): bool
