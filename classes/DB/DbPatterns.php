@@ -31,7 +31,7 @@ class DbPatterns
 VALUES(:pattern, :pattern_chars);');
         $current = 1;
         foreach ($patternsArray as $pattern) {
-            $patternObj = new Pattern($pattern);
+            $patternObj = new Pattern(str_replace('.','',$pattern));
             $patternCharArray = $patternObj->getPatternCharArray();
             $serializedPatternCharArray = serialize($patternCharArray);
             $this->logger->info('Importing pattern {current} / {total} to database',
@@ -62,5 +62,26 @@ VALUES(:pattern, :pattern_chars);');
             $this->logger->notice('Loaded patterns from database.');
         } else $this->logger->critical('Cannot get patterns from database!');
         return $patternsArray;
+    }
+
+    public function getPatternChars(string $pattern): array
+    {
+        $patternCharsArray = array();
+        $pdo = $this->dbConfig->getPdo();
+        $sql = $pdo->prepare('SELECT `pattern_chars` FROM `hyphenation_patterns` WHERE `pattern` = :pattern;');
+        $sql->bindParam(':pattern', $pattern);
+        if ($sql->execute()) {
+            $patternCharsArray = unserialize($sql->fetch(PDO::FETCH_ASSOC)['pattern_chars']);
+            $this->logger->notice("Loaded pattern '{pattern}' chars from database.",
+                array(
+                    'pattern' => $pattern
+                ));
+        } else {
+            $this->logger->critical("Cannot get pattern '{pattern}' chars from database!",
+                array(
+                    'pattern' => $pattern
+                ));
+        }
+        return $patternCharsArray;
     }
 }
