@@ -14,7 +14,6 @@ Core\AutoLoader::register();
 
 $logger = new Logger();
 $config = new Config($logger);
-$config->applyLoggerConfig($logger);
 $cache = new FileCache($config->getCachePath(), $config->getCacheDefaultTtl());
 $app = new App($logger, $config, $cache);
 $app->start($argc, $argv);

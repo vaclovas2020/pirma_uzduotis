@@ -138,10 +138,8 @@ class Config
                 $this->{$param} = $configData[$param];
             } else $notAllDataStored = true;
         }
-        if ($this->enabledDbSource) {
-            $this->dbConfig = new DbConfig($this->dbHost, $this->dbName, $this->dbUser,
+        $this->dbConfig = new DbConfig($this->dbHost, $this->dbName, $this->dbUser,
                 $this->dbPassword, $this->logger);
-        }
         return !$notAllDataStored;
     }
 }

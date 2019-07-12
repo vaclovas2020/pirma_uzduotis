@@ -14,15 +14,17 @@ class DbConfig
     private $pdo = null;
 
     public function __construct(string $dbHost, string $dbName, string $dbUser, string $dbPassword,
-                                LoggerInterface $logger)
+                                LoggerInterface $logger, bool $isDbEnabled = false)
     {
         $this->logger = $logger;
-        $dsn = "mysql:dbname={$dbName};host={$dbHost};charset=utf8";
-        try {
-            $this->pdo = new PDO($dsn, $dbUser, $dbPassword);
-        } catch (PDOException $e){
-            $this->logger->critical('Cannot connect to database {dsn}', array('dsn'=>$dsn));
-            exit();
+        if ($isDbEnabled) {
+            $dsn = "mysql:dbname={$dbName};host={$dbHost};charset=utf8";
+            try {
+                $this->pdo = new PDO($dsn, $dbUser, $dbPassword);
+            } catch (PDOException $e) {
+                $this->logger->critical('Cannot connect to database {dsn}', array('dsn' => $dsn));
+                exit();
+            }
         }
     }
 
