@@ -50,7 +50,6 @@ class WordHyphenationTool
     {
         $hash = sha1($word);
         $resultCache = $this->cache->get($hash);
-        $resultStr = '';
         if ($resultCache === null) {
             $result = $this->findPatternsAndPushToWord($allPatterns, strtolower($word));
             $resultStr = $this->getResultStrFromResultArray($result);
@@ -158,8 +157,9 @@ class WordHyphenationTool
 
     private function pushPatternDataToWord(array &$result, string $pattern, int $positionAtWord): void
     {
-        $patternObj = new Pattern(str_replace('.', '', $pattern), $positionAtWord);
-        $patternObj->pushPatternToWord($result);
+        $patternObj = new Pattern(($this->config->isEnabledDbSource()) ? $pattern :
+            str_replace('.', '', $pattern), $positionAtWord);
+        $patternObj->pushPatternToWord($result, $this->config, $this->logger);
     }
 
     private function getResultStrFromResultArray(array &$result): string
