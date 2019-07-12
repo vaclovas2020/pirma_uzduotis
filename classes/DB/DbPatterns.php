@@ -31,7 +31,7 @@ class DbPatterns
 VALUES(:pattern, :pattern_chars);');
         $current = 1;
         foreach ($patternsArray as $pattern) {
-            $patternObj = new Pattern(str_replace('.','',$pattern));
+            $patternObj = new Pattern(str_replace('.', '', $pattern));
             $patternCharArray = $patternObj->getPatternCharArray();
             $serializedPatternCharArray = serialize($patternCharArray);
             $this->logger->info('Importing pattern {current} / {total} to database',
