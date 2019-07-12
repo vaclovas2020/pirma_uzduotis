@@ -23,14 +23,14 @@ class DbWordSaver
         $pdo = $this->dbConfig->getPdo();
         $patternList = explode("\n", $patternListStr);
         $pdo->beginTransaction();
-        $sql1 = $pdo->prepare('INSERT INTO `hyphenated_words`(`word`,`hyphenated_word`) 
+        $sql1 = $pdo->prepare('REPLACE INTO `hyphenated_words`(`word`,`hyphenated_word`) 
 VALUES(:word,:hyphenated_word);');
         if (!$sql1->execute(array('word' => $word, 'hyphenated_word' => $hyphenatedWord))) {
             $pdo->rollBack();
             return false;
         }
         $wordId = $pdo->lastInsertId();
-        $sql2 = $pdo->prepare('INSERT INTO `hyphenated_word_patterns`(`word_id`,`pattern_id`) 
+        $sql2 = $pdo->prepare('REPLACE INTO `hyphenated_word_patterns`(`word_id`,`pattern_id`) 
 VALUES(:word_id, (SELECT `pattern_id` FROM `hyphenation_patterns` WHERE `pattern` = :pattern));');
         foreach ($patternList as $pattern) {
             if (!empty($pattern)) {
