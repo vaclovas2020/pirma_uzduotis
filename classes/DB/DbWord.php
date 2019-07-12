@@ -36,6 +36,20 @@ class DbWord
         return $query->fetch(PDO::FETCH_ASSOC)['hyphenated_word'];
     }
 
+    public function getFoundPatternsOfWord(string $word, array &$patterns): bool
+    {
+        $pdo = $this->dbConfig->getPdo();
+        $sql = $pdo->prepare('SELECT `hyphenation_patterns`.`pattern` FROM `hyphenated_word_patterns`
+INNER JOIN `hyphenation_patterns` ON `hyphenation_patterns`.`pattern_id` = `hyphenated_word_patterns`.`pattern_id` 
+INNER JOIN `hyphenated_words` ON `hyphenated_words`.`word_id` = `hyphenated_word_patterns`.`word_id` 
+WHERE `hyphenated_words`.`word` = :word;');
+        if (!$sql->execute(array('word' => $word))) {
+            return false;
+        }
+        $patterns = $sql->fetchAll(PDO::FETCH_COLUMN, 0);
+        return true;
+    }
+
     public function saveWordAndFoundPatterns(string $word, string $hyphenatedWord, string $patternListStr): bool
     {
         $pdo = $this->dbConfig->getPdo();
