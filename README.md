@@ -14,6 +14,8 @@
  #hyphenate one paragraph / sentence
  php word_hyphenation.php -f [read_file] [save_result_to_file(optional)]
  #hyphenate all text from file
+ php word_hyphenation.php --patterns [word]
+ #get patterns list of word (works only if database source is configured)
  php word_hyphenation.php --clear cache
  #clean Cache Storage
  php word_hyphenation.php --clear log
