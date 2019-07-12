@@ -19,7 +19,7 @@ class DbWordSaver
     public function isWordSavedToDb(string $word): bool
     {
         $pdo = $this->dbConfig->getPdo();
-        $query = $pdo->prepare('SELECT `word_id` FROM `hyphenated_words` WHERE `word` = :word;');
+        $query = $pdo->prepare('SELECT `word_id` FROM `hyphenated_words` WHERE `word` = LOWER(:word);');
         if (!$query->execute(array('word' => $word))) {
             return false;
         }
@@ -29,7 +29,7 @@ class DbWordSaver
     public function getHyphenatedWordFromDb(string $word): string
     {
         $pdo = $this->dbConfig->getPdo();
-        $query = $pdo->prepare('SELECT `hyphenated_word` FROM `hyphenated_words` WHERE `word` = :word;');
+        $query = $pdo->prepare('SELECT `hyphenated_word` FROM `hyphenated_words` WHERE `word` = LOWER(:word);');
         if (!$query->execute(array('word' => $word))) {
             return '';
         }
@@ -42,7 +42,7 @@ class DbWordSaver
         $patternList = explode("\n", $patternListStr);
         $pdo->beginTransaction();
         $sql1 = $pdo->prepare('REPLACE INTO `hyphenated_words`(`word`,`hyphenated_word`) 
-VALUES(:word,:hyphenated_word);');
+VALUES(LOWER(:word),:hyphenated_word);');
         if (!$sql1->execute(array('word' => $word, 'hyphenated_word' => $hyphenatedWord))) {
             $pdo->rollBack();
             return false;
