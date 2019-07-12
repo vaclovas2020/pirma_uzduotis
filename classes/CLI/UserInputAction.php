@@ -4,6 +4,8 @@
 namespace CLI;
 
 
+use AppConfig\DbConfig;
+use DB\DbWord;
 use Hyphenation\WordHyphenationTool;
 use IO\FileReader;
 use Log\Logger;
@@ -55,6 +57,18 @@ class UserInputAction
             $this->hyphenationTool->saveHyphenatedTextFileToCache($fileName, $resultStr);
         }
         return true;
+    }
+
+    public function getFoundPatternsOfWord(string $word, DbConfig $dbConfig): void
+    {
+        $dbWord = new DbWord($dbConfig);
+        $foundPatterns = array();
+        if ($dbWord->getFoundPatternsOfWord($word, $foundPatterns)) {
+            $this->logger->info("Founded patterns of word '{word}': {patterns}",
+                array('word' => $word, 'patterns' => print_r($foundPatterns, true)));
+        } else {
+            $this->logger->warning("Cannot get patterns of word '{word}' from database", array('word' => $word));
+        }
     }
 
     public function clearStorage(string $storageName): void
