@@ -13,14 +13,14 @@ class WordHyphenationTool
     private $logger;
     private $cache;
     private $config;
-    private $dbWordSaver;
+    private $dbWord;
 
     public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config)
     {
         $this->logger = $logger;
         $this->cache = $cache;
         $this->config = $config;
-        $this->dbWordSaver = new DbWord($this->config->getDbConfig());
+        $this->dbWord = new DbWord($this->config->getDbConfig());
     }
 
     public function isHyphenatedTextFileCacheExist(string $fileName): bool
@@ -53,7 +53,7 @@ class WordHyphenationTool
     {
         $hash = sha1($word);
         $wordSavedToDb = ($this->config->isEnabledDbSource()) ?
-            $this->dbWordSaver->isWordSavedToDb($word) : false;
+            $this->dbWord->isWordSavedToDb($word) : false;
         $resultCache = $this->cache->get($hash);
         $resultStr = '';
         if (($resultCache === null && !$wordSavedToDb) ||
@@ -76,7 +76,7 @@ class WordHyphenationTool
                 'hyphenateWord' => $resultStr
             ));
         } else if ($this->config->isEnabledDbSource() && $wordSavedToDb) {
-            $resultStr = $this->dbWordSaver->getHyphenatedWordFromDb($word);
+            $resultStr = $this->dbWord->getHyphenatedWordFromDb($word);
             $this->logger->notice("Word '{word}' hyphenated to '{hyphenateWord}' from database source", array(
                 'word' => $word,
                 'hyphenateWord' => $resultStr
@@ -200,7 +200,7 @@ class WordHyphenationTool
 
     private function saveWordDataToDb(string $word, string $hyphenatedWord, string $patternListStr): void
     {
-        if ($this->dbWordSaver->saveWordAndFoundPatterns($word, $hyphenatedWord, $patternListStr)) {
+        if ($this->dbWord->saveWordAndFoundPatterns($word, $hyphenatedWord, $patternListStr)) {
             $this->logger->notice("Word '{word}', hyphenation result '{hyphenatedWord}' 
                     and founded patterns saved to database", array('word' => $word, 'hyphenatedWord' => $hyphenatedWord));
         } else {
