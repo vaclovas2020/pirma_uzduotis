@@ -111,7 +111,7 @@ class Config
     public function configureDatabase(string $dbHost, string $dbName,
                                       string $dbUser, string $dbPassword): void
     {
-        $this->dbConfig = new DbConfig($dbHost, $dbName, $dbUser, $dbPassword, $this->logger);
+        $this->dbConfig = new DbConfig($dbHost, $dbName, $dbUser, $dbPassword, $this->logger, true);
         if ($this->dbConfig->createDbTables()) {
             $this->logger->notice('Database tables created successful!');
             $this->dbHost = $dbHost;

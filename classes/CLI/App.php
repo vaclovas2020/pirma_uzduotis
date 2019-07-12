@@ -48,7 +48,8 @@ class App
     {
         $this->logger->info('Program started with arguments: {arguments}',
             array('arguments' => print_r($argv, true)));
-        if (!$this->checkConfigurationCLI($argc, $argv) && $argc >= 3) {
+        $checkConfigurationCli = $this->checkConfigurationCLI($argc, $argv);
+        if (!$checkConfigurationCli && $argc >= 3) {
             $execCalc = new ExecDurationCalculator();
             $choose = $argv[1]; // -w one word, -p paragraph, -f file
             $resultStr = '';
@@ -67,7 +68,7 @@ class App
             $this->logger->notice("Program execution duration: {execDuration} seconds", array(
                 'execDuration' => $execDuration
             ));
-        } else {
+        } else if(!$checkConfigurationCli) {
             (new Helper())->printHelp();
         }
     }
