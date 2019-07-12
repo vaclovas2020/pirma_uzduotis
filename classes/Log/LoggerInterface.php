@@ -23,4 +23,7 @@ interface LoggerInterface
     public function debug(string $message, array $context = array()): void;
 
     public function log(string $level, string $message, array $context = array()): void;
+
+    public function clear(): bool;
+    
 }

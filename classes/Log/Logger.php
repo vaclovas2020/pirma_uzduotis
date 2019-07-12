@@ -19,7 +19,7 @@ class Logger implements LoggerInterface
         $this->fileName = $fileName;
     }
 
-    public function deleteLogFile(): bool{
+    public function clear(): bool{
         return @unlink($this->fileName);
     }
 

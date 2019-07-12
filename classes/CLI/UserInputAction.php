@@ -4,11 +4,10 @@
 namespace CLI;
 
 
-use AppConfig\DbConfig;
 use DB\DbWord;
 use Hyphenation\WordHyphenationTool;
 use IO\FileReader;
-use Log\Logger;
+use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
 
 class UserInputAction
@@ -18,14 +17,15 @@ class UserInputAction
     private $cache;
     private $allPatterns;
     private $hyphenationTool;
+    private $dbWord;
 
-    public function __construct(array &$allPatterns, WordHyphenationTool $hyphenationTool,
-                                Logger $logger, CacheInterface $cache)
+    public function __construct(array &$allPatterns, WordHyphenationTool $hyphenationTool, LoggerInterface $logger, CacheInterface $cache, DbWord $dbWord)
     {
         $this->logger = $logger;
         $this->cache = $cache;
         $this->allPatterns = $allPatterns;
         $this->hyphenationTool = $hyphenationTool;
+        $this->dbWord = $dbWord;
     }
 
     public function hyphenateOneWord(string $word, string &$resultStr): void
@@ -59,11 +59,10 @@ class UserInputAction
         return true;
     }
 
-    public function getFoundPatternsOfWord(string $word, DbConfig $dbConfig): void
+    public function getFoundPatternsOfWord(string $word): void
     {
-        $dbWord = new DbWord($dbConfig);
         $foundPatterns = array();
-        if ($dbWord->getFoundPatternsOfWord($word, $foundPatterns)) {
+        if ($this->dbWord->getFoundPatternsOfWord($word, $foundPatterns)) {
             $this->logger->info("Founded patterns of word '{word}': {patterns}",
                 array('word' => $word, 'patterns' => print_r($foundPatterns, true)));
         } else {
@@ -82,7 +81,7 @@ class UserInputAction
                 }
                 break;
             case 'log':
-                if ($this->logger->deleteLogFile()) {
+                if ($this->logger->clear()) {
                     $this->logger->notice('Log file was cleaned.');
                 } else {
                     $this->logger->error('Cannot delete log file.');

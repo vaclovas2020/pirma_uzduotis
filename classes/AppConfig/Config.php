@@ -22,9 +22,12 @@ class Config
     private $dbUser = "";
     private $dbPassword = "";
     private $enabledDbSource = false;
+    private $logger;
+    private $dbConfig;
 
-    public function __construct(string $thisFileName = "app_config.json")
+    public function __construct(LoggerInterface $logger, string $thisFileName = "app_config.json")
     {
+        $this->logger = $logger;
         $thisStr = @file_get_contents($thisFileName);
         if ($thisStr !== false) {
             $configData = json_decode($thisStr, true);
@@ -41,15 +44,19 @@ class Config
                 'dbPassword',
                 'enabledDbSource'))) {
                 $this->createConfigFile($thisFileName);
+                if ($this->enabledDbSource) {
+                    $this->dbConfig = new DbConfig($this->dbHost, $this->dbName, $this->dbUser,
+                        $this->dbPassword, $this->logger);
+                }
             }
         } else {
             $this->createConfigFile($thisFileName);
         }
     }
 
-    public function getDbConfig(LoggerInterface $logger): DbConfig
+    public function getDbConfig(): DbConfig
     {
-        return new DbConfig($this->dbHost, $this->dbName, $this->dbUser, $this->dbPassword, $logger);
+        return $this->dbConfig;
     }
 
     public function isEnabledDbSource(): bool
@@ -60,26 +67,6 @@ class Config
     public function setEnabledDbSource(bool $enabledDbSource): void
     {
         $this->enabledDbSource = $enabledDbSource;
-    }
-
-    public function setDbHost(string $dbHost): void
-    {
-        $this->dbHost = $dbHost;
-    }
-
-    public function setDbName(string $dbName): void
-    {
-        $this->dbName = $dbName;
-    }
-
-    public function setDbUser(string $dbUser): void
-    {
-        $this->dbUser = $dbUser;
-    }
-
-    public function setDbPassword(string $dbPassword): void
-    {
-        $this->dbPassword = $dbPassword;
     }
 
     public function applyLoggerConfig(Logger $logger): bool
@@ -130,19 +117,21 @@ class Config
         return true;
     }
 
-    public function configureDatabase(array &$argv, LoggerInterface $logger): void
+    public function configureDatabase(string $dbHost, string $dbName,
+                                      string $dbUser, string $dbPassword): void
     {
-        if ((new DbConfig($argv[2], $argv[3], $argv[4], $argv[5], $logger))->createDbTables()) {
-            $logger->notice('Database tables created successful!');
-            $this->setDbHost($argv[2]);
-            $this->setDbName($argv[3]);
-            $this->setDbUser($argv[4]);
-            $this->setDbPassword($argv[5]);
+        $this->dbConfig = new DbConfig($dbHost, $dbName, $dbUser, $dbPassword, $this->logger);
+        if ($this->dbConfig->createDbTables()) {
+            $this->logger->notice('Database tables created successful!');
+            $this->dbHost = $dbHost;
+            $this->dbName = $dbName;
+            $this->dbUser = $dbUser;
+            $this->dbPassword = $dbPassword;
             $this->setEnabledDbSource(true);
             if ($this->createConfigFile()) {
-                $logger->notice('Database configuration saved to app_config.json file!');
-            } else $logger->error('Cannot save app_config.json file!');
-        } else $logger->critical('Cannot create database tables!');
+                $this->logger->notice('Database configuration saved to app_config.json file!');
+            } else $this->logger->error('Cannot save app_config.json file!');
+        } else $this->logger->critical('Cannot create database tables!');
     }
 
     private function applyConfigFileData(array $configData, array $params): bool
