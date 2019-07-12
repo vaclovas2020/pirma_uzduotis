@@ -65,13 +65,6 @@ class Config
         $this->enabledDbSource = $enabledDbSource;
     }
 
-    public function applyLoggerConfig(Logger $logger): bool
-    {
-        $logger->setPrintToScreen($this->logPrintToScreen);
-        $logger->setWriteToFile($this->logWriteToFile);
-        return true;
-    }
-
     public function getLogFilePath(): string
     {
         return $this->logFilePath;
@@ -130,6 +123,13 @@ class Config
         } else $this->logger->critical('Cannot create database tables!');
     }
 
+    public function applyLoggerConfig(Logger $logger): bool
+    {
+        $logger->setPrintToScreen($this->logPrintToScreen);
+        $logger->setWriteToFile($this->logWriteToFile);
+        return true;
+    }
+
     private function applyConfigFileData(array $configData, array $params): bool
     {
         $notAllDataStored = false;
@@ -139,7 +139,7 @@ class Config
             } else $notAllDataStored = true;
         }
         $this->dbConfig = new DbConfig($this->dbHost, $this->dbName, $this->dbUser,
-                $this->dbPassword, $this->logger);
+                $this->dbPassword, $this->logger, $this->isEnabledDbSource());
         return !$notAllDataStored;
     }
 }
