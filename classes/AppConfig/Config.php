@@ -48,6 +48,8 @@ class Config
         } else {
             $this->createConfigFile($thisFileName);
         }
+        $this->dbConfig = new DbConfig($this->dbHost, $this->dbName, $this->dbUser,
+            $this->dbPassword, $this->logger, $this->isEnabledDbSource());
     }
 
     public function getDbConfig(): DbConfig
@@ -138,8 +140,6 @@ class Config
                 $this->{$param} = $configData[$param];
             } else $notAllDataStored = true;
         }
-        $this->dbConfig = new DbConfig($this->dbHost, $this->dbName, $this->dbUser,
-                $this->dbPassword, $this->logger, $this->isEnabledDbSource());
         return !$notAllDataStored;
     }
 }
