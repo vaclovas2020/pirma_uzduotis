@@ -2,7 +2,9 @@
 ## Database Configuration
 ```bash
  php word_hyphenation.php --config-db [db_host] [db_name] [db_user] [db_password]
- #cofigure database and enable database source
+ #configure database and enable database source
+ php word_hyphenation.php --db-import-patterns-file [pattern_file_path]
+ #import patterns file to database
 ```
 ## More CLI commands
 ```bash
