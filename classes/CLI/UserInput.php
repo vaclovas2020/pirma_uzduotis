@@ -16,7 +16,6 @@ class UserInput
 {
 
     private $logger;
-    private $dbPatterns;
     private $userInputAction;
     private $config;
 
@@ -25,13 +24,12 @@ class UserInput
         $this->logger = $logger;
         $this->config = $config;
         $allPatterns = ($config->isEnabledDbSource()) ?
-            $this->dbPatterns->getPatternsArray() :
+            $dbPatterns->getPatternsArray() :
             PatternDataLoader::loadDataFromFile($config->getPatternsFilePath(),
                 $cache, $logger);
         $hyphenationTool = new WordHyphenationTool($logger, $cache, $config);
         $dbWord = new DbWord($config->getDbConfig());
         $this->userInputAction = new UserInputAction($allPatterns, $hyphenationTool, $logger, $cache, $dbWord);
-        $this->dbPatterns = $dbPatterns;
     }
 
     public function processInput(string $choice, string $input, string &$resultStr): bool

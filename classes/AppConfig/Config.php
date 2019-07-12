@@ -44,10 +44,6 @@ class Config
                 'dbPassword',
                 'enabledDbSource'))) {
                 $this->createConfigFile($thisFileName);
-                if ($this->enabledDbSource) {
-                    $this->dbConfig = new DbConfig($this->dbHost, $this->dbName, $this->dbUser,
-                        $this->dbPassword, $this->logger);
-                }
             }
         } else {
             $this->createConfigFile($thisFileName);
@@ -142,7 +138,10 @@ class Config
                 $this->{$param} = $configData[$param];
             } else $notAllDataStored = true;
         }
+        if ($this->enabledDbSource) {
+            $this->dbConfig = new DbConfig($this->dbHost, $this->dbName, $this->dbUser,
+                $this->dbPassword, $this->logger);
+        }
         return !$notAllDataStored;
     }
-
 }

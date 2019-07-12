@@ -22,7 +22,9 @@ class App
         $this->logger = $logger;
         $this->config = $config;
         $this->cache = $cache;
-        $this->dbPatterns = new DbPatterns($config->getDbConfig(), $logger);
+        if ($config->isEnabledDbSource()) {
+            $this->dbPatterns = new DbPatterns($config->getDbConfig(), $logger);
+        }
         $this->userInput = new UserInput($logger, $cache, $config, $this->dbPatterns);
     }
 
