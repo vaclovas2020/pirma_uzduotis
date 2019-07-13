@@ -30,7 +30,7 @@ class App
             $this->config->configureDatabase($argv[2], $argv[3], $argv[4], $argv[5]);
             return true;
         } else if ($argc == 3 && $argv[1] === '--db-import-patterns-file') {
-            $dbPatterns = new DbPatterns($this->config->getDbConfig(), $this->logger, $this->cache);
+            $dbPatterns = new DbPatterns($this->config, $this->logger, $this->cache);
             if ($dbPatterns->importFromFile($argv[2])) {
                 $this->logger->notice('Patterns file {fileName} successfully imported to database!',
                     array('fileName' => $argv[2]));
