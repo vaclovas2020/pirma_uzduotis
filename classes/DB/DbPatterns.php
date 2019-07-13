@@ -4,7 +4,7 @@
 namespace DB;
 
 
-use AppConfig\DbConfig;
+use AppConfig\Config;
 use Hyphenation\Pattern;
 use Hyphenation\PatternDataLoader;
 use Log\LoggerInterface;
@@ -13,27 +13,27 @@ use SimpleCache\CacheInterface;
 
 class DbPatterns
 {
-    private $dbConfig;
+    private $config;
     private $logger;
     private $cache;
 
-    public function __construct(DbConfig $dbConfig, LoggerInterface $logger, CacheInterface $cache)
+    public function __construct(Config $config, LoggerInterface $logger, CacheInterface $cache)
     {
-        $this->dbConfig = $dbConfig;
         $this->logger = $logger;
         $this->cache = $cache;
+        $this->config = $config;
     }
 
     public function importFromFile(string $fileName): bool
     {
         $patternsArray = PatternDataLoader::loadDataFromFile($fileName, $this->cache, $this->logger);
-        $pdo = $this->dbConfig->getPdo();
+        $pdo = $this->config->getDbConfig()->getPdo();
         $pdo->beginTransaction();
         $query = $pdo->prepare('REPLACE INTO `hyphenation_patterns`(`pattern`, `pattern_chars`) 
 VALUES(:pattern, :pattern_chars);');
         $current = 1;
         foreach ($patternsArray as $pattern) {
-            $patternObj = new Pattern(str_replace('.', '', $pattern));
+            $patternObj = new Pattern($this->config, $this, str_replace('.', '', $pattern));
             $patternCharArray = $patternObj->getPatternCharArray();
             $serializedPatternCharArray = serialize($patternCharArray);
             $this->logger->info('Importing pattern {current} / {total} to database',
@@ -57,7 +57,7 @@ VALUES(:pattern, :pattern_chars);');
     public function getPatternsArray(): array
     {
         $patternsArray = array();
-        $pdo = $this->dbConfig->getPdo();
+        $pdo = $this->config->getDbConfig()->getPdo();
         $result = $pdo->query('SELECT `pattern` FROM `hyphenation_patterns`;');
         if ($result) {
             $patternsArray = $result->fetchAll(PDO::FETCH_COLUMN, 0);
@@ -69,7 +69,7 @@ VALUES(:pattern, :pattern_chars);');
     public function getPatternChars(string $pattern): array
     {
         $patternCharsArray = array();
-        $pdo = $this->dbConfig->getPdo();
+        $pdo = $this->config->getDbConfig()->getPdo();
         $sql = $pdo->prepare('SELECT `pattern_chars` FROM `hyphenation_patterns` WHERE `pattern` = :pattern;');
         $sql->bindParam(':pattern', $pattern);
         if ($sql->execute()) {
