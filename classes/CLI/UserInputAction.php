@@ -4,7 +4,6 @@
 namespace CLI;
 
 
-use DB\DbWord;
 use Hyphenation\WordHyphenationTool;
 use IO\FileReader;
 use Log\LoggerInterface;
@@ -15,29 +14,25 @@ class UserInputAction
 
     private $logger;
     private $cache;
-    private $allPatterns;
     private $hyphenationTool;
-    private $dbWord;
 
-    public function __construct(array &$allPatterns, WordHyphenationTool $hyphenationTool, LoggerInterface $logger, CacheInterface $cache, DbWord $dbWord)
+    public function __construct(WordHyphenationTool $hyphenationTool, LoggerInterface $logger, CacheInterface $cache)
     {
         $this->logger = $logger;
         $this->cache = $cache;
-        $this->allPatterns = $allPatterns;
         $this->hyphenationTool = $hyphenationTool;
-        $this->dbWord = $dbWord;
     }
 
     public function hyphenateOneWord(string $word, string &$resultStr): void
     {
         $this->logger->info("Chosen hyphenate one word '{word}'", array('word' => $word));
-        $resultStr = $this->hyphenationTool->hyphenateWord($this->allPatterns, $word);
+        $resultStr = $this->hyphenationTool->hyphenateWord($word);
     }
 
     public function hyphenateParagraph(string $text, string &$resultStr): void
     {
         $this->logger->info("Chosen hyphenate paragraph /sentence '{text}'", array('text' => $text));
-        $resultStr = $this->hyphenationTool->hyphenateAllText($this->allPatterns, $text);
+        $resultStr = $this->hyphenationTool->hyphenateAllText($text);
     }
 
     public function hyphenateFromTextFile(string $fileName, string &$resultStr): bool
@@ -53,7 +48,7 @@ class UserInputAction
                 'fileName' => $fileName
             ));
         } else {
-            $resultStr = $this->hyphenationTool->hyphenateAllText($this->allPatterns, $resultStr);
+            $resultStr = $this->hyphenationTool->hyphenateAllText($resultStr);
             $this->hyphenationTool->saveHyphenatedTextFileToCache($fileName, $resultStr);
         }
         return true;
@@ -61,35 +56,10 @@ class UserInputAction
 
     public function getFoundPatternsOfWord(string $word): void
     {
-        $foundPatterns = array();
-        if ($this->dbWord->getFoundPatternsOfWord($word, $foundPatterns)) {
+        $foundPatterns = $this->hyphenationTool->getFoundPatternsOfWord($word);
+        if (!empty($foundPatterns)) {
             $this->logger->info("Founded patterns of word '{word}': {patterns}",
                 array('word' => $word, 'patterns' => print_r($foundPatterns, true)));
-        } else {
-            $this->logger->warning("Cannot get patterns of word '{word}' from database", array('word' => $word));
-        }
-    }
-
-    public function clearStorage(string $storageName): void
-    {
-        switch ($storageName) {
-            case 'cache':
-                if ($this->cache->clear()) {
-                    $this->logger->notice('Cache Storage was cleaned.');
-                } else {
-                    $this->logger->error('Cannot clean Cache Storage');
-                }
-                break;
-            case 'log':
-                if ($this->logger->clear()) {
-                    $this->logger->notice('Log file was cleaned.');
-                } else {
-                    $this->logger->error('Cannot delete log file.');
-                }
-                break;
-            default:
-                $this->logger->warning("Unknown storage named '{input}'.", array('input' => $storageName));
-                break;
         }
     }
 

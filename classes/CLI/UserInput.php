@@ -5,9 +5,6 @@ namespace CLI;
 
 
 use AppConfig\Config;
-use DB\DbPatterns;
-use DB\DbWord;
-use Hyphenation\PatternDataLoader;
 use Hyphenation\WordHyphenationTool;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
@@ -18,18 +15,38 @@ class UserInput
     private $logger;
     private $userInputAction;
     private $config;
+    private $cache;
 
-    public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config, DbPatterns $dbPatterns)
+    public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config)
     {
         $this->logger = $logger;
         $this->config = $config;
-        $allPatterns = ($config->isEnabledDbSource()) ?
-            $dbPatterns->getPatternsArray() :
-            PatternDataLoader::loadDataFromFile($config->getPatternsFilePath(),
-                $cache, $logger);
+        $this->cache = $cache;
         $hyphenationTool = new WordHyphenationTool($logger, $cache, $config);
-        $dbWord = new DbWord($config->getDbConfig());
-        $this->userInputAction = new UserInputAction($allPatterns, $hyphenationTool, $logger, $cache, $dbWord);
+        $this->userInputAction = new UserInputAction($hyphenationTool, $logger, $cache);
+    }
+
+    public function clearStorage(string $storageName): void
+    {
+        switch ($storageName) {
+            case 'cache':
+                if ($this->cache->clear()) {
+                    $this->logger->notice('Cache Storage was cleaned.');
+                } else {
+                    $this->logger->error('Cannot clean Cache Storage');
+                }
+                break;
+            case 'log':
+                if ($this->logger->clear()) {
+                    $this->logger->notice('Log file was cleaned.');
+                } else {
+                    $this->logger->error('Cannot delete log file.');
+                }
+                break;
+            default:
+                $this->logger->warning("Unknown storage named '{input}'.", array('input' => $storageName));
+                break;
+        }
     }
 
     public function processInput(string $choice, string $input, string &$resultStr): bool
@@ -46,10 +63,6 @@ class UserInput
                 if (!$this->userInputAction->hyphenateFromTextFile($input, $resultStr)) {
                     return false;
                 }
-                break;
-            case '--clear':
-                $this->userInputAction->clearStorage($input);
-                return false;
                 break;
             case '--patterns':
                 if ($this->config->isEnabledDbSource()) {

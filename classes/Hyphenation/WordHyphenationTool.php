@@ -3,6 +3,7 @@
 namespace Hyphenation;
 
 use AppConfig\Config;
+use DB\DbPatterns;
 use DB\DbWord;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
@@ -14,6 +15,7 @@ class WordHyphenationTool
     private $cache;
     private $config;
     private $dbWord;
+    private $dbPatterns;
 
     public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config)
     {
@@ -21,6 +23,7 @@ class WordHyphenationTool
         $this->cache = $cache;
         $this->config = $config;
         $this->dbWord = new DbWord($this->config->getDbConfig());
+        $this->dbPatterns = new DbPatterns($this->config->getDbConfig(), $logger, $cache);
     }
 
     public function isHyphenatedTextFileCacheExist(string $fileName): bool
@@ -49,8 +52,9 @@ class WordHyphenationTool
         }
     }
 
-    public function hyphenateWord(array &$allPatterns, string $word): string
+    public function hyphenateWord(string $word): string
     {
+        $allPatterns = $this->getPatternsArray();
         $hash = sha1($word);
         $wordSavedToDb = ($this->config->isEnabledDbSource()) ?
             $this->dbWord->isWordSavedToDb($word) : false;
@@ -86,7 +90,7 @@ class WordHyphenationTool
         return $resultStr;
     }
 
-    public function hyphenateAllText(array &$allPatterns, string $text): string
+    public function hyphenateAllText(string $text): string
     {
         $words = array();
         $count = preg_match_all('/[a-zA-Z]+[.,!?;:]*/', $text, $words);
@@ -98,12 +102,21 @@ class WordHyphenationTool
                     'total' => $count
                 ));
                 $word = preg_replace('/[.,!?;:]+/', '', $word);
-                $hyphenatedWord = $this->hyphenateWord($allPatterns, $word);
+                $hyphenatedWord = $this->hyphenateWord($word);
                 $text = str_replace($word, $hyphenatedWord, $text);
                 $currentWord++;
             }
         }
         return $text;
+    }
+
+    public function getFoundPatternsOfWord(string $word): array
+    {
+        $foundPatterns = array();
+        if (!$this->dbWord->getFoundPatternsOfWord($word, $foundPatterns)) {
+            $this->logger->warning("Cannot get patterns of word '{word}' from database", array('word' => $word));
+        }
+        return $foundPatterns;
     }
 
     private function isDotAtBegin(string $pattern): bool
@@ -175,9 +188,10 @@ class WordHyphenationTool
 
     private function pushPatternDataToWord(array &$result, string $pattern, int $positionAtWord): void
     {
-        $patternObj = new Pattern(($this->config->isEnabledDbSource()) ? $pattern :
+        $patternObj = new Pattern($this->config, $this->dbPatterns,
+            ($this->config->isEnabledDbSource()) ? $pattern :
             str_replace('.', '', $pattern), $positionAtWord);
-        $patternObj->pushPatternToWord($result, $this->config, $this->logger);
+        $patternObj->pushPatternToWord($result);
     }
 
     private function getResultStrFromResultArray(array &$result): string
@@ -207,6 +221,26 @@ class WordHyphenationTool
             $this->logger->error("Cannot save word '{word}', hyphenation result '{hyphenatedWord}' 
                     and founded patterns to database", array('word' => $word, 'hyphenatedWord' => $hyphenatedWord));
         }
+    }
+
+    private function getPatternsArray(): array
+    {
+        $allPatterns = ($this->config->isEnabledDbSource()) ?
+            $this->dbPatterns->getPatternsArray() :
+            PatternDataLoader::loadDataFromFile($this->config->getPatternsFilePath(),
+                $this->cache, $this->logger);
+        if ($this->config->isEnabledDbSource() && empty($allPatterns)){
+            if ($this->dbPatterns->importFromFile($this->config->getPatternsFilePath())){
+                $this->logger->notice("Patterns database table was empty, so the app imported 
+                patterns from file '{fileName}'.", array('fileName'=>$this->config->getPatternsFilePath()));
+                $allPatterns = $this->dbPatterns->getPatternsArray();
+            }
+            else{
+                $this->logger->notice("Patterns database table was empty, so the app importing 
+                patterns from file '{fileName} 'but error occurred.", array('fileName'=>$this->config->getPatternsFilePath()));
+            }
+        }
+        return $allPatterns;
     }
 
 }

@@ -5,23 +5,26 @@ namespace Hyphenation;
 
 use AppConfig\Config;
 use DB\DbPatterns;
-use Log\LoggerInterface;
 
 class Pattern
 {
+    private $dbPatterns;
+    private $config;
     private $pattern = "";
     private $positionAtWord = 0;
 
-    public function __construct(string $pattern, int $positionAtWord = 0)
+    public function __construct(Config $config, DbPatterns $dbPatterns, string $pattern, int $positionAtWord = 0)
     {
         $this->positionAtWord = $positionAtWord;
         $this->pattern = $pattern;
+        $this->dbPatterns = $dbPatterns;
+        $this->config = $config;
     }
 
-    public function pushPatternToWord(array &$result, Config $config, LoggerInterface $logger): void
+    public function pushPatternToWord(array &$result): void
     {
-        $patterns = ($config->isEnabledDbSource()) ?
-            (new DbPatterns($config->getDbConfig($logger), $logger))->getPatternChars($this->pattern) :
+        $patterns = ($this->config->isEnabledDbSource()) ?
+            $this->dbPatterns->getPatternChars($this->pattern) :
             $this->getPatternCharArray();
         foreach ($patterns as $patternChar) {
             $count = $patternChar->getCount();

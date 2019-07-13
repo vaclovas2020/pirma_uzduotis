@@ -15,15 +15,13 @@ class App
     private $config;
     private $cache;
     private $userInput;
-    private $dbPatterns;
 
     public function __construct(LoggerInterface $logger, Config $config, CacheInterface $cache)
     {
         $this->logger = $logger;
         $this->config = $config;
         $this->cache = $cache;
-        $this->dbPatterns = new DbPatterns($config->getDbConfig(), $logger);
-        $this->userInput = new UserInput($logger, $cache, $config, $this->dbPatterns);
+        $this->userInput = new UserInput($logger, $cache, $config);
     }
 
     public function checkConfigurationCLI(int $argc, array $argv): bool
@@ -32,13 +30,17 @@ class App
             $this->config->configureDatabase($argv[2], $argv[3], $argv[4], $argv[5]);
             return true;
         } else if ($argc == 3 && $argv[1] === '--db-import-patterns-file') {
-            if ($this->dbPatterns->importFromFile($argv[2], $this->cache)) {
+            $dbPatterns = new DbPatterns($this->config->getDbConfig(), $this->logger, $this->cache);
+            if ($dbPatterns->importFromFile($argv[2])) {
                 $this->logger->notice('Patterns file {fileName} successfully imported to database!',
                     array('fileName' => $argv[2]));
             } else {
                 $this->logger->error('Patterns file {fileName} was not imported to database because error occurred!',
                     array('fileName' => $argv[2]));
             }
+            return true;
+        } else if ($argc == 3 && $argv[1] === '--clear') {
+            $this->userInput->clearStorage($argv[2]);
             return true;
         }
         return false;
