@@ -15,16 +15,18 @@ class DbPatterns
 {
     private $dbConfig;
     private $logger;
+    private $cache;
 
-    public function __construct(DbConfig $dbConfig, LoggerInterface $logger)
+    public function __construct(DbConfig $dbConfig, LoggerInterface $logger, CacheInterface $cache)
     {
         $this->dbConfig = $dbConfig;
         $this->logger = $logger;
+        $this->cache = $cache;
     }
 
-    public function importFromFile(string $fileName, CacheInterface $cache): bool
+    public function importFromFile(string $fileName): bool
     {
-        $patternsArray = PatternDataLoader::loadDataFromFile($fileName, $cache, $this->logger);
+        $patternsArray = PatternDataLoader::loadDataFromFile($fileName, $this->cache, $this->logger);
         $pdo = $this->dbConfig->getPdo();
         $pdo->beginTransaction();
         $query = $pdo->prepare('REPLACE INTO `hyphenation_patterns`(`pattern`, `pattern_chars`) 
