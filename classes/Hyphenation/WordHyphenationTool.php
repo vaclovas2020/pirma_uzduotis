@@ -87,6 +87,7 @@ class WordHyphenationTool
             ));
             $this->cache->set($hash, $resultStr);
         }
+        $resultStr = substr($word, 0, 1) .substr($resultStr, 1);
         return $resultStr;
     }
 
