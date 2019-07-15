@@ -69,17 +69,29 @@ VALUES(:pattern, :pattern_chars);');
     public function getPatternChars(string $pattern): array
     {
         $patternCharsArray = array();
-        $pdo = $this->config->getDbConfig()->getPdo();
-        $sql = $pdo->prepare('SELECT `pattern_chars` FROM `hyphenation_patterns` WHERE `pattern` = :pattern;');
-        $sql->bindParam(':pattern', $pattern);
-        if ($sql->execute()) {
-            $patternCharsArray = unserialize($sql->fetch(PDO::FETCH_ASSOC)['pattern_chars']);
-            $this->logger->notice("Loaded pattern '{pattern}' chars from database.",
-                array(
-                    'pattern' => $pattern
-                ));
-        } else {
-            $this->logger->critical("Cannot get pattern '{pattern}' chars from database!",
+        $key = sha1($pattern .'_chars');
+        $patternCharsCache = $this->cache->get($key);
+        if ($patternCharsCache === null) {
+            $pdo = $this->config->getDbConfig()->getPdo();
+            $sql = $pdo->prepare('SELECT `pattern_chars` FROM `hyphenation_patterns` WHERE `pattern` = :pattern;');
+            $sql->bindParam(':pattern', $pattern);
+            if ($sql->execute()) {
+                $patternCharsArray = unserialize($sql->fetch(PDO::FETCH_ASSOC)['pattern_chars']);
+                $this->cache->set($key, $patternCharsArray);
+                $this->logger->notice("Loaded pattern '{pattern}' chars from database and saved to cache.",
+                    array(
+                        'pattern' => $pattern
+                    ));
+            } else {
+                $this->logger->critical("Cannot get pattern '{pattern}' chars from database!",
+                    array(
+                        'pattern' => $pattern
+                    ));
+            }
+        }
+        else{
+            $patternCharsArray = $patternCharsCache;
+            $this->logger->notice("Loaded pattern '{pattern}' chars from cache.",
                 array(
                     'pattern' => $pattern
                 ));
