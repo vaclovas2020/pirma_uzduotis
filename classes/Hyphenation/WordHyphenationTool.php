@@ -113,8 +113,17 @@ class WordHyphenationTool
     public function getFoundPatternsOfWord(string $word): array
     {
         $foundPatterns = array();
-        if (!$this->dbWord->getFoundPatternsOfWord($word, $foundPatterns)) {
-            $this->logger->warning("Cannot get patterns of word '{word}' from database", array('word' => $word));
+        $key = sha1($word . '_patterns');
+        $foundPatternsCache = $this->cache->get($key);
+        if ($foundPatternsCache === null) {
+            if ($this->dbWord->getFoundPatternsOfWord($word, $foundPatterns)) {
+                $this->cache->set($key, $foundPatterns);
+            } else {
+                $this->logger->warning("Cannot get patterns of word '{word}' from database", array('word' => $word));
+            }
+        }
+        else{
+            $foundPatterns = $foundPatternsCache;
         }
         return $foundPatterns;
     }
@@ -190,7 +199,7 @@ class WordHyphenationTool
     {
         $patternObj = new Pattern($this->config, $this->dbPatterns,
             ($this->config->isEnabledDbSource()) ? $pattern :
-            str_replace('.', '', $pattern), $positionAtWord);
+                str_replace('.', '', $pattern), $positionAtWord);
         $patternObj->pushPatternToWord($result);
     }
 
@@ -229,15 +238,14 @@ class WordHyphenationTool
             $this->dbPatterns->getPatternsArray() :
             PatternDataLoader::loadDataFromFile($this->config->getPatternsFilePath(),
                 $this->cache, $this->logger);
-        if ($this->config->isEnabledDbSource() && empty($allPatterns)){
-            if ($this->dbPatterns->importFromFile($this->config->getPatternsFilePath())){
+        if ($this->config->isEnabledDbSource() && empty($allPatterns)) {
+            if ($this->dbPatterns->importFromFile($this->config->getPatternsFilePath())) {
                 $this->logger->notice("Patterns database table was empty, so the app imported 
-                patterns from file '{fileName}'.", array('fileName'=>$this->config->getPatternsFilePath()));
+                patterns from file '{fileName}'.", array('fileName' => $this->config->getPatternsFilePath()));
                 $allPatterns = $this->dbPatterns->getPatternsArray();
-            }
-            else{
+            } else {
                 $this->logger->notice("Patterns database table was empty, so the app importing 
-                patterns from file '{fileName} 'but error occurred.", array('fileName'=>$this->config->getPatternsFilePath()));
+                patterns from file '{fileName} 'but error occurred.", array('fileName' => $this->config->getPatternsFilePath()));
             }
         }
         return $allPatterns;
