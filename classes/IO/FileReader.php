@@ -12,11 +12,20 @@ use SimpleCache\CacheInterface;
 
 class FileReader
 {
-    public function readTextFromFile(string $fileName, string &$text, LoggerInterface $logger, CacheInterface $cache): bool
+    private $cache;
+    private $logger;
+
+    public function __construct(CacheInterface $cache, LoggerInterface $logger)
+    {
+        $this->cache = $cache;
+        $this->logger = $logger;
+    }
+
+    public function readTextFromFile(string $fileName, string &$text): bool
     {
         $execCalc = new ExecDurationCalculator();
         $hash = @sha1_file($fileName);
-        $cachedText = $cache->get($hash);
+        $cachedText = $this->cache->get($hash);
         $source = "from file '$fileName'";
         if ($cachedText === null) {
             try {
@@ -25,16 +34,16 @@ class FileReader
                     throw new ErrorException("Cannot read text file '$fileName'!");
                 }
             } catch (ErrorException $e) {
-                $logger->log(LogLevel::ERROR, $e->getMessage());
+                $this->logger->log(LogLevel::ERROR, $e->getMessage());
                 return false;
             }
-            $cache->set($hash, $text);
+            $this->cache->set($hash, $text);
         } else {
             $text = $cachedText;
             $source = 'from cache';
         }
         $execDuration = $execCalc->finishAndGetDuration();
-        $logger->notice("Text read {from} time: {execDuration} seconds", array(
+        $this->logger->notice("Text read {from} time: {execDuration} seconds", array(
             'execDuration' => $execDuration,
             'from' => $source
         ));

@@ -38,7 +38,8 @@ class UserInputAction
     public function hyphenateFromTextFile(string $fileName, string &$resultStr): bool
     {
         $this->logger->info("Chosen hyphenate from text file '{filename}'", array('filename' => $fileName));
-        $status = (new FileReader)->readTextFromFile($fileName, $resultStr, $this->logger, $this->cache);
+        $fileReader = new FileReader($this->cache, $this->logger);
+        $status = $fileReader->readTextFromFile($fileName, $resultStr);
         if ($status === false) {
             return false;
         }
