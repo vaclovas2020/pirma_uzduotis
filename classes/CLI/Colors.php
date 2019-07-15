@@ -37,27 +37,19 @@ class Colors
         $this->background_colors['light_gray'] = '47';
     }
 
-    public function getColoredString($string, $foreground_color = null, $background_color = null)
+    public function getColoredString($string, $colors_str = 'black;white')
     {
         $colored_string = "";
-        if (isset($this->foreground_colors[$foreground_color])) {
-            $colored_string .= "\033[" . $this->foreground_colors[$foreground_color] . "m";
+        $colors = explode(';', $colors_str);
+        if (count($colors) >= 1 && isset($this->foreground_colors[$colors[0]])) {
+            $colored_string .= "\033[" . $this->foreground_colors[$colors[0]] . "m";
         }
-        if (isset($this->background_colors[$background_color])) {
-            $colored_string .= "\033[" . $this->background_colors[$background_color] . "m";
+        if (count($colors) >= 2 && isset($this->background_colors[$colors[1]])) {
+            $colored_string .= "\033[" . $this->background_colors[$colors[1]] . "m";
         }
         $colored_string .= $string . "\033[0m";
 
         return $colored_string;
     }
 
-    public function getForegroundColors()
-    {
-        return array_keys($this->foreground_colors);
-    }
-
-    public function getBackgroundColors()
-    {
-        return array_keys($this->background_colors);
-    }
 }

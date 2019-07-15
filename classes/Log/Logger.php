@@ -4,6 +4,7 @@
 namespace Log;
 
 
+use CLI\Colors;
 use DateTime;
 use InvalidArgumentException;
 use SplFileObject;
@@ -13,10 +14,12 @@ class Logger implements LoggerInterface
     private $fileName;
     private $printToScreen = false;
     private $writeToFile = true;
+    private $colors;
 
     public function __construct(string $fileName = 'word_hyphenation.log')
     {
         $this->fileName = $fileName;
+        $this->colors = new Colors();
     }
 
     public function clear(): bool{
@@ -35,48 +38,56 @@ class Logger implements LoggerInterface
     {
         $message = $this->formatMessage(LogLevel::EMERGENCY, $message, $context);
         $this->writeToLogFile($message);
+        $this->printToScreenIfNeeded($message, LogColor::EMERGENCY);
     }
 
     public function alert(string $message, array $context = array()): void
     {
         $message = $this->formatMessage(LogLevel::ALERT, $message, $context);
         $this->writeToLogFile($message);
+        $this->printToScreenIfNeeded($message, LogColor::ALERT);
     }
 
     public function critical(string $message, array $context = array()): void
     {
         $message = $this->formatMessage(LogLevel::CRITICAL, $message, $context);
         $this->writeToLogFile($message);
+        $this->printToScreenIfNeeded($message, LogColor::CRITICAL);
     }
 
     public function error(string $message, array $context = array()): void
     {
         $message = $this->formatMessage(LogLevel::ERROR, $message, $context);
         $this->writeToLogFile($message);
+        $this->printToScreenIfNeeded($message, LogColor::ERROR);
     }
 
     public function warning(string $message, array $context = array()): void
     {
         $message = $this->formatMessage(LogLevel::WARNING, $message, $context);
         $this->writeToLogFile($message);
+        $this->printToScreenIfNeeded($message, LogColor::WARNING);
     }
 
     public function notice(string $message, array $context = array()): void
     {
         $message = $this->formatMessage(LogLevel::NOTICE, $message, $context);
         $this->writeToLogFile($message);
+        $this->printToScreenIfNeeded($message, LogColor::NOTICE);
     }
 
     public function info(string $message, array $context = array()): void
     {
         $message = $this->formatMessage(LogLevel::INFO, $message, $context);
         $this->writeToLogFile($message);
+        $this->printToScreenIfNeeded($message, LogColor::INFO);
     }
 
     public function debug(string $message, array $context = array()): void
     {
         $message = $this->formatMessage(LogLevel::DEBUG, $message, $context);
         $this->writeToLogFile($message);
+        $this->printToScreenIfNeeded($message, LogColor::DEBUG);
     }
 
     public function log(string $level, string $message, array $context = array()): void
@@ -119,12 +130,11 @@ class Logger implements LoggerInterface
             $file->fwrite($message);
             $file = null;
         }
-        $this->printToScreenIfNeeded($message);
     }
 
-    private function printToScreenIfNeeded(string $message): void{
+    private function printToScreenIfNeeded(string $message, string $colors_str): void{
         if ($this->printToScreen){
-            echo $message;
+            echo $this->colors->getColoredString($message, $colors_str);
         }
     }
 
