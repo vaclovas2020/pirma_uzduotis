@@ -34,16 +34,17 @@ class DbConfig
     }
 
 
-    public function createDbTables(): bool{
+    public function createDbTables(): bool
+    {
         $queries = @file_get_contents('word_hyphenation_db.sql');
-        if ($queries === false){
+        if ($queries === false) {
             return false;
         }
         $queriesArr = explode(';', $queries);
         $this->pdo->beginTransaction();
-        foreach ($queriesArr as $query){
-            if (!$this->pdo->exec($query) === false){
-                $this->logger->critical("Cannot execute SQL query: '{sql}' Rollback changes.", array('sql'=>$query));
+        foreach ($queriesArr as $query) {
+            if (!$this->pdo->exec($query) === false) {
+                $this->logger->critical("Cannot execute SQL query: '{sql}' Rollback changes.", array('sql' => $query));
                 $this->pdo->rollBack();
                 return false;
             }
