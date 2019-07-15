@@ -6,12 +6,12 @@ namespace Log;
 
 class LogColor
 {
-    public const EMERGENCY = 'purple;white';
-    public const ALERT = 'light_red;black';
-    public const CRITICAL = 'red;white';
-    public const ERROR = 'red;black';
-    public const WARNING = 'yellow;black';
-    public const NOTICE = 'white;green';
-    public const INFO = 'white;blue';
-    public const DEBUG = 'black;white';
+    public const EMERGENCY = 'purple';
+    public const ALERT = 'light_red';
+    public const CRITICAL = 'red';
+    public const ERROR = 'red';
+    public const WARNING = 'yellow';
+    public const NOTICE = 'green';
+    public const INFO = 'blue';
+    public const DEBUG = 'white';
 }

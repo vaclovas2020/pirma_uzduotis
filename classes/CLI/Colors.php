@@ -7,7 +7,6 @@ namespace CLI;
 class Colors
 {
     private $foreground_colors = array();
-    private $background_colors = array();
 
     public function __construct()
     {
@@ -27,25 +26,13 @@ class Colors
         $this->foreground_colors['yellow'] = '1;33';
         $this->foreground_colors['light_gray'] = '0;37';
         $this->foreground_colors['white'] = '1;37';
-        $this->background_colors['black'] = '40';
-        $this->background_colors['red'] = '41';
-        $this->background_colors['green'] = '42';
-        $this->background_colors['yellow'] = '43';
-        $this->background_colors['blue'] = '44';
-        $this->background_colors['magenta'] = '45';
-        $this->background_colors['cyan'] = '46';
-        $this->background_colors['light_gray'] = '47';
     }
 
-    public function getColoredString($string, $colors_str = 'black;white')
+    public function getColoredString($string, $color_str = 'white')
     {
         $colored_string = "";
-        $colors = explode(';', $colors_str);
-        if (count($colors) >= 1 && isset($this->foreground_colors[$colors[0]])) {
-            $colored_string .= "\033[" . $this->foreground_colors[$colors[0]] . "m";
-        }
-        if (count($colors) >= 2 && isset($this->background_colors[$colors[1]])) {
-            $colored_string .= "\033[" . $this->background_colors[$colors[1]] . "m";
+        if (isset($this->foreground_colors[$color_str])) {
+            $colored_string .= "\033[" . $this->foreground_colors[$color_str] . "m";
         }
         $colored_string .= $string . "\033[0m";
 
