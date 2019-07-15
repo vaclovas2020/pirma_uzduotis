@@ -50,7 +50,7 @@ class FileReader
             ));
         }
         else{
-            $this->logger->error('File {fileName} not found!', array('fileName'=>$fileName));
+            $this->logger->error("File '{fileName}' not found!", array('fileName'=>$fileName));
             return false;
         }
         return true;
