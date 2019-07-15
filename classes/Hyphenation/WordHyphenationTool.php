@@ -55,7 +55,7 @@ class WordHyphenationTool
     public function hyphenateWord(string $word): string
     {
         $allPatterns = $this->getPatternsArray();
-        $hash = sha1($word);
+        $hash = sha1(strtolower($word));
         $wordSavedToDb = ($this->config->isEnabledDbSource()) ?
             $this->dbWord->isWordSavedToDb($word) : false;
         $resultCache = $this->cache->get($hash);
