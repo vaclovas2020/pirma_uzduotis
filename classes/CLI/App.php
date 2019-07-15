@@ -63,6 +63,7 @@ class App
                 $userInput = new UserOutput($this->logger, $fileWriter);
                 if ($argc > 3) {
                     $fileName = $argv[3];
+                    $writeToFile = true;
                 }
                 $userInput->outputToUser($resultStr, $writeToFile, $fileName);
             }
