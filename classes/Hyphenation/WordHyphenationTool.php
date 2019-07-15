@@ -121,8 +121,7 @@ class WordHyphenationTool
             } else {
                 $this->logger->warning("Cannot get patterns of word '{word}' from database", array('word' => $word));
             }
-        }
-        else{
+        } else {
             $foundPatterns = $foundPatternsCache;
         }
         return $foundPatterns;
