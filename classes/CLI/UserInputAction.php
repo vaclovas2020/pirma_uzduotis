@@ -62,6 +62,10 @@ class UserInputAction
             $this->logger->notice("Founded patterns of word '{word}': {patterns}",
                 array('word' => $word, 'patterns' => $foundPatterns));
         }
+        else{
+            $this->logger->warning("Word '{word}' patterns are not saved to database",
+                array('word' => $word));
+        }
     }
 
 }
