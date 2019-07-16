@@ -63,11 +63,10 @@ class WordHyphenationTool
             $this->dbWord->isWordSavedToDb($word) : false;
         $resultCache = $this->cache->get($hash);
         $resultStr = '';
+        $patternList = array();
         if (($resultCache === null && !$wordSavedToDb) ||
             ($this->config->isEnabledDbSource() && !$wordSavedToDb)) {
-            $patternListStr = '';
-            $result = $this->findPatternsAndPushToWord($this->allPatterns,
-                strtolower($word), $patternListStr);
+            $result = $this->findPatternsAndPushToWord(strtolower($word), $patternList);
             $resultStr = $this->getResultStrFromResultArray($result);
             $this->logger->info("Word '{word}' hyphenated to '{hyphenateWord}'", array(
                 'word' => $word,
@@ -75,7 +74,7 @@ class WordHyphenationTool
             ));
             $this->cache->set($hash, $resultStr);
             if ($this->config->isEnabledDbSource()) {
-                $this->saveWordDataToDb($word, $resultStr, $patternListStr);
+                $this->saveWordDataToDb($word, $resultStr, $patternList);
             }
         } else if ($resultCache !== null) {
             $resultStr = $resultCache;
@@ -163,38 +162,37 @@ class WordHyphenationTool
         return $pos;
     }
 
-    private function findPatternsAndPushToWord(array &$allPatterns, string $word, string & $patternsListStr): array
+    private function findPatternsAndPushToWord(string $word, array & $patternsList): array
     {
         $result = $this->createResultArray($word);
-        $patternsListStr = "\n";
-        foreach ($allPatterns as $pattern) {
+        foreach ($this->allPatterns as $pattern) {
             $noCounts = preg_replace('/[0-9]+/', '', $pattern);
             $pos = $this->findPatternPositionAtWord($word, $noCounts);
             if ($this->isDotAtBegin($pattern)) {
                 if ($this->isPatternAtWordBegin($word, $noCounts)) {
                     $this->pushPatternDataToWord($result, $pattern, $pos);
-                    $patternsListStr .= "$pattern\n";
+                    array_push($patternsList, $pattern);
                 }
             } else if ($this->isDotAtEnd($pattern)) {
                 if ($this->isPatternAtWordEnd($word, $noCounts)) {
                     $this->pushPatternDataToWord($result, $pattern, $pos);
-                    $patternsListStr .= "$pattern\n";
+                    array_push($patternsList, $pattern);
                 }
             } else if ($pos !== -1) {
                 $this->pushPatternDataToWord($result, $pattern, $pos);
-                $patternsListStr .= "$pattern\n";
+                array_push($patternsList, $pattern);
             }
         }
-        $this->printFoundedPatternsToLog($patternsListStr, $word);
+        $this->printFoundedPatternsToLog($patternsList, $word);
         return $result;
     }
 
-    private function printFoundedPatternsToLog(string $patternsListStr, string $word): void
+    private function printFoundedPatternsToLog(array & $patternsList, string $word): void
     {
 
         $this->logger->notice("Founded patterns for word '{word}': {patterns}",
             array(
-                'patterns' => $patternsListStr,
+                'patterns' => $patternsList,
                 'word' => $word
             ));
     }
@@ -225,9 +223,9 @@ class WordHyphenationTool
         return $result;
     }
 
-    private function saveWordDataToDb(string $word, string $hyphenatedWord, string $patternListStr): void
+    private function saveWordDataToDb(string $word, string $hyphenatedWord, array & $patternList): void
     {
-        if ($this->dbWord->saveWordAndFoundPatterns($word, $hyphenatedWord, $patternListStr)) {
+        if ($this->dbWord->saveWordAndFoundPatterns($word, $hyphenatedWord, $patternList)) {
             $this->logger->notice("Word '{word}', hyphenation result '{hyphenatedWord}' 
                     and founded patterns saved to database", array('word' => $word, 'hyphenatedWord' => $hyphenatedWord));
         } else {
