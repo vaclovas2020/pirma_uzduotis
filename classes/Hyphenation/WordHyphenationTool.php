@@ -16,6 +16,7 @@ class WordHyphenationTool
     private $config;
     private $dbWord;
     private $dbPatterns;
+    private $allPatterns = null;
 
     public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config)
     {
@@ -54,7 +55,9 @@ class WordHyphenationTool
 
     public function hyphenateWord(string $word): string
     {
-        $allPatterns = $this->getPatternsArray();
+        if ($this->allPatterns === null){
+            $this->allPatterns = $this->getPatternsArray();
+        }
         $hash = sha1(strtolower($word));
         $wordSavedToDb = ($this->config->isEnabledDbSource()) ?
             $this->dbWord->isWordSavedToDb($word) : false;
@@ -63,7 +66,8 @@ class WordHyphenationTool
         if (($resultCache === null && !$wordSavedToDb) ||
             ($this->config->isEnabledDbSource() && !$wordSavedToDb)) {
             $patternListStr = '';
-            $result = $this->findPatternsAndPushToWord($allPatterns, strtolower($word), $patternListStr);
+            $result = $this->findPatternsAndPushToWord($this->allPatterns,
+                strtolower($word), $patternListStr);
             $resultStr = $this->getResultStrFromResultArray($result);
             $this->logger->info("Word '{word}' hyphenated to '{hyphenateWord}'", array(
                 'word' => $word,
@@ -87,7 +91,7 @@ class WordHyphenationTool
             ));
             $this->cache->set($hash, $resultStr);
         }
-        $resultStr = substr($word, 0, 1) .substr($resultStr, 1);
+        $resultStr = substr($word, 0, 1) . substr($resultStr, 1);
         return $resultStr;
     }
 
