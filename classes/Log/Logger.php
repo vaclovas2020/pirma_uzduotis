@@ -152,6 +152,9 @@ class Logger implements LoggerInterface
             if (!is_array($value) && !is_object($value) || method_exists($value, '__toString')) {
                 $message = str_replace('{' . $key . '}', $value, $message);
             }
+            else{
+                $message = str_replace('{' . $key . '}', print_r($value, true), $message);
+            }
         }
         return $message;
     }
