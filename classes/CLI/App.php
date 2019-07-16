@@ -48,7 +48,7 @@ class App
 
     public function start(int $argc, array $argv): void
     {
-        $this->logger->info('Program started with arguments: {arguments}',
+        $this->logger->debug('Program started with arguments: {arguments}',
             array('arguments' => print_r($argv, true)));
         $checkConfigurationCli = $this->checkConfigurationCLI($argc, $argv);
         if (!$checkConfigurationCli && $argc >= 3) {

@@ -3,8 +3,6 @@
 
 namespace Log;
 
-
-use CLI\Colors;
 use DateTime;
 use InvalidArgumentException;
 use SplFileObject;
@@ -14,23 +12,24 @@ class Logger implements LoggerInterface
     private $fileName;
     private $printToScreen = false;
     private $writeToFile = true;
-    private $colors;
 
     public function __construct(string $fileName = 'word_hyphenation.log')
     {
         $this->fileName = $fileName;
-        $this->colors = new Colors();
     }
 
-    public function clear(): bool{
+    public function clear(): bool
+    {
         return @unlink($this->fileName);
     }
 
-    public function setPrintToScreen(bool $printToAScreen){
+    public function setPrintToScreen(bool $printToAScreen)
+    {
         $this->printToScreen = $printToAScreen;
     }
 
-    public function setWriteToFile(bool $writeToFile){
+    public function setWriteToFile(bool $writeToFile)
+    {
         $this->writeToFile = $writeToFile;
     }
 
@@ -132,8 +131,9 @@ class Logger implements LoggerInterface
         }
     }
 
-    private function printToScreenIfNeeded(string $message, string $color_str): void{
-        if ($this->printToScreen){
+    private function printToScreenIfNeeded(string $message, string $color_str): void
+    {
+        if ($this->printToScreen) {
             echo sprintf($color_str, $message);
         }
     }
