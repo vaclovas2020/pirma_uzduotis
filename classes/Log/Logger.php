@@ -132,9 +132,9 @@ class Logger implements LoggerInterface
         }
     }
 
-    private function printToScreenIfNeeded(string $message, string $colors_str): void{
+    private function printToScreenIfNeeded(string $message, string $color_str): void{
         if ($this->printToScreen){
-            echo $this->colors->getColoredString($message, $colors_str);
+            echo sprintf($color_str, $message);
         }
     }
 
