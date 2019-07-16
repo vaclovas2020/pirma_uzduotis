@@ -60,7 +60,7 @@ class UserInputAction
         $foundPatterns = $this->hyphenationTool->getFoundPatternsOfWord($word);
         if (!empty($foundPatterns)) {
             $this->logger->notice("Founded patterns of word '{word}': {patterns}",
-                array('word' => $word, 'patterns' => print_r($foundPatterns, true)));
+                array('word' => $word, 'patterns' => $foundPatterns));
         }
     }
 

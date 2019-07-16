@@ -49,7 +49,7 @@ class App
     public function start(int $argc, array $argv): void
     {
         $this->logger->debug('Program started with arguments: {arguments}',
-            array('arguments' => print_r($argv, true)));
+            array('arguments' => $argv));
         $checkConfigurationCli = $this->checkConfigurationCLI($argc, $argv);
         if (!$checkConfigurationCli && $argc >= 3) {
             $execCalc = new ExecDurationCalculator();

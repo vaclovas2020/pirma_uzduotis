@@ -50,10 +50,9 @@ WHERE `hyphenated_words`.`word` = :word;');
         return true;
     }
 
-    public function saveWordAndFoundPatterns(string $word, string $hyphenatedWord, string $patternListStr): bool
+    public function saveWordAndFoundPatterns(string $word, string $hyphenatedWord, array & $patternList): bool
     {
         $pdo = $this->dbConfig->getPdo();
-        $patternList = explode("\n", $patternListStr);
         $pdo->beginTransaction();
         $sql1 = $pdo->prepare('REPLACE INTO `hyphenated_words`(`word`,`hyphenated_word`) 
 VALUES(LOWER(:word),:hyphenated_word);');
