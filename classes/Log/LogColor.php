@@ -7,7 +7,7 @@ namespace Log;
 class LogColor
 {
     public const EMERGENCY = 'purple';
-    public const ALERT = 'light_red';
+    public const ALERT = 'red';
     public const CRITICAL = 'red';
     public const ERROR = 'red';
     public const WARNING = 'yellow';
