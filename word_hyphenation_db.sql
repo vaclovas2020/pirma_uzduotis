@@ -22,7 +22,7 @@ ALTER TABLE `hyphenated_words`
   ADD UNIQUE KEY `hyphenated_word` (`hyphenated_word`);
 
 ALTER TABLE `hyphenated_word_patterns`
-  ADD PRIMARY KEY (`word_id`,`pattern_id`),
+  ADD UNIQUE KEY `hyphenated_word_patterns_key` (`word_id`,`pattern_id`),
   ADD KEY `word_pattern_id_key` (`pattern_id`);
 
 ALTER TABLE `hyphenation_patterns`
