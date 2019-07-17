@@ -29,6 +29,7 @@ class DbPatterns
         $patternsArray = PatternDataLoader::loadDataFromFile($fileName, $this->cache, $this->logger);
         $pdo = $this->config->getDbConfig()->getPdo();
         $pdo->beginTransaction();
+        $pdo->exec('SET FOREIGN_KEY_CHECKS = 0;');
         $query1 = $pdo->prepare('TRUNCATE TABLE `hyphenated_word_patterns`;');
         if (!$query1->execute()) {
             $pdo->rollBack();
@@ -39,6 +40,7 @@ class DbPatterns
             $pdo->rollBack();
             return false;
         }
+        $pdo->exec('SET FOREIGN_KEY_CHECKS = 1;');
         $query = $pdo->prepare('REPLACE INTO `hyphenation_patterns`(`pattern`, `pattern_chars`) 
 VALUES(:pattern, :pattern_chars);');
         $current = 1;
