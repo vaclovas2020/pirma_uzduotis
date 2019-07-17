@@ -50,6 +50,16 @@ VALUES(:pattern, :pattern_chars);');
             }
             $current++;
         }
+        $query1 = $pdo->prepare('TRUNCATE TABLE `hyphenated_word_patterns`;');
+        if (!$query1->execute()) {
+            $pdo->rollBack();
+            return false;
+        }
+        $query2 = $pdo->prepare('TRUNCATE TABLE `hyphenated_words`;');
+        if (!$query2->execute()) {
+            $pdo->rollBack();
+            return false;
+        }
         $pdo->commit();
         return true;
     }
@@ -69,7 +79,7 @@ VALUES(:pattern, :pattern_chars);');
     public function getPatternChars(string $pattern): array
     {
         $patternCharsArray = array();
-        $key = sha1($pattern .'_chars');
+        $key = sha1($pattern . '_chars');
         $patternCharsCache = $this->cache->get($key);
         if ($patternCharsCache === null) {
             $pdo = $this->config->getDbConfig()->getPdo();
@@ -88,8 +98,7 @@ VALUES(:pattern, :pattern_chars);');
                         'pattern' => $pattern
                     ));
             }
-        }
-        else{
+        } else {
             $patternCharsArray = $patternCharsCache;
             $this->logger->notice("Loaded pattern '{pattern}' chars from cache.",
                 array(
