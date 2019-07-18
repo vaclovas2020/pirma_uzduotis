@@ -36,6 +36,17 @@ class DbWord
         return $query->fetch(PDO::FETCH_ASSOC)['hyphenated_word'];
     }
 
+    public function getHyphenatedWordsListFromDb(int $page, int $rowsInPage): array
+    {
+        $pdo = $this->dbConfig->getPdo();
+        $begin = ($page - 1) * $rowsInPage;
+        $query = $pdo->prepare("SELECT `word`,`hyphenated_word` FROM `hyphenated_words` LIMIT $begin, $rowsInPage;");
+        if (!$query->execute()) {
+            return null;
+        }
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getFoundPatternsOfWord(string $word, array &$patterns): bool
     {
         $pdo = $this->dbConfig->getPdo();
