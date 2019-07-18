@@ -33,6 +33,9 @@ class DbWord
         if (!$query->execute(array('word' => $word))) {
             return '';
         }
+        if ($query->rowCount() == 0){
+            return '';
+        }
         return $query->fetch(PDO::FETCH_ASSOC)['hyphenated_word'];
     }
 
