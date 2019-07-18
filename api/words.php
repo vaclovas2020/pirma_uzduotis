@@ -14,7 +14,10 @@ Core\AutoLoader::register(true);
 $logger = new Logger();
 $config = new Config($logger, $_SERVER['DOCUMENT_ROOT'] . '/app_config.json');
 $config->applyLoggerConfig($logger);
+
 $cache = new FileCache($_SERVER['DOCUMENT_ROOT'] . '/' . $config->getCachePath(), $config->getCacheDefaultTtl());
 $dbWord = new DbWord($config->getDbConfig());
 $request = new ApiRequest($logger, $config, $dbWord);
-$request->getHyphenatedWordsList();
+if (!empty($_SERVER['PATH_INFO'])) {
+    $request->processPathInfo(substr($_SERVER['PATH_INFO'],1));
+} else $request->getHyphenatedWordsList();
