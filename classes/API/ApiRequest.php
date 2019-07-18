@@ -28,9 +28,12 @@ class ApiRequest
             $hyphenatedWordsList = $this->dbWord->getHyphenatedWordsListFromDb($_GET['page'], $_GET['rowsInPage']);
             if ($hyphenatedWordsList === null) {
                 $this->sendErrorJson('Cannot get list from database!');
-            } else $this->sendResponse(json_encode($hyphenatedWordsList));
-        }
-        else $this->sendErrorJson("Please give required GET query fields 'page' and 'rowsInPage'.");
+            } else $this->sendResponse(json_encode(array(
+                'page' => $_GET['page'],
+                'rowsInPage' => $_GET['rowsInPage'],
+                'rows' => $hyphenatedWordsList
+            )));
+        } else $this->sendErrorJson("Please give required GET query fields 'page' and 'rowsInPage'.");
     }
 
     private function sendErrorJson(string $error): void
