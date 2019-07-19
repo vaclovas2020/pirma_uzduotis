@@ -4,3 +4,4 @@
 /app_config.json
 /cache
 /db_backup
+/api/word_hyphenation.log
