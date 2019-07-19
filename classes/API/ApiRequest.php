@@ -5,6 +5,7 @@ namespace API;
 
 
 use AppConfig\Config;
+use DB\DbPatterns;
 use DB\DbWord;
 use Hyphenation\WordHyphenationTool;
 use Log\LoggerInterface;
@@ -17,6 +18,7 @@ class ApiRequest
     private $config;
     private $cache;
     private $dbWord;
+    private $dbPatterns;
     private $hyphenationTool;
 
     public function __construct(LoggerInterface $logger, Config $config, CacheInterface $cache)
@@ -24,6 +26,7 @@ class ApiRequest
         $this->logger = $logger;
         $this->config = $config;
         $this->dbWord = new DbWord($config->getDbConfig());
+        $this->dbPatterns = new DbPatterns($config, $logger, $cache);
         $this->cache = $cache;
         $this->hyphenationTool = new WordHyphenationTool($this->logger, $this->cache, $this->config);
     }
@@ -44,25 +47,58 @@ class ApiRequest
         if (preg_match('/^[a-zA-Z0-9]+$/', $name) == 1) {
             switch ($method) {
                 case 'GET':
-                    if ($resource === 'word') {
-                        $this->printWord($name);
-                    }
+                    $this->printResource($resource, $name);
                     break;
                 case 'PUT':
-                    if ($resource === 'word') {
-                        $this->addWord($name);
-                    }
+                    $this->addResource($resource, $name);
                     break;
                 case 'DELETE':
-                    if ($resource === 'word') {
-                        $this->deleteWord($name);
-                    }
+                    $this->deleteResource($resource, $name);
                     break;
                 default:
                     $this->sendErrorJson('Method Not Allowed. Please use GET, PUT or DELETE', 405);
             }
         } else {
             $this->sendErrorJson('Allowed resource name pattern is ^[a-zA-Z0-9]+', 400);
+        }
+    }
+
+    private function printResource(string $resource, string $name)
+    {
+        switch ($resource) {
+            case 'word':
+                $this->printWord($name);
+                break;
+            case 'pattern':
+                $this->printPattern(intval($name));
+                break;
+            default:
+                $this->sendErrorJson('Unknown resource!', 404);
+                break;
+        }
+    }
+
+    private function deleteResource(string $resource, string $name)
+    {
+        switch ($resource) {
+            case 'word':
+                $this->deleteWord($name);
+                break;
+            default:
+                $this->sendErrorJson('Unknown resource!', 404);
+                break;
+        }
+    }
+
+    private function addResource(string $resource, string $name)
+    {
+        switch ($resource) {
+            case 'word':
+                $this->addWord($name);
+                break;
+            default:
+                $this->sendErrorJson('Unknown resource!', 404);
+                break;
         }
     }
 
@@ -73,6 +109,16 @@ class ApiRequest
             $this->sendResponse(json_encode(array('word' => $word, 'hyphenatedWord' => $hyphenatedWord)));
         } else {
             $this->sendErrorJson("Word '$word' not exist!", 404);
+        }
+    }
+
+    private function printPattern(int $patternId): void
+    {
+        $pattern = $this->dbPatterns->getPattern($patternId);
+        if (!empty($pattern)) {
+            $this->sendResponse(json_encode(array('patternId' => $patternId, 'pattern' => $pattern)));
+        } else {
+            $this->sendErrorJson("Pattern with ID $patternId not exist!", 404);
         }
     }
 
@@ -90,10 +136,9 @@ class ApiRequest
     private function deleteWord($word): void
     {
         if ($this->dbWord->isWordSavedToDb($word)) {
-            if ($this->dbWord->deleteWord($word)){
+            if ($this->dbWord->deleteWord($word)) {
                 $this->sendSuccessJson("Word '$word' deleted!", 200);
-            }
-            else{
+            } else {
                 $this->sendErrorJson("Cannot delete word '$word' from database!", 500);
             }
         } else {
@@ -130,6 +175,9 @@ class ApiRequest
             case 'word':
                 $pageCount = $this->dbWord->getHyphenatedWordsListPageCount($rowsInPage);
                 break;
+            case 'pattern':
+                $pageCount = $this->dbPatterns->getPatternsListPageCount($rowsInPage);
+                break;
             default:
                 break;
         }
@@ -142,6 +190,9 @@ class ApiRequest
         switch ($resource) {
             case 'word':
                 $list = $this->dbWord->getHyphenatedWordsListFromDb($page, $rowsInPage);
+                break;
+            case 'pattern':
+                $list = $this->dbPatterns->getPatternsArray($page, $rowsInPage);
                 break;
             default:
                 break;

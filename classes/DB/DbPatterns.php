@@ -86,11 +86,11 @@ VALUES(:pattern, :pattern_chars);');
     public function getPattern(int $id): string
     {
         $pdo = $this->config->getDbConfig()->getPdo();
-        $query = $pdo->prepare('SELECT `pattern` FROM `hyphenation_patterns` WHERE `patterns_id` = :id;');
+        $query = $pdo->prepare('SELECT `pattern` FROM `hyphenation_patterns` WHERE `pattern_id` = :id;');
         if ($query->execute(array('id' => $id))) {
             return $query->fetch(PDO::FETCH_ASSOC)['pattern'];
         }
-        return null;
+        return '';
     }
 
 
