@@ -19,11 +19,11 @@ class ApiRequest
     private $dbWord;
     private $hyphenationTool;
 
-    public function __construct(LoggerInterface $logger, Config $config, DbWord $dbWord, CacheInterface $cache)
+    public function __construct(LoggerInterface $logger, Config $config, CacheInterface $cache)
     {
         $this->logger = $logger;
         $this->config = $config;
-        $this->dbWord = $dbWord;
+        $this->dbWord = new DbWord($config->getDbConfig());
         $this->cache = $cache;
         $this->hyphenationTool = new WordHyphenationTool($this->logger, $this->cache, $this->config);
     }

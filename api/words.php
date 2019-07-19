@@ -16,6 +16,5 @@ $config = new Config($logger, $_SERVER['DOCUMENT_ROOT'] . '/app_config.json');
 $config->applyLoggerConfig($logger);
 
 $cache = new FileCache($_SERVER['DOCUMENT_ROOT'] . '/' . $config->getCachePath(), $config->getCacheDefaultTtl());
-$dbWord = new DbWord($config->getDbConfig());
-$request = new ApiRequest($logger, $config, $dbWord, $cache);
+$request = new ApiRequest($logger, $config, $cache);
 $request->processRequest('word', $_SERVER['REQUEST_METHOD']);
