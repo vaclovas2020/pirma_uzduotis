@@ -1,8 +1,8 @@
 Options -Indexes
 RewriteEngine On
 
-RewriteRule ^api/words/([a-z0-9]+) /api/words.php/$1 [L]
-RewriteRule ^api/patterns/([a-z0-9]+) /api/patterns.php/$1 [L]
+RewriteRule ^api/words/(.+) /api/words.php/$1 [L]
+RewriteRule ^api/patterns/(.+) /api/patterns.php/$1 [L]
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f

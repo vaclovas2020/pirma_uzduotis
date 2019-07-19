@@ -39,28 +39,55 @@ class DbWord
         return $query->fetch(PDO::FETCH_ASSOC)['hyphenated_word'];
     }
 
-    public function getHyphenatedWordsListFromDb(int $page, int $rowsInPage): array
+    public function getWordById(int $id): array
     {
         $pdo = $this->dbConfig->getPdo();
-        $begin = ($page - 1) * $rowsInPage;
-        $query = $pdo->prepare("SELECT `word`,`hyphenated_word` FROM `hyphenated_words` LIMIT $begin, $rowsInPage;");
+        $query = $pdo->prepare('SELECT `word_id`, `word`,`hyphenated_word` FROM `hyphenated_words` WHERE `word_id` = :id;');
+        if (!$query->execute(array('id' => $id))) {
+            return array();
+        }
+        if ($query->rowCount() == 0) {
+            return array();
+        }
+        return $query->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getWordId(string $word): int
+    {
+        $pdo = $this->dbConfig->getPdo();
+        $query = $pdo->prepare('SELECT `word_id` FROM `hyphenated_words` WHERE `word` = :word;');
+        if (!$query->execute(array('word' => $word))) {
+            return null;
+        }
+        if ($query->rowCount() == 0) {
+            return false;
+        }
+        return $query->fetch(PDO::FETCH_ASSOC)['word_id'];
+    }
+
+    public function getHyphenatedWordsListFromDb(int $page, int $perPage): array
+    {
+        $pdo = $this->dbConfig->getPdo();
+        $begin = ($page - 1) * $perPage;
+        $query = $pdo->prepare("SELECT `word_id`, `word`,`hyphenated_word` FROM `hyphenated_words` LIMIT $begin, $perPage;");
         if (!$query->execute()) {
             return null;
         }
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function deleteWord(string $word): bool
+
+    public function deleteWord(int $id): bool
     {
         $pdo = $this->dbConfig->getPdo();
-        $query = $pdo->prepare("DELETE FROM `hyphenated_words` WHERE `word` = LOWER(:word);");
-        $query->bindParam(':word',$word);
+        $query = $pdo->prepare("DELETE FROM `hyphenated_words` WHERE `word_id` = :id;");
+        $query->bindParam(':id', $id);
         if (!$query->execute()) {
             return false;
         }
         return true;
     }
 
-    public function getHyphenatedWordsListPageCount(int $rowsInPage): int
+    public function getHyphenatedWordsListPageCount(int $perPage): int
     {
         $pdo = $this->dbConfig->getPdo();
         $query = $pdo->prepare("SELECT COUNT(`word_id`) AS `count` FROM `hyphenated_words`;");
@@ -68,8 +95,8 @@ class DbWord
             return null;
         }
         $count = $query->fetch(PDO::FETCH_ASSOC)['count'];
-        $pages = intval($count / $rowsInPage);
-        if ($count % $rowsInPage > 0) {
+        $pages = intval($count / $perPage);
+        if ($count % $perPage > 0) {
             $pages++;
         }
         return $pages;

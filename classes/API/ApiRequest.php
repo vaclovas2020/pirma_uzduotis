@@ -33,44 +33,48 @@ class ApiRequest
 
     public function processRequest(string $resource, string $method): void
     {
-        if (!empty($_SERVER['PATH_INFO'])) {
-            $this->processPathInfo($resource, substr($_SERVER['PATH_INFO'], 1), $method);
-        } else if ($method === 'GET') {
-            $this->printResources($resource);
-        } else {
-            $this->sendErrorJson('Method Not Allowed. Please use GET, PUT or DELETE', 405);
+        $path = substr($_SERVER['PATH_INFO'], 1);
+        $id = $this->filterPath($path, $method !== 'POST' && !empty($path));
+        switch ($method) {
+            case 'GET':
+                if (empty($path)) {
+                    $this->printResources($resource);
+                } else if (!empty($id)) {
+                    $this->printResource($resource, $id);
+                }
+                break;
+            case
+            'POST':
+                $this->addResource($resource);
+                break;
+            case 'DELETE':
+                if (!empty($id)) {
+                    $this->deleteResource($resource, $id);
+                }
+                break;
+            default:
+                $this->sendErrorJson('Method Not Allowed. Please use GET, POST or DELETE', 405);
         }
     }
 
-    private function processPathInfo(string $resource, string $name, string $method): void
+    private function filterPath(string $path, bool $returnErrorJson = false): string
     {
-        if (preg_match('/^[a-zA-Z0-9]+$/', $name) == 1) {
-            switch ($method) {
-                case 'GET':
-                    $this->printResource($resource, $name);
-                    break;
-                case 'PUT':
-                    $this->addResource($resource, $name);
-                    break;
-                case 'DELETE':
-                    $this->deleteResource($resource, $name);
-                    break;
-                default:
-                    $this->sendErrorJson('Method Not Allowed. Please use GET, PUT or DELETE', 405);
-            }
-        } else {
-            $this->sendErrorJson('Allowed resource name pattern is ^[a-zA-Z0-9]+', 400);
+        if (preg_match('/^[0-9]+$/', $path) == 1) {
+            return $path;
+        } else if ($returnErrorJson) {
+            $this->sendErrorJson('Resource ID must be number');
         }
+        return '';
     }
 
-    private function printResource(string $resource, string $name)
+    private function printResource(string $resource, int $id): void
     {
         switch ($resource) {
             case 'word':
-                $this->printWord($name);
+                $this->printWord($id);
                 break;
             case 'pattern':
-                $this->printPattern(intval($name));
+                $this->printPattern($id);
                 break;
             default:
                 $this->sendErrorJson('Unknown resource!', 404);
@@ -78,11 +82,14 @@ class ApiRequest
         }
     }
 
-    private function deleteResource(string $resource, string $name)
+    private function deleteResource(string $resource, int $id): void
     {
         switch ($resource) {
             case 'word':
-                $this->deleteWord($name);
+                $this->deleteWord($id);
+                break;
+            case 'pattern':
+                $this->deletePattern($id);
                 break;
             default:
                 $this->sendErrorJson('Unknown resource!', 404);
@@ -90,11 +97,14 @@ class ApiRequest
         }
     }
 
-    private function addResource(string $resource, string $name)
+    private function addResource(string $resource): void
     {
         switch ($resource) {
             case 'word':
-                $this->addWord($name);
+                $this->addWord();
+                break;
+            case 'pattern':
+                $this->addPattern();
                 break;
             default:
                 $this->sendErrorJson('Unknown resource!', 404);
@@ -102,81 +112,125 @@ class ApiRequest
         }
     }
 
-    private function printWord(string $word): void
+    private function printWord(int $id): void
     {
-        $hyphenatedWord = $this->dbWord->getHyphenatedWordFromDb($word);
-        if (!empty($hyphenatedWord)) {
-            $this->sendResponse(json_encode(array('word' => $word, 'hyphenatedWord' => $hyphenatedWord)));
+        $word = $this->dbWord->getWordById($id);
+        if (!empty($word)) {
+            $this->sendResponse(json_encode($word));
         } else {
-            $this->sendErrorJson("Word '$word' not exist!", 404);
+            $this->sendErrorJson("Word with ID $id not exist!", 404);
         }
     }
 
-    private function printPattern(int $patternId): void
+    private function printPattern(int $id): void
     {
-        $pattern = $this->dbPatterns->getPattern($patternId);
+        $pattern = $this->dbPatterns->getPattern($id);
         if (!empty($pattern)) {
-            $this->sendResponse(json_encode(array('patternId' => $patternId, 'pattern' => $pattern)));
+            $this->sendResponse(json_encode($pattern));
         } else {
-            $this->sendErrorJson("Pattern with ID $patternId not exist!", 404);
+            $this->sendErrorJson("Pattern with ID $id not exist!", 404);
         }
     }
 
-    private function addWord($word): void
+    private function addWord(): void
     {
-        if ($this->dbWord->isWordSavedToDb($word)) {
-            $hyphenatedWord = $this->dbWord->getHyphenatedWordFromDb($word);
-            $this->sendResponse(json_encode(array('word' => $word, 'hyphenatedWord' => $hyphenatedWord)), 409);
-        } else {
-            $hyphenatedWord = $this->hyphenationTool->hyphenateWord($word);
-            $this->sendResponse(json_encode(array('word' => $word, 'hyphenatedWord' => $hyphenatedWord)), 201);
-        }
-    }
-
-    private function deleteWord($word): void
-    {
-        if ($this->dbWord->isWordSavedToDb($word)) {
-            if ($this->dbWord->deleteWord($word)) {
-                $this->sendSuccessJson("Word '$word' deleted!", 200);
+        if (!empty($_POST['word'])) {
+            $word = $_POST['word'];
+            if ($this->dbWord->isWordSavedToDb($word)) {
+                $hyphenatedWord = $this->dbWord->getHyphenatedWordFromDb($word);
+                $this->sendResponse(json_encode(array(
+                        'word_id' => $this->dbWord->getWordId($word),
+                        'word' => $word,
+                        'hyphenated_word' => $hyphenatedWord)
+                ), 409);
             } else {
-                $this->sendErrorJson("Cannot delete word '$word' from database!", 500);
+                $hyphenatedWord = $this->hyphenationTool->hyphenateWord($word);
+                $this->sendResponse(json_encode(array(
+                        'word_id' => $this->dbWord->getWordId($word),
+                        'word' => $word,
+                        'hyphenated_word' => $hyphenatedWord)
+                ), 201);
+            }
+        } else $this->sendErrorJson("Please give required POST query field 'word'.");
+    }
+
+    private function addPattern(): void
+    {
+        if (!empty($_POST['pattern'])) {
+            $pattern = $_POST['pattern'];
+            if (preg_match('/[a-z0-9.]+/', $pattern) == 1) {
+                $patternId = $this->dbPatterns->getPatternIdByPatternStr($pattern);
+                $created = false;
+                if ($patternId === null) {
+                    $created = true;
+                    $patternId = $this->dbPatterns->addPattern($pattern);
+                    if ($patternId === null) {
+                        $this->sendErrorJson("Cannot create Pattern resource.", 500);
+                        return;
+                    }
+                }
+                $this->sendResponse(json_encode(array(
+                    'pattern_id' => $patternId,
+                    'pattern' => $pattern
+                )), ($created) ? 201 : 409);
+            } else $this->sendErrorJson("Field 'pattern' must have only these characters a-z0-9.");
+        } else $this->sendErrorJson("Please give required POST query field 'pattern'.");
+    }
+
+    private function deleteWord(int $id): void
+    {
+        if (!empty($this->dbWord->getWordById($id))) {
+            if ($this->dbWord->deleteWord($id)) {
+                $this->sendSuccessJson("Word with ID $id deleted!", 200);
+            } else {
+                $this->sendErrorJson("Cannot delete Word with ID $id from database!", 500);
             }
         } else {
-            $this->sendErrorJson("Word '$word' not exist!", 404);
+            $this->sendErrorJson("Word with ID $id not exist!", 404);
+        }
+    }
+
+    private function deletePattern(int $id): void
+    {
+        if (!empty($this->dbPatterns->getPattern($id))) {
+            if ($this->dbPatterns->deletePattern($id)) {
+                $this->sendSuccessJson("Pattern with ID $id deleted!", 200);
+            } else {
+                $this->sendErrorJson("Cannot delete Pattern with ID $id from database!", 500);
+            }
+        } else {
+            $this->sendErrorJson("Pattern with ID $id not exist!", 404);
         }
     }
 
     private function printResources(string $resource): void
     {
-        if (!empty($_GET['page']) && !empty($_GET['rowsInPage'])) {
+        if (!empty($_GET['page']) && !empty($_GET['per_page'])) {
             $page = $_GET['page'];
-            $rowsInPage = $_GET['rowsInPage'];
-            $pageCount = $this->getResourcesPageCount($resource, $rowsInPage);
-            if ($_GET['page'] > $pageCount) {
-                $this->sendErrorJson("Page number {$_GET['page']} not found! Last page number is $pageCount.", 404);
-            } else {
-                $list = $this->getResourcesList($resource, $page, $rowsInPage);
-                if ($list === null) {
-                    $this->sendErrorJson('Cannot get list from database!', 500);
-                } else $this->sendResponse(json_encode(array(
-                    'currentPage' => $_GET['page'],
-                    'lastPage' => $pageCount,
-                    'rowsInPage' => $_GET['rowsInPage'],
-                    'rows' => $list
-                )));
-            }
-        } else $this->sendErrorJson("Please give required GET query fields 'page' and 'rowsInPage'.");
+            $perPage = $_GET['per_page'];
+            if (preg_match('/^[0-9]+$/', $page) == 1 && preg_match('/^[0-9]+$/', $perPage) == 1) {
+                $pageCount = $this->getResourcesPageCount($resource, $perPage);
+                if ($page > $pageCount) {
+                    $this->sendErrorJson("Page number $page not found! Last page number is $pageCount.", 404);
+                } else {
+                    $list = $this->getResourcesList($resource, $page, $perPage);
+                    if ($list === null) {
+                        $this->sendErrorJson('Cannot get list from database!', 500);
+                    } else $this->sendResponse(json_encode($list));
+                }
+            } else $this->sendErrorJson("GET query fields 'page' and 'per_page' must be numbers.");
+        } else $this->sendErrorJson("Please give required GET query fields 'page' and 'perPage'.");
     }
 
-    private function getResourcesPageCount(string $resource, int $rowsInPage): int
+    private function getResourcesPageCount(string $resource, int $perPage): int
     {
         $pageCount = 0;
         switch ($resource) {
             case 'word':
-                $pageCount = $this->dbWord->getHyphenatedWordsListPageCount($rowsInPage);
+                $pageCount = $this->dbWord->getHyphenatedWordsListPageCount($perPage);
                 break;
             case 'pattern':
-                $pageCount = $this->dbPatterns->getPatternsListPageCount($rowsInPage);
+                $pageCount = $this->dbPatterns->getPatternsListPageCount($perPage);
                 break;
             default:
                 break;
@@ -184,15 +238,15 @@ class ApiRequest
         return $pageCount;
     }
 
-    private function getResourcesList(string $resource, int $page, int $rowsInPage): array
+    private function getResourcesList(string $resource, int $page, int $perPage): array
     {
         $list = null;
         switch ($resource) {
             case 'word':
-                $list = $this->dbWord->getHyphenatedWordsListFromDb($page, $rowsInPage);
+                $list = $this->dbWord->getHyphenatedWordsListFromDb($page, $perPage);
                 break;
             case 'pattern':
-                $list = $this->dbPatterns->getPatternsArray($page, $rowsInPage);
+                $list = $this->dbPatterns->getPatternsList($page, $perPage);
                 break;
             default:
                 break;

@@ -66,16 +66,11 @@ VALUES(:pattern, :pattern_chars);');
         return true;
     }
 
-    public function getPatternsArray(int $page = null, int $rowsInPage = null): array
+    public function getPatternsArray(): array
     {
         $patternsArray = array();
         $pdo = $this->config->getDbConfig()->getPdo();
-        if (isset($page) && isset($rowsInPage)) {
-            $begin = ($page - 1) * $rowsInPage;
-            $result = $pdo->query("SELECT `pattern` FROM `hyphenation_patterns` LIMIT $begin, $rowsInPage;");
-        } else {
-            $result = $pdo->query('SELECT `pattern` FROM `hyphenation_patterns`;');
-        }
+        $result = $pdo->query('SELECT `pattern` FROM `hyphenation_patterns`;');
         if ($result) {
             $patternsArray = $result->fetchAll(PDO::FETCH_COLUMN, 0);
             $this->logger->notice('Loaded patterns from database.');
@@ -83,18 +78,68 @@ VALUES(:pattern, :pattern_chars);');
         return $patternsArray;
     }
 
-    public function getPattern(int $id): string
+    public function getPatternsList(int $page, int $perPage): array
     {
+        $patternsArray = array();
         $pdo = $this->config->getDbConfig()->getPdo();
-        $query = $pdo->prepare('SELECT `pattern` FROM `hyphenation_patterns` WHERE `pattern_id` = :id;');
-        if ($query->execute(array('id' => $id))) {
-            return $query->fetch(PDO::FETCH_ASSOC)['pattern'];
+        $begin = ($page - 1) * $perPage;
+        $result = $pdo->query("SELECT `pattern_id`,`pattern` FROM `hyphenation_patterns` LIMIT $begin, $perPage;");
+        if ($result) {
+            return $result->fetchAll(PDO::FETCH_ASSOC);
         }
-        return '';
+        return null;
     }
 
+    public function getPattern(int $id): array
+    {
+        $pdo = $this->config->getDbConfig()->getPdo();
+        $query = $pdo->prepare('SELECT `pattern_id`,`pattern` FROM `hyphenation_patterns` WHERE `pattern_id` = :id;');
+        if ($query->execute(array('id' => $id))) {
+            return $query->fetch(PDO::FETCH_ASSOC);
+        }
+        return array();
+    }
 
-    public function getPatternsListPageCount(int $rowsInPage): int
+    public function getPatternIdByPatternStr(string $pattern): int
+    {
+        $pdo = $this->config->getDbConfig()->getPdo();
+        $query = $pdo->prepare('SELECT `pattern_id` FROM `hyphenation_patterns` WHERE `pattern` = :pattern;');
+        if ($query->execute(array('pattern' => $pattern))) {
+            if ($query->rowCount() > 0) {
+                return intval($query->fetch(PDO::FETCH_ASSOC)['pattern_id']);
+            }
+        }
+        return null;
+    }
+
+    public function deletePattern(int $id): bool
+    {
+        $pdo = $this->config->getDbConfig()->getPdo();
+        $query = $pdo->prepare('DELETE FROM `hyphenation_patterns` WHERE `pattern_id` = :id;');
+        if ($query->execute(array('id' => $id))) {
+            return true;
+        }
+        return false;
+    }
+
+    public function addPattern(string $pattern): int
+    {
+        $pdo = $this->config->getDbConfig()->getPdo();
+        $query = $pdo->prepare('INSERT INTO `hyphenation_patterns`(`pattern`, `pattern_chars`) 
+VALUES(:pattern, :pattern_chars);');
+        $patternObj = new Pattern($this->config, $this, str_replace('.', '', $pattern));
+        $patternCharArray = $patternObj->getPatternCharArray();
+        $serializedPatternCharArray = serialize($patternCharArray);
+        if (!$query->execute(array(
+            'pattern' => $pattern,
+            'pattern_chars' => $serializedPatternCharArray
+        ))) {
+            return null;
+        }
+        return $pdo->lastInsertId();
+    }
+
+    public function getPatternsListPageCount(int $perPage): int
     {
         $pdo = $this->config->getDbConfig()->getPdo();
         $query = $pdo->prepare("SELECT COUNT(`pattern_id`) AS `count` FROM `hyphenation_patterns`;");
@@ -102,8 +147,8 @@ VALUES(:pattern, :pattern_chars);');
             return null;
         }
         $count = $query->fetch(PDO::FETCH_ASSOC)['count'];
-        $pages = intval($count / $rowsInPage);
-        if ($count % $rowsInPage > 0) {
+        $pages = intval($count / $perPage);
+        if ($count % $perPage > 0) {
             $pages++;
         }
         return $pages;
