@@ -43,9 +43,13 @@ class ApiRequest
                     $this->printResource($resource, $id);
                 }
                 break;
-            case
-            'POST':
+            case 'POST':
                 $this->addResource($resource);
+                break;
+            case 'PUT':
+                if (!empty($id)) {
+                    $this->updateResource($resource, $id);
+                }
                 break;
             case 'DELETE':
                 if (!empty($id)) {
@@ -75,6 +79,21 @@ class ApiRequest
                 break;
             case 'pattern':
                 $this->printPattern($id);
+                break;
+            default:
+                $this->sendErrorJson('Unknown resource!', 404);
+                break;
+        }
+    }
+
+    private function updateResource(string $resource, int $id): void
+    {
+        switch ($resource) {
+            case 'word':
+                $this->updateWord($id);
+                break;
+            case 'pattern':
+                $this->updatePattern($id);
                 break;
             default:
                 $this->sendErrorJson('Unknown resource!', 404);
@@ -175,6 +194,58 @@ class ApiRequest
                 )), ($created) ? 201 : 409);
             } else $this->sendErrorJson("Field 'pattern' must have only these characters a-z0-9.");
         } else $this->sendErrorJson("Please give required POST query field 'pattern'.");
+    }
+
+    private function updatePattern(int $id): void
+    {
+        $patternStr = $this->dbPatterns->getPattern($id);
+        if (!empty($patternStr)) {
+            parse_str(file_get_contents('php://input'), $_PUT);
+            if (!empty($_PUT['pattern'])) {
+                $pattern = $_PUT['pattern'];
+                if (preg_match('/[a-z0-9.]+/', $pattern) === 1) {
+                    $success = $this->dbPatterns->updatePattern($id, $pattern);
+                    if (!$success) {
+                        $this->sendErrorJson("Cannot update Pattern resource.", 500);
+                        return;
+                    }
+                    $this->sendResponse(json_encode(array(
+                        'pattern_id' => $id,
+                        'pattern' => $pattern
+                    )));
+                } else $this->sendErrorJson("Field 'pattern' must have only these characters a-z0-9.");
+            } else $this->sendErrorJson("Please give required PUT query field 'pattern'.");
+        } else {
+            $this->sendErrorJson("Pattern with ID $id not exist!", 404);
+        }
+    }
+
+    private function updateWord(int $id): void
+    {
+        $word = $this->dbWord->getWordById($id);
+        if (!empty($word)) {
+            parse_str(file_get_contents('php://input'), $_PUT);
+            if (!empty($_PUT['word']) && !empty($_PUT['hyphenated_word'])) {
+                $word = $_PUT['word'];
+                $hyphenatedWord = $_PUT['hyphenated_word'];
+                if (preg_match('/[a-zA-Z]+/', $word) === 1) {
+                    if (preg_match('/[a-zA-Z-]+/', $hyphenatedWord) === 1) {
+                        $success = $this->dbWord->updateWord($word, $hyphenatedWord, $id);
+                        if (!$success) {
+                            $this->sendErrorJson("Cannot update Word resource.", 500);
+                            return;
+                        }
+                        $this->sendResponse(json_encode(array(
+                            'word_id' => $id,
+                            'word' => $word,
+                            'hyphenated_word' => $hyphenatedWord
+                        )));
+                    } else $this->sendErrorJson("Field 'hyphenated_word' must have only these characters a-zA-Z and -");
+                } else $this->sendErrorJson("Field 'word' must have only these characters a-zA-Z");
+            } else $this->sendErrorJson("Please give required PUT query field 'word'.");
+        } else {
+            $this->sendErrorJson("Word with ID $id not exist!", 404);
+        }
     }
 
     private function deleteWord(int $id): void

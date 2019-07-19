@@ -65,6 +65,21 @@ class DbWord
         return $query->fetch(PDO::FETCH_ASSOC)['word_id'];
     }
 
+    public function updateWord(string $word, string $hyphenatedWord, int $id): bool
+    {
+        $pdo = $this->dbConfig->getPdo();
+        $query = $pdo->prepare('UPDATE `hyphenated_words` SET `word` = :word, `hyphenated_word` = :hyphenated_word
+WHERE `word_id` = :id;');
+        if (!$query->execute(array(
+            'word' => $word,
+            'hyphenated_word' => $hyphenatedWord,
+            'id' => $id
+        ))) {
+            return false;
+        }
+        return true;
+    }
+
     public function getHyphenatedWordsListFromDb(int $page, int $perPage): array
     {
         $pdo = $this->dbConfig->getPdo();

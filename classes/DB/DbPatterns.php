@@ -141,6 +141,24 @@ VALUES(:pattern, :pattern_chars);');
         return $pdo->lastInsertId();
     }
 
+    public function updatePattern(int $id, string $pattern): bool
+    {
+        $pdo = $this->config->getDbConfig()->getPdo();
+        $query = $pdo->prepare('UPDATE `hyphenation_patterns` SET `pattern` = :pattern, `pattern_chars` = :pattern_chars
+WHERE `pattern_id` = :id;');
+        $patternObj = new Pattern($this->config, $this, str_replace('.', '', $pattern));
+        $patternCharArray = $patternObj->getPatternCharArray();
+        $serializedPatternCharArray = serialize($patternCharArray);
+        if (!$query->execute(array(
+            'pattern' => $pattern,
+            'pattern_chars' => $serializedPatternCharArray,
+            'id' => $id
+        ))) {
+            return false;
+        }
+        return true;
+    }
+
     public function getPatternsListPageCount(int $perPage): int
     {
         $pdo = $this->config->getDbConfig()->getPdo();
