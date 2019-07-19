@@ -185,6 +185,48 @@
 					]
 				},
 				{
+					"name": "UPDATE Word",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "word",
+									"value": "mistranslate",
+									"type": "text"
+								},
+								{
+									"key": "hyphenated_word",
+									"value": "mis-trans-late",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost/api/words/418928",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"words",
+								"418928"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "DELETE word",
 					"request": {
 						"method": "DELETE",
@@ -308,6 +350,43 @@
 					"response": []
 				},
 				{
+					"name": "UPDATE Pattern",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "pattern",
+									"value": "test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost/api/patterns/4451",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"patterns",
+								"4451"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "DELETE Pattern",
 					"request": {
 						"method": "DELETE",
@@ -317,7 +396,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost/api/patterns/4449",
+							"raw": "http://localhost/api/patterns/4450",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -325,7 +404,7 @@
 							"path": [
 								"api",
 								"patterns",
-								"4449"
+								"4450"
 							]
 						}
 					},
