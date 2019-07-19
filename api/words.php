@@ -3,7 +3,6 @@
 
 use API\ApiRequest;
 use AppConfig\Config;
-use DB\DbWord;
 use Log\Logger;
 use SimpleCache\FileCache;
 
