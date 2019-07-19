@@ -83,6 +83,16 @@ VALUES(:pattern, :pattern_chars);');
         return $patternsArray;
     }
 
+    public function getPattern(int $id): string
+    {
+        $pdo = $this->config->getDbConfig()->getPdo();
+        $query = $pdo->prepare('SELECT `pattern` FROM `hyphenation_patterns` WHERE `patterns_id` = :id;');
+        if ($query->execute(array('id' => $id))) {
+            return $query->fetch(PDO::FETCH_ASSOC)['pattern'];
+        }
+        return null;
+    }
+
 
     public function getPatternsListPageCount(int $rowsInPage): int
     {
@@ -98,6 +108,7 @@ VALUES(:pattern, :pattern_chars);');
         }
         return $pages;
     }
+
     public function getPatternChars(string $pattern): array
     {
         $patternCharsArray = array();
