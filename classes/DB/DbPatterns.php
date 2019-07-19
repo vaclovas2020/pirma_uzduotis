@@ -66,11 +66,16 @@ VALUES(:pattern, :pattern_chars);');
         return true;
     }
 
-    public function getPatternsArray(): array
+    public function getPatternsArray(int $page = null, int $rowsInPage = null): array
     {
         $patternsArray = array();
         $pdo = $this->config->getDbConfig()->getPdo();
-        $result = $pdo->query('SELECT `pattern` FROM `hyphenation_patterns`;');
+        if (isset($page) && isset($rowsInPage)) {
+            $begin = ($page - 1) * $rowsInPage;
+            $result = $pdo->query("SELECT `pattern` FROM `hyphenation_patterns` LIMIT $begin, $rowsInPage;");
+        } else {
+            $result = $pdo->query('SELECT `pattern` FROM `hyphenation_patterns`;');
+        }
         if ($result) {
             $patternsArray = $result->fetchAll(PDO::FETCH_COLUMN, 0);
             $this->logger->notice('Loaded patterns from database.');
@@ -78,6 +83,21 @@ VALUES(:pattern, :pattern_chars);');
         return $patternsArray;
     }
 
+
+    public function getPatternsListPageCount(int $rowsInPage): int
+    {
+        $pdo = $this->config->getDbConfig()->getPdo();
+        $query = $pdo->prepare("SELECT COUNT(`pattern_id`) AS `count` FROM `hyphenation_patterns`;");
+        if (!$query->execute()) {
+            return null;
+        }
+        $count = $query->fetch(PDO::FETCH_ASSOC)['count'];
+        $pages = intval($count / $rowsInPage);
+        if ($count % $rowsInPage > 0) {
+            $pages++;
+        }
+        return $pages;
+    }
     public function getPatternChars(string $pattern): array
     {
         $patternCharsArray = array();
