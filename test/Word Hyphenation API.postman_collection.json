@@ -1,0 +1,337 @@
+{
+	"info": {
+		"_postman_id": "997f9c9e-f8e2-400f-b9c5-afebc2d7c8d8",
+		"name": "Word Hyphenation API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Words",
+			"item": [
+				{
+					"name": "Get hyphenated words list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost/api/words?page=1&per_page=25",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"words"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "25"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get hyphenated word",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost/api/words/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"words",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add new Word",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "word",
+									"value": "mistranslate",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost/api/words/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"words",
+								""
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Add new Word",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "word",
+											"value": "mistranslate",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost/api/words/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"path": [
+										"api",
+										"words",
+										""
+									],
+									"query": [
+										{
+											"key": "",
+											"value": "",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 19 Jul 2019 12:24:32 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache/2.4.29 (Ubuntu)"
+								},
+								{
+									"key": "Content-Length",
+									"value": "75"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/json;charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"word_id\": 418926,\n    \"word\": \"mistranslate\",\n    \"hyphenated_word\": \"mis-trans-late\"\n}"
+						}
+					]
+				},
+				{
+					"name": "DELETE word",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost/api/words/418927",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"words",
+								"418927"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Patterns",
+			"item": [
+				{
+					"name": "GET Patterns List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost/api/patterns?page=1&per_page=25",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"patterns"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "25"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Pattern by Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost/api/patterns/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"patterns",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Pattern",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "pattern",
+									"value": ".test5a",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost/api/patterns/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"patterns",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Pattern",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost/api/patterns/4449",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"patterns",
+								"4449"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
