@@ -17,7 +17,5 @@ $config->applyLoggerConfig($logger);
 
 $cache = new FileCache($_SERVER['DOCUMENT_ROOT'] . '/' . $config->getCachePath(), $config->getCacheDefaultTtl());
 $dbWord = new DbWord($config->getDbConfig());
-$request = new ApiRequest($logger, $config, $dbWord);
-if (!empty($_SERVER['PATH_INFO'])) {
-    $request->processPathInfo(substr($_SERVER['PATH_INFO'],1));
-} else $request->getHyphenatedWordsList();
+$request = new ApiRequest($logger, $config, $dbWord, $cache);
+$request->processRequest('word', $_SERVER['REQUEST_METHOD']);

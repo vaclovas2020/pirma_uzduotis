@@ -33,7 +33,7 @@ class DbWord
         if (!$query->execute(array('word' => $word))) {
             return '';
         }
-        if ($query->rowCount() == 0){
+        if ($query->rowCount() == 0) {
             return '';
         }
         return $query->fetch(PDO::FETCH_ASSOC)['hyphenated_word'];
@@ -49,6 +49,31 @@ class DbWord
         }
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function deleteWord(string $word): bool
+    {
+        $pdo = $this->dbConfig->getPdo();
+        $query = $pdo->prepare("DELETE FROM `hyphenated_words` WHERE `word` = LOWER(:word);");
+        $query->bindParam(':word',$word);
+        if (!$query->execute()) {
+            return false;
+        }
+        return true;
+    }
+
+    public function getHyphenatedWordsListPageCount(int $rowsInPage): int
+    {
+        $pdo = $this->dbConfig->getPdo();
+        $query = $pdo->prepare("SELECT COUNT(`word_id`) AS `count` FROM `hyphenated_words`;");
+        if (!$query->execute()) {
+            return null;
+        }
+        $count = $query->fetch(PDO::FETCH_ASSOC)['count'];
+        $pages = intval($count / $rowsInPage);
+        if ($count % $rowsInPage > 0) {
+            $pages++;
+        }
+        return $pages;
+    }
 
     public function getFoundPatternsOfWord(string $word, array &$patterns): bool
     {
@@ -56,7 +81,7 @@ class DbWord
         $sql = $pdo->prepare('SELECT `hyphenation_patterns`.`pattern` FROM `hyphenated_word_patterns`
 INNER JOIN `hyphenation_patterns` ON `hyphenation_patterns`.`pattern_id` = `hyphenated_word_patterns`.`pattern_id` 
 INNER JOIN `hyphenated_words` ON `hyphenated_words`.`word_id` = `hyphenated_word_patterns`.`word_id` 
-WHERE `hyphenated_words`.`word` = :word;');
+WHERE `hyphenated_words`.`word` = LOWER(:word);');
         if (!$sql->execute(array('word' => $word))) {
             return false;
         }
