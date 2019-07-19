@@ -158,13 +158,13 @@ class ApiRequest
     {
         if (!empty($_POST['pattern'])) {
             $pattern = $_POST['pattern'];
-            if (preg_match('/[a-z0-9.]+/', $pattern) == 1) {
+            if (preg_match('/[a-z0-9.]+/', $pattern) === 1) {
                 $patternId = $this->dbPatterns->getPatternIdByPatternStr($pattern);
                 $created = false;
-                if ($patternId === null) {
+                if ($patternId === -1) {
                     $created = true;
                     $patternId = $this->dbPatterns->addPattern($pattern);
-                    if ($patternId === null) {
+                    if ($patternId === -1) {
                         $this->sendErrorJson("Cannot create Pattern resource.", 500);
                         return;
                     }

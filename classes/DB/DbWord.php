@@ -46,7 +46,7 @@ class DbWord
         if (!$query->execute(array('id' => $id))) {
             return array();
         }
-        if ($query->rowCount() == 0) {
+        if ($query->rowCount() === 0) {
             return array();
         }
         return $query->fetch(PDO::FETCH_ASSOC);

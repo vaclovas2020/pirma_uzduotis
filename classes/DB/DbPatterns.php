@@ -80,7 +80,6 @@ VALUES(:pattern, :pattern_chars);');
 
     public function getPatternsList(int $page, int $perPage): array
     {
-        $patternsArray = array();
         $pdo = $this->config->getDbConfig()->getPdo();
         $begin = ($page - 1) * $perPage;
         $result = $pdo->query("SELECT `pattern_id`,`pattern` FROM `hyphenation_patterns` LIMIT $begin, $perPage;");
@@ -94,10 +93,13 @@ VALUES(:pattern, :pattern_chars);');
     {
         $pdo = $this->config->getDbConfig()->getPdo();
         $query = $pdo->prepare('SELECT `pattern_id`,`pattern` FROM `hyphenation_patterns` WHERE `pattern_id` = :id;');
-        if ($query->execute(array('id' => $id))) {
-            return $query->fetch(PDO::FETCH_ASSOC);
+        if (!$query->execute(array('id' => $id))) {
+            return array();
         }
-        return array();
+        if ($query->rowCount() === 0) {
+            return array();
+        }
+        return $query->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getPatternIdByPatternStr(string $pattern): int
@@ -105,11 +107,11 @@ VALUES(:pattern, :pattern_chars);');
         $pdo = $this->config->getDbConfig()->getPdo();
         $query = $pdo->prepare('SELECT `pattern_id` FROM `hyphenation_patterns` WHERE `pattern` = :pattern;');
         if ($query->execute(array('pattern' => $pattern))) {
-            if ($query->rowCount() > 0) {
+            if ($query->rowCount() === 1) {
                 return intval($query->fetch(PDO::FETCH_ASSOC)['pattern_id']);
             }
         }
-        return null;
+        return -1;
     }
 
     public function deletePattern(int $id): bool
@@ -134,7 +136,7 @@ VALUES(:pattern, :pattern_chars);');
             'pattern' => $pattern,
             'pattern_chars' => $serializedPatternCharArray
         ))) {
-            return null;
+            return -1;
         }
         return $pdo->lastInsertId();
     }
