@@ -5,7 +5,7 @@ namespace CLI;
 
 
 use Hyphenation\WordHyphenationTool;
-use IO\FileReader;
+use IO\FileReaderProxy;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
 
@@ -38,7 +38,7 @@ class UserInputAction
     public function hyphenateFromTextFile(string $fileName, string &$resultStr): bool
     {
         $this->logger->info("Chosen hyphenate from text file '{filename}'", array('filename' => $fileName));
-        $fileReader = new FileReader($this->cache, $this->logger);
+        $fileReader = new FileReaderProxy($this->cache, $this->logger);
         $status = $fileReader->readTextFromFile($fileName, $resultStr);
         if ($status === false) {
             return false;
