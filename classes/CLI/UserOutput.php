@@ -1,8 +1,6 @@
 <?php
 
-
 namespace CLI;
-
 
 use IO\FileWriter;
 use Log\LoggerInterface;
