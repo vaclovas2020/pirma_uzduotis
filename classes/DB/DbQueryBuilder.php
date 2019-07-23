@@ -82,6 +82,7 @@ class DbQueryBuilder
     {
         array_push($this->paramList, $paramName);
         $this->paramListValues[$paramName] = $paramValue;
+        return $this;
     }
 
     public function addSelectField(string $fieldName, string $beforeAndAfter = '`'): DbQueryBuilder
@@ -99,6 +100,83 @@ class DbQueryBuilder
 
     public function build(): string
     {
+        $this->throwIfDataIsMissing();
+        $queryStr = "";
+        $this->addActionToQueryStr($queryStr);
+        $this->addTableNameToQueryStr($queryStr);
+        switch ($this->action) {
+            case DBQueryAction::INSERT_INTO:
+            case DBQueryAction::REPLACE_INTO:
+                $this->buildInsertReplace($queryStr);
+                break;
+            case DBQueryAction::SELECT_FROM:
+                $this->buildSelectFrom($queryStr);
+                break;
+            case DbQueryAction::UPDATE:
+                $this->buildUpdate($queryStr);
+                break;
+            default:
+                break;
+        }
+        $this->addInnerJoinToQueryStr($queryStr);
+        $this->addConditionSentenceToQueryStr($queryStr);
+        return $queryStr;
+    }
+
+    private function addInnerJoinToQueryStr(string &$queryStr): void
+    {
+        if (!empty($this->innerJoinStr)) {
+            $queryStr .= " {$this->innerJoinStr}";
+        }
+    }
+
+    private function addConditionSentenceToQueryStr(string &$queryStr): void
+    {
+        if (!empty($this->conditionSentence)) {
+            $queryStr .= " {$this->conditionSentence}";
+        }
+    }
+
+    private function addActionToQueryStr(string &$queryStr): void
+    {
+        $queryStr .= $this->action;
+    }
+
+    private function addTableNameToQueryStr(string &$queryStr): void
+    {
+        $queryStr .= ' `' . $this->tableName . '`';
+    }
+
+    private function buildInsertReplace(string &$queryStr): void
+    {
+        $queryStr .= '(`' . implode('`,`', $this->paramList) . '`)';
+        $queryStr .= ' VALUES(:' . implode(',:', $this->paramList) . ')';
+        foreach ($this->paramListValues as $param => $value) {
+            $queryStr = str_replace(":$param", $value, $queryStr);
+        }
+    }
+
+    private function buildSelectFrom(string &$queryStr): void
+    {
+        if (!empty($this->selectList)) {
+            $queryStr = str_replace('*',
+                implode(',', $this->selectList),
+                $queryStr);
+        }
+    }
+
+    private function buildUpdate(string &$queryStr): void
+    {
+        $queryStr .= ' SET ';
+        $paramArr = [];
+        foreach ($this->paramList as $param) {
+            array_push($paramArr, "`$param` = :$param");
+        }
+        $queryStr .= implode(', ', $paramArr);
+    }
+
+    private function throwIfDataIsMissing(): void
+    {
         if (empty($this->action) && empty($this->tableName)) {
             throw new RuntimeException('DbQueryBuilder: Please set action and tableName!');
         }
@@ -112,41 +190,5 @@ class DbQueryBuilder
                 $this->action === DBQueryAction::INSERT_INTO)) {
             throw new RuntimeException("DbQueryBuilder: Action {$this->action} no need condition sentence!");
         }
-        $queryStr = $this->action;
-        $queryStr .= ' `' . $this->tableName . '`';
-        switch ($this->action) {
-            case DBQueryAction::INSERT_INTO:
-            case DBQueryAction::REPLACE_INTO:
-                $queryStr .= '(`' . implode('`,`', $this->paramList) . '`)';
-                $queryStr .= ' VALUES(:' . implode(',:', $this->paramList) . ')';
-                foreach ($this->paramListValues as $param => $value) {
-                    $queryStr = str_replace(":$param", $value, $queryStr);
-                }
-                break;
-            case DBQueryAction::SELECT_FROM:
-                if (!empty($this->selectList)) {
-                    $queryStr = str_replace('*',
-                        implode(',', $this->selectList),
-                        $queryStr);
-                }
-                break;
-            case DbQueryAction::UPDATE:
-                $queryStr .= ' SET ';
-                $paramArr = [];
-                foreach ($this->paramList as $param) {
-                    array_push($paramArr, "`$param` = :$param");
-                }
-                $queryStr .= implode(', ', $paramArr);
-                break;
-            default:
-                break;
-        }
-        if (!empty($this->innerJoinStr)) {
-            $queryStr .= " {$this->innerJoinStr}";
-        }
-        if (!empty($this->conditionSentence)) {
-            $queryStr .= " {$this->conditionSentence}";
-        }
-        return $queryStr;
     }
 }
