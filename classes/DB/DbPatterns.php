@@ -30,19 +30,29 @@ class DbPatterns
         $pdo = $this->config->getDbConfig()->getPdo();
         $pdo->beginTransaction();
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 0;');
-        $query1 = $pdo->prepare('TRUNCATE TABLE `hyphenated_word_patterns`;');
+        $queryStr = (new DbQueryBuilder())
+            ->truncateTable('hyphenated_word_patterns')
+            ->build();
+        $query1 = $pdo->prepare($queryStr);
         if (!$query1->execute()) {
             $pdo->rollBack();
             return false;
         }
-        $query2 = $pdo->prepare('TRUNCATE TABLE `hyphenated_words`;');
+        $queryStr = (new DbQueryBuilder())
+            ->truncateTable('hyphenated_words')
+            ->build();
+        $query2 = $pdo->prepare($queryStr);
         if (!$query2->execute()) {
             $pdo->rollBack();
             return false;
         }
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 1;');
-        $query = $pdo->prepare('REPLACE INTO `hyphenation_patterns`(`pattern`, `pattern_chars`) 
-VALUES(:pattern, :pattern_chars);');
+        $queryStr = (new DbQueryBuilder())
+            ->replaceInto('hyphenation_patterns')
+            ->addParam('pattern')
+            ->addParam('pattern_chars')
+            ->build();
+        $query = $pdo->prepare($queryStr);
         $current = 1;
         foreach ($patternsArray as $pattern) {
             $patternObj = new Pattern($this->config, $this, str_replace('.', '', $pattern));
@@ -70,7 +80,11 @@ VALUES(:pattern, :pattern_chars);');
     {
         $patternsArray = [];
         $pdo = $this->config->getDbConfig()->getPdo();
-        $result = $pdo->query('SELECT `pattern` FROM `hyphenation_patterns`;');
+        $queryStr = (new DbQueryBuilder())
+            ->selectFrom('hyphenation_patterns')
+            ->addSelectField('pattern')
+            ->build();
+        $result = $pdo->query($queryStr);
         if ($result) {
             $patternsArray = $result->fetchAll(PDO::FETCH_COLUMN, 0);
             $this->logger->notice('Loaded patterns from database.');
@@ -82,7 +96,13 @@ VALUES(:pattern, :pattern_chars);');
     {
         $pdo = $this->config->getDbConfig()->getPdo();
         $begin = ($page - 1) * $perPage;
-        $result = $pdo->query("SELECT `pattern_id`,`pattern` FROM `hyphenation_patterns` LIMIT $begin, $perPage;");
+        $queryStr = (new DbQueryBuilder())
+            ->selectFrom('hyphenation_patterns')
+            ->addSelectField('pattern_id')
+            ->addSelectField('pattern')
+            ->setConditionSentence("LIMIT $begin, $perPage")
+            ->build();
+        $result = $pdo->query($queryStr);
         if ($result) {
             return $result->fetchAll(PDO::FETCH_ASSOC);
         }
@@ -92,7 +112,13 @@ VALUES(:pattern, :pattern_chars);');
     public function getPattern(int $id): array
     {
         $pdo = $this->config->getDbConfig()->getPdo();
-        $query = $pdo->prepare('SELECT `pattern_id`,`pattern` FROM `hyphenation_patterns` WHERE `pattern_id` = :id;');
+        $queryStr = (new DbQueryBuilder())
+            ->selectFrom('hyphenation_patterns')
+            ->addSelectField('pattern_id')
+            ->addSelectField('pattern')
+            ->setConditionSentence("WHERE `pattern_id` = :id")
+            ->build();
+        $query = $pdo->prepare($queryStr);
         if (!$query->execute(array('id' => $id))) {
             return [];
         }
@@ -105,7 +131,12 @@ VALUES(:pattern, :pattern_chars);');
     public function getPatternIdByPatternStr(string $pattern): int
     {
         $pdo = $this->config->getDbConfig()->getPdo();
-        $query = $pdo->prepare('SELECT `pattern_id` FROM `hyphenation_patterns` WHERE `pattern` = :pattern;');
+        $queryStr = (new DbQueryBuilder())
+            ->selectFrom('hyphenation_patterns')
+            ->addSelectField('pattern_id')
+            ->setConditionSentence("WHERE `pattern` = :pattern")
+            ->build();
+        $query = $pdo->prepare($queryStr);
         if ($query->execute(array('pattern' => $pattern))) {
             if ($query->rowCount() === 1) {
                 return intval($query->fetch(PDO::FETCH_ASSOC)['pattern_id']);
@@ -117,7 +148,11 @@ VALUES(:pattern, :pattern_chars);');
     public function deletePattern(int $id): bool
     {
         $pdo = $this->config->getDbConfig()->getPdo();
-        $query = $pdo->prepare('DELETE FROM `hyphenation_patterns` WHERE `pattern_id` = :id;');
+        $queryStr = (new DbQueryBuilder())
+            ->deleteFrom('hyphenation_patterns')
+            ->setConditionSentence("WHERE `pattern_id` = :id")
+            ->build();
+        $query = $pdo->prepare($queryStr);
         if ($query->execute(array('id' => $id))) {
             return true;
         }
@@ -127,8 +162,12 @@ VALUES(:pattern, :pattern_chars);');
     public function addPattern(string $pattern): int
     {
         $pdo = $this->config->getDbConfig()->getPdo();
-        $query = $pdo->prepare('INSERT INTO `hyphenation_patterns`(`pattern`, `pattern_chars`) 
-VALUES(:pattern, :pattern_chars);');
+        $queryStr = (new DbQueryBuilder())
+            ->insertInto('hyphenation_patterns')
+            ->addParam('pattern')
+            ->addParam('pattern_chars')
+            ->build();
+        $query = $pdo->prepare($queryStr);
         $patternObj = new Pattern($this->config, $this, str_replace('.', '', $pattern));
         $patternCharArray = $patternObj->getPatternCharArray();
         $serializedPatternCharArray = serialize($patternCharArray);
@@ -144,8 +183,13 @@ VALUES(:pattern, :pattern_chars);');
     public function updatePattern(int $id, string $pattern): bool
     {
         $pdo = $this->config->getDbConfig()->getPdo();
-        $query = $pdo->prepare('UPDATE `hyphenation_patterns` SET `pattern` = :pattern, `pattern_chars` = :pattern_chars
-WHERE `pattern_id` = :id;');
+        $queryStr = (new DbQueryBuilder())
+            ->updateTable('hyphenation_patterns')
+            ->addParam('pattern')
+            ->addParam('pattern_chars')
+            ->setConditionSentence("WHERE `pattern_id` = :id")
+            ->build();
+        $query = $pdo->prepare($queryStr);
         $patternObj = new Pattern($this->config, $this, str_replace('.', '', $pattern));
         $patternCharArray = $patternObj->getPatternCharArray();
         $serializedPatternCharArray = serialize($patternCharArray);
@@ -162,7 +206,11 @@ WHERE `pattern_id` = :id;');
     public function getPatternsListPageCount(int $perPage): int
     {
         $pdo = $this->config->getDbConfig()->getPdo();
-        $query = $pdo->prepare("SELECT COUNT(`pattern_id`) AS `count` FROM `hyphenation_patterns`;");
+        $queryStr = (new DbQueryBuilder())
+            ->selectFrom('hyphenation_patterns')
+            ->addSelectField('COUNT(`pattern_id`) AS `count`', '')
+            ->build();
+        $query = $pdo->prepare($queryStr);
         if (!$query->execute()) {
             return null;
         }
@@ -181,7 +229,12 @@ WHERE `pattern_id` = :id;');
         $patternCharsCache = $this->cache->get($key);
         if ($patternCharsCache === null) {
             $pdo = $this->config->getDbConfig()->getPdo();
-            $sql = $pdo->prepare('SELECT `pattern_chars` FROM `hyphenation_patterns` WHERE `pattern` = :pattern;');
+            $queryStr = (new DbQueryBuilder())
+                ->selectFrom('hyphenation_patterns')
+                ->addSelectField('pattern_chars')
+                ->setConditionSentence("WHERE `pattern` = :pattern")
+                ->build();
+            $sql = $pdo->prepare($queryStr);
             $sql->bindParam(':pattern', $pattern);
             if ($sql->execute()) {
                 $patternCharsArray = unserialize($sql->fetch(PDO::FETCH_ASSOC)['pattern_chars']);
