@@ -48,7 +48,7 @@ class Config
         } else {
             $this->createConfigFile($thisFileName);
         }
-        $this->dbConfig = new DbConfig($this->dbHost, $this->dbName, $this->dbUser,
+        $this->dbConfig = DbConfig::getInstance($this->dbHost, $this->dbName, $this->dbUser,
             $this->dbPassword, $this->logger, $this->isEnabledDbSource());
     }
 
@@ -111,7 +111,7 @@ class Config
     public function configureDatabase(string $dbHost, string $dbName,
                                       string $dbUser, string $dbPassword): void
     {
-        $this->dbConfig = new DbConfig($dbHost, $dbName, $dbUser, $dbPassword, $this->logger, true);
+        $this->dbConfig = DbConfig::getInstance($dbHost, $dbName, $dbUser, $dbPassword, $this->logger, true);
         if ($this->dbConfig->createDbTables()) {
             $this->logger->notice('Database tables created successful!');
             $this->dbHost = $dbHost;
