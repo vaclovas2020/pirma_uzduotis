@@ -8,14 +8,11 @@ class ApiObject
 {
     public function __construct(string $resourceName, ControllerInterface $controller, ApiRouter $router)
     {
-        // TODO: move validation to other method
         $router->add('/^\/(' . $resourceName . ')$/', 'GET', $controller,
             function (ApiRequest $request, ApiResponse $response, ControllerInterface $controller) {
-                if (!empty($_GET['page']) && !empty($_GET['per_page'])) {
-                    if (preg_match('/[0-9]+/', $_GET['page']) && preg_match('/[0-9]+/', $_GET['per_page'])) {
-                        $controller->printList($_GET['page'], $_GET['per_page']);
-                    } else $response->sendErrorJson("GET query fields 'page' and 'per_page' mus be numbers.", 400);
-                } else $response->sendErrorJson("Please give GET query fields 'page' and 'per_page'", 400);
+                if ((PaginationValidator::getInstance($_GET['page'], $_GET['per_page'], $response)->validate())) {
+                    $controller->printList($_GET['page'], $_GET['per_page']);
+                }
             });
 
         $router->add('/^\/(' . $resourceName . ')\/[0-9]+$/', 'GET', $controller,
