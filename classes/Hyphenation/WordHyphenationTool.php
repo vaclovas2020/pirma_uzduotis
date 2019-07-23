@@ -63,7 +63,7 @@ class WordHyphenationTool
             $this->dbWord->isWordSavedToDb($word) : false;
         $resultCache = $this->cache->get($hash);
         $resultStr = '';
-        $patternList = array();
+        $patternList = [];
         if (($resultCache === null && !$wordSavedToDb) ||
             ($this->config->isEnabledDbSource() && !$wordSavedToDb)) {
             $result = $this->findPatternsAndPushToWord(strtolower($word), $patternList);
@@ -96,7 +96,7 @@ class WordHyphenationTool
 
     public function hyphenateAllText(string $text): string
     {
-        $words = array();
+        $words = [];
         $count = preg_match_all('/[a-zA-Z]+[.,!?;:]*/', $text, $words);
         $currentWord = 1;
         foreach ($words as $x => $y) {
@@ -116,7 +116,7 @@ class WordHyphenationTool
 
     public function getFoundPatternsOfWord(string $word): array
     {
-        $foundPatterns = array();
+        $foundPatterns = [];
         $key = sha1($word . '_patterns');
         $foundPatternsCache = $this->cache->get($key);
         if ($foundPatternsCache === null) {
@@ -216,7 +216,7 @@ class WordHyphenationTool
 
     private function createResultArray(string $word): array
     {
-        $result = array();
+        $result = [];
         for ($i = 0; $i < strlen($word); $i++) {
             array_push($result, new WordChar(substr($word, $i, 1), 0, $i));
         }

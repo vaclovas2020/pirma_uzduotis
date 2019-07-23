@@ -88,7 +88,7 @@ class FileCache implements CacheInterface
 
     public function getMultiple(array $keys, $default = null): array
     {
-        $resultArray = array();
+        $resultArray = [];
         foreach ($keys as $key) {
             $value = $this->get($key, $default);
             $resultArray[$key] = $value;

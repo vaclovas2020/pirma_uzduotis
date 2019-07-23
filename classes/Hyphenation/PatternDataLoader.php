@@ -13,7 +13,7 @@ class PatternDataLoader
 
     public static function loadDataFromFile(string $fileName, CacheInterface $cache, LoggerInterface $logger): array
     {
-        $patternData = array();
+        $patternData = [];
         $execCalc = new ExecDurationCalculator();
         $hash = @sha1_file($fileName);
         $cachedData = $cache->get($hash);

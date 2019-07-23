@@ -44,10 +44,10 @@ class DbWord
         $pdo = $this->dbConfig->getPdo();
         $query = $pdo->prepare('SELECT `word_id`, `word`,`hyphenated_word` FROM `hyphenated_words` WHERE `word_id` = :id;');
         if (!$query->execute(array('id' => $id))) {
-            return array();
+            return [];
         }
         if ($query->rowCount() === 0) {
-            return array();
+            return [];
         }
         return $query->fetch(PDO::FETCH_ASSOC);
     }

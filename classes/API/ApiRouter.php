@@ -15,7 +15,7 @@ class ApiRouter
     {
         $this->request = $request;
         $this->response = new ApiResponse();
-        $this->routes = array();
+        $this->routes = [];
         $this->allowedMethods = $allowedMethods;
     }
 

@@ -40,7 +40,7 @@ class Pattern
 
     public function getPatternCharArray(): array
     {
-        $patternCharArray = array();
+        $patternCharArray = [];
         $noCounts = preg_replace('/[0-9]+/', '', $this->pattern);
         $chars = array_merge($this->extractPattern(), $this->extractPatternEndCount());
         foreach ($chars as $x => $y) {
@@ -58,14 +58,14 @@ class Pattern
 
     private function extractPattern(): array
     {
-        $chars = array();
+        $chars = [];
         preg_match_all('/[0-9]+[a-z]{1}/', $this->pattern, $chars);
         return $chars;
     }
 
     private function extractPatternEndCount(): array
     {
-        $endCount = array();
+        $endCount = [];
         preg_match_all('/[0-9]+$/', $this->pattern, $endCount);
         return $endCount;
     }

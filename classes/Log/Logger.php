@@ -33,63 +33,63 @@ class Logger implements LoggerInterface
         $this->writeToFile = $writeToFile;
     }
 
-    public function emergency(string $message, array $context = array()): void
+    public function emergency(string $message, array $context = []): void
     {
         $message = $this->formatMessage(LogLevel::EMERGENCY, $message, $context);
         $this->writeToLogFile($message);
         $this->printToScreenIfNeeded($message, LogColor::EMERGENCY);
     }
 
-    public function alert(string $message, array $context = array()): void
+    public function alert(string $message, array $context = []): void
     {
         $message = $this->formatMessage(LogLevel::ALERT, $message, $context);
         $this->writeToLogFile($message);
         $this->printToScreenIfNeeded($message, LogColor::ALERT);
     }
 
-    public function critical(string $message, array $context = array()): void
+    public function critical(string $message, array $context = []): void
     {
         $message = $this->formatMessage(LogLevel::CRITICAL, $message, $context);
         $this->writeToLogFile($message);
         $this->printToScreenIfNeeded($message, LogColor::CRITICAL);
     }
 
-    public function error(string $message, array $context = array()): void
+    public function error(string $message, array $context = []): void
     {
         $message = $this->formatMessage(LogLevel::ERROR, $message, $context);
         $this->writeToLogFile($message);
         $this->printToScreenIfNeeded($message, LogColor::ERROR);
     }
 
-    public function warning(string $message, array $context = array()): void
+    public function warning(string $message, array $context = []): void
     {
         $message = $this->formatMessage(LogLevel::WARNING, $message, $context);
         $this->writeToLogFile($message);
         $this->printToScreenIfNeeded($message, LogColor::WARNING);
     }
 
-    public function notice(string $message, array $context = array()): void
+    public function notice(string $message, array $context = []): void
     {
         $message = $this->formatMessage(LogLevel::NOTICE, $message, $context);
         $this->writeToLogFile($message);
         $this->printToScreenIfNeeded($message, LogColor::NOTICE);
     }
 
-    public function info(string $message, array $context = array()): void
+    public function info(string $message, array $context = []): void
     {
         $message = $this->formatMessage(LogLevel::INFO, $message, $context);
         $this->writeToLogFile($message);
         $this->printToScreenIfNeeded($message, LogColor::INFO);
     }
 
-    public function debug(string $message, array $context = array()): void
+    public function debug(string $message, array $context = []): void
     {
         $message = $this->formatMessage(LogLevel::DEBUG, $message, $context);
         $this->writeToLogFile($message);
         $this->printToScreenIfNeeded($message, LogColor::DEBUG);
     }
 
-    public function log(string $level, string $message, array $context = array()): void
+    public function log(string $level, string $message, array $context = []): void
     {
         switch ($level) {
             case LogLevel::EMERGENCY:
@@ -138,7 +138,7 @@ class Logger implements LoggerInterface
         }
     }
 
-    private function formatMessage(string $level, string $message, array $context = array())
+    private function formatMessage(string $level, string $message, array $context = [])
     {
         $levelUpperCase = strtoupper($level);
         $dateTimeStr = (new DateTime())->format('Y-m-d H:i:s,u');
@@ -146,7 +146,7 @@ class Logger implements LoggerInterface
         return "$dateTimeStr [$levelUpperCase]: $message\n";
     }
 
-    private function interpolate(string $message, array $context = array()): string
+    private function interpolate(string $message, array $context = []): string
     {
         foreach ($context as $key => $value) {
             if (!is_array($value) && !is_object($value) || method_exists($value, '__toString')) {

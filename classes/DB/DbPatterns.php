@@ -68,7 +68,7 @@ VALUES(:pattern, :pattern_chars);');
 
     public function getPatternsArray(): array
     {
-        $patternsArray = array();
+        $patternsArray = [];
         $pdo = $this->config->getDbConfig()->getPdo();
         $result = $pdo->query('SELECT `pattern` FROM `hyphenation_patterns`;');
         if ($result) {
@@ -94,10 +94,10 @@ VALUES(:pattern, :pattern_chars);');
         $pdo = $this->config->getDbConfig()->getPdo();
         $query = $pdo->prepare('SELECT `pattern_id`,`pattern` FROM `hyphenation_patterns` WHERE `pattern_id` = :id;');
         if (!$query->execute(array('id' => $id))) {
-            return array();
+            return [];
         }
         if ($query->rowCount() === 0) {
-            return array();
+            return [];
         }
         return $query->fetch(PDO::FETCH_ASSOC);
     }
@@ -176,7 +176,7 @@ WHERE `pattern_id` = :id;');
 
     public function getPatternChars(string $pattern): array
     {
-        $patternCharsArray = array();
+        $patternCharsArray = [];
         $key = sha1($pattern . '_chars');
         $patternCharsCache = $this->cache->get($key);
         if ($patternCharsCache === null) {
