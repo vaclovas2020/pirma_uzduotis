@@ -45,7 +45,7 @@ class PaginationValidator
 
     private function validateNumber(string $number): bool
     {
-        return preg_match('/[0-9]+/', $number) === 1;
+        return preg_match('/^[0-9]+$/', $number) === 1;
     }
 
     private function __construct(string $page, string $perPage, ApiResponse $response)
