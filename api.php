@@ -2,7 +2,6 @@
 
 
 use Core\AppContainer;
-use Exception\ApiException;
 
 require_once($_SERVER['DOCUMENT_ROOT'] . '/classes/Core/AutoLoader.php');
 Core\AutoLoader::register(true);
