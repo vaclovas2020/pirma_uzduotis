@@ -4,15 +4,21 @@
 namespace API;
 
 
+use Exception\ApiException;
+
 class ApiObject
 {
     public function __construct(string $resourceName, ControllerInterface $controller, ApiRouter $router)
     {
         $router->add('/^\/(' . $resourceName . ')$/', 'GET', $controller,
             function (ApiRequest $request, ApiResponse $response, ControllerInterface $controller) {
-                if ((PaginationValidator::getInstance($_GET['page'], $_GET['per_page'], $response)->validate())) {
-                    $controller->printList($_GET['page'], $_GET['per_page']);
+                if (empty($_GET['page']) || empty($_GET['per_page'])) {
+                    throw new ApiException('Please define fields `page` and `per_page`!');
                 }
+                if (!Validator::validateNumber($_GET['page']) || !Validator::validateNumber($_GET['per_page'])) {
+                    throw new ApiException('Fields `page` and `per_page` must be numbers!');
+                }
+                $controller->printList($_GET['page'], $_GET['per_page']);
             });
 
         $router->add('/^\/(' . $resourceName . ')\/[0-9]+$/', 'GET', $controller,
