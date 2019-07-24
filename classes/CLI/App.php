@@ -15,6 +15,14 @@ class App
     private $config;
     private $cache;
     private $userInput;
+    public const DB_CONFIGURATION_ARGC = 6;
+    public const CLI_MINIMUM_ARGC = 3;
+    public const CLI_ACTION_ARGC = 1;
+    public const CLI_FILENAME_ARGC = 2;
+    public const DB_HOST_ARGC = 2;
+    public const DB_NAME_ARGC = 3;
+    public const DB_USER_ARGC = 4;
+    public const DB_PASSWORD_ARGC = 5;
 
     public function __construct(LoggerInterface $logger, Config $config, CacheInterface $cache)
     {
@@ -26,21 +34,23 @@ class App
 
     public function checkConfigurationCLI(int $argc, array $argv): bool
     {
-        if ($argc == 6 && $argv[1] === '--config-db') {
-            $this->config->configureDatabase($argv[2], $argv[3], $argv[4], $argv[5]);
+        if ($this->isDatabaseConfigurationCliArguments($argc, $argv)) {
+            $this->config->configureDatabase(
+                $argv[self::DB_HOST_ARGC], $argv[self::DB_NAME_ARGC],
+                $argv[self::DB_USER_ARGC], $argv[self::DB_PASSWORD_ARGC]);
             return true;
-        } else if ($argc == 3 && $argv[1] === '--db-import-patterns-file') {
+        } else if ($argc == self::CLI_MINIMUM_ARGC && $argv[self::CLI_ACTION_ARGC] === '--db-import-patterns-file') {
             $dbPatterns = new DbPatterns($this->config, $this->logger, $this->cache);
-            if ($dbPatterns->importFromFile($argv[2])) {
+            if ($dbPatterns->importFromFile($argv[self::CLI_FILENAME_ARGC])) {
                 $this->logger->notice('Patterns file {fileName} successfully imported to database!',
-                    array('fileName' => $argv[2]));
+                    array('fileName' => $argv[self::CLI_FILENAME_ARGC]));
             } else {
                 $this->logger->error('Patterns file {fileName} was not imported to database because error occurred!',
-                    array('fileName' => $argv[2]));
+                    array('fileName' => $argv[self::CLI_FILENAME_ARGC]));
             }
             return true;
-        } else if ($argc == 3 && $argv[1] === '--clear') {
-            $this->userInput->clearStorage($argv[2]);
+        } else if ($argc == self::CLI_MINIMUM_ARGC && $argv[self::CLI_ACTION_ARGC] === '--clear') {
+            $this->userInput->clearStorage($argv[self::CLI_FILENAME_ARGC]);
             return true;
         }
         return false;
@@ -51,18 +61,18 @@ class App
         $this->logger->debug('Program started with arguments: {arguments}',
             array('arguments' => $argv));
         $checkConfigurationCli = $this->checkConfigurationCLI($argc, $argv);
-        if (!$checkConfigurationCli && $argc >= 3) {
+        if (!$checkConfigurationCli && $argc >= self::CLI_MINIMUM_ARGC) {
             $execCalc = new ExecDurationCalculator();
-            $choose = $argv[1]; // -w one word, -p paragraph, -f file
+            $choose = $argv[self::CLI_ACTION_ARGC]; // -w one word, -p paragraph, -f file
             $resultStr = '';
-            $status = $this->userInput->processInput($choose, $argv[2], $resultStr);
+            $status = $this->userInput->processInput($choose, $argv[self::CLI_FILENAME_ARGC], $resultStr);
             if ($status !== false) {
                 $fileName = '';
                 $writeToFile = false;
                 $fileWriter = new FileWriter();
                 $userInput = new UserOutput($this->logger, $fileWriter);
-                if ($argc > 3) {
-                    $fileName = $argv[3];
+                if ($argc > self::CLI_MINIMUM_ARGC) {
+                    $fileName = $argv[self::CLI_MINIMUM_ARGC];
                     $writeToFile = true;
                 }
                 $userInput->outputToUser($resultStr, $writeToFile, $fileName);
@@ -75,4 +85,10 @@ class App
             (new Helper())->printHelp();
         }
     }
+
+    private function isDatabaseConfigurationCliArguments(int $argc, array $argv)
+    {
+        return $argc === self::DB_CONFIGURATION_ARGC && $argv[self::CLI_ACTION_ARGC] === '--config-db';
+    }
+
 }
