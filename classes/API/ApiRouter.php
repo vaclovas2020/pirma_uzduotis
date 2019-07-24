@@ -40,23 +40,25 @@ class ApiRouter
     {
         $path = $_SERVER['PATH_INFO'];
         $method = $_SERVER['REQUEST_METHOD'];
-        if (!in_array($method, $this->allowedMethods)) {
-            throw new ApiException('Method is not Allowed', 405);
-        }
-        if (!$this->callRouteCallback($path, $method)) {
-            throw new ApiException('Bad Request', 400);
+        try {
+            if (!in_array($method, $this->allowedMethods)) {
+                throw new ApiException('Method is not Allowed', 405);
+            }
+            $this->callRouteCallback($path, $method);
+        } catch (ApiException $e) {
+            $this->response->sendErrorJson($e->getMessage(), $e->getHttpStatus());
         }
     }
 
-    public function callRouteCallback(string $path, string $method): bool
+    private function callRouteCallback(string $path, string $method): void
     {
         foreach ($this->routes as $route) {
             if (preg_match($route['path'], $path) === 1 && $route['method'] === $method) {
                 call_user_func($route['callback'], $this->request, $this->response, $route['controller']);
-                return true;
+                return;
             }
         }
-        return false;
+        throw new ApiException('Bad Request', 400);
     }
 
 }

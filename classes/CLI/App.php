@@ -88,7 +88,8 @@ class App
                 $argv[self::DB_HOST_ARGC], $argv[self::DB_NAME_ARGC],
                 $argv[self::DB_USER_ARGC], $argv[self::DB_PASSWORD_ARGC]);
             return true;
-        } else return false;
+        }
+        return false;
     }
 
     private function checkImportPatternsFileToDb(int $argc, array $argv): bool
@@ -96,7 +97,8 @@ class App
         if ($this->isImportPatternsFileToDbCliArguments($argc, $argv)) {
             $this->importPatternsFileToDb($argv[self::CLI_FILENAME_ARGC]);
             return true;
-        } else return false;
+        }
+        return false;
     }
 
     private function checkClearStorage(int $argc, array $argv): bool
@@ -104,7 +106,8 @@ class App
         if ($argc == self::CLI_MINIMUM_ARGC && $argv[self::CLI_ACTION_ARGC] === '--clear') {
             $this->userInput->clearStorage($argv[self::CLI_FILENAME_ARGC]);
             return true;
-        } else return false;
+        }
+        return false;
     }
 
     private function outputToUser(string $resultStr, bool $status, string $fileName, bool $writeToFile): void
