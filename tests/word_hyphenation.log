@@ -1,0 +1,42 @@
+2019-07-25 13:39:15,804811 [NOTICE]: Patterns list read from file 'tex-hyphenation-patterns.txt' time: 0.014694929122925 seconds
+2019-07-25 13:39:15,805245 [NOTICE]: 4447 patterns loaded to memory
+2019-07-25 13:39:15,840941 [NOTICE]: Founded patterns for word 'mistranslate': Array
+(
+    [0] => .mis1
+    [1] => a2n
+    [2] => m2is
+    [3] => 2n1s2
+    [4] => n2sl
+    [5] => s1l2
+    [6] => s3lat
+    [7] => st4r
+    [8] => 4te.
+    [9] => 1tra
+)
+
+2019-07-25 13:39:15,841107 [INFO]: Word 'mistranslate' hyphenated to 'mis-trans-late'
+2019-07-25 13:39:59,036536 [NOTICE]: Patterns list read from cache time: 0.00094199180603027 seconds
+2019-07-25 13:39:59,036750 [NOTICE]: 4447 patterns loaded to memory
+2019-07-25 13:39:59,036860 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache
+2019-07-25 13:41:51,779013 [NOTICE]: Loaded patterns from database.
+2019-07-25 13:41:51,782339 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache
+2019-07-25 13:42:13,264454 [NOTICE]: Loaded patterns from database.
+2019-07-25 13:42:13,265213 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache
+2019-07-25 13:44:42,907875 [NOTICE]: Loaded patterns from database.
+2019-07-25 13:44:42,911576 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache
+2019-07-25 13:44:47,874759 [NOTICE]: Loaded patterns from database.
+2019-07-25 13:44:47,879062 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache
+2019-07-25 13:45:37,052187 [NOTICE]: Loaded patterns from database.
+2019-07-25 13:45:37,053178 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache
+2019-07-25 13:45:53,636842 [NOTICE]: Loaded patterns from database.
+2019-07-25 13:45:53,637924 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache
+2019-07-25 13:47:39,983934 [NOTICE]: Loaded patterns from database.
+2019-07-25 13:47:39,984624 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache
+2019-07-25 13:52:55,302467 [NOTICE]: Loaded patterns from database.
+2019-07-25 13:52:55,303232 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache
+2019-07-25 13:53:31,903809 [NOTICE]: Loaded patterns from database.
+2019-07-25 13:53:31,904996 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache
+2019-07-25 13:53:49,024435 [NOTICE]: Loaded patterns from database.
+2019-07-25 13:53:49,025153 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache
+2019-07-25 13:58:36,511085 [NOTICE]: Loaded patterns from database.
+2019-07-25 13:58:36,512029 [NOTICE]: Word 'mistranslate' hyphenated to 'mis-trans-late' from cache

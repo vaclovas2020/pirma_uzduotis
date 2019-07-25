@@ -1,0 +1,1 @@
+{"logPrintToScreen":true,"logWriteToFile":true,"logFilePath":"word_hyphenation.log","cachePath":"cache","cacheDefaultTtl":2592000,"patternFilePath":"tex-hyphenation-patterns.txt","dbHost":"localhost","dbName":"word_hyphenation_db","dbUser":"root","dbPassword":"Q1w5e9r7t5y3@","enabledDbSource":true}
