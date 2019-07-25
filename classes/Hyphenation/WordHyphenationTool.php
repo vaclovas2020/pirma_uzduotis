@@ -240,8 +240,8 @@ class WordHyphenationTool
     {
         $allPatterns = ($this->config->isEnabledDbSource()) ?
             $this->dbPatterns->getPatternsArray() :
-            PatternDataLoader::loadDataFromFile($this->config->getPatternsFilePath(),
-                $this->cache, $this->logger);
+            PatternDataLoader::loadDataFromFile(
+                $this->cache, $this->logger, $this->config->getPatternsFilePath());
         if ($this->config->isEnabledDbSource() && empty($allPatterns)) {
             if ($this->dbPatterns->importFromFile($this->config->getPatternsFilePath())) {
                 $this->logger->notice("Patterns database table was empty, so the app imported 

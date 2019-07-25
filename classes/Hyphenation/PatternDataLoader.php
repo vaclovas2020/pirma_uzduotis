@@ -11,8 +11,12 @@ class PatternDataLoader
 {
     public const DEFAULT_FILENAME = 'tex-hyphenation-patterns.txt';
 
-    public static function loadDataFromFile(string $fileName, CacheInterface $cache, LoggerInterface $logger): array
+    public static function loadDataFromFile(CacheInterface $cache, LoggerInterface $logger,
+                                            string $fileName = self::DEFAULT_FILENAME): array
     {
+        if (empty($fileName)) {
+            $fileName = self::DEFAULT_FILENAME;
+        }
         $patternData = [];
         $execCalc = new ExecDurationCalculator();
         $hash = @sha1_file($fileName);
