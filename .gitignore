@@ -7,3 +7,5 @@
 /api/word_hyphenation.log
 /vendor
 composer.lock
+/test/word_hyphenation.log
+/test/app_config.json
