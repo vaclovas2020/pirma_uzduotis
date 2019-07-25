@@ -26,7 +26,7 @@ class DbPatterns
 
     public function importFromFile(string $fileName): bool
     {
-        $patternsArray = PatternDataLoader::loadDataFromFile($fileName, $this->cache, $this->logger);
+        $patternsArray = PatternDataLoader::loadDataFromFile($this->cache, $this->logger, $fileName);
         $pdo = $this->config->getDbConfig()->getPdo();
         $pdo->beginTransaction();
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 0;');
