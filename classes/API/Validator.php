@@ -12,9 +12,9 @@ class Validator
         return preg_match('/^[0-9]+$/', $number) === 1;
     }
 
-    public static function validateValue(string $pattern, string $value)
+    public static function validateValue(string $pattern, string $value): bool
     {
-        return preg_match('/[a-z0-9.]+/', $pattern) === 1;
+        return preg_match($pattern, $value) === 1;
     }
 
 }
