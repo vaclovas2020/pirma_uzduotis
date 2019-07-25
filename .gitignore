@@ -5,3 +5,5 @@
 /cache
 /db_backup
 /api/word_hyphenation.log
+/vendor
+composer.lock
