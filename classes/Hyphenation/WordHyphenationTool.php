@@ -5,6 +5,7 @@ namespace Hyphenation;
 use AppConfig\Config;
 use DB\DbPatterns;
 use DB\DbWord;
+use Error;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
 
@@ -47,9 +48,10 @@ class WordHyphenationTool
                 'fileName' => $fileName
             ));
         } else {
-            $this->logger->error(">Cannot save hyphenated text file '{fileName}' to cache", array(
+            $this->logger->error("Cannot save hyphenated text file '{fileName}' to cache", array(
                 'fileName' => $fileName
             ));
+            throw new Error("Cannot save hyphenated text file '{$fileName}' to cache");
         }
     }
 
