@@ -191,7 +191,7 @@ class DbWord
             ->addParam('hyphenated_word')
             ->build();
         $sql1 = $pdo->prepare($queryStr);
-        if (!$sql1->execute(array('word' => strtolower($word), 'hyphenated_word' => $hyphenatedWord))) {
+        if (!$sql1->execute(array('word' => strtolower($word), 'hyphenated_word' => strtolower($hyphenatedWord)))) {
             $pdo->rollBack();
             return false;
         }
@@ -204,7 +204,6 @@ class DbWord
         $queryStr = (new DbQueryBuilder())
             ->replaceInto('hyphenated_word_patterns')
             ->addParam('word_id')
-            ->addParam('pattern_id')
             ->addParamValue('pattern_id', "($patternIdQueryStr)")
             ->build();
         $sql2 = $pdo->prepare($queryStr);
