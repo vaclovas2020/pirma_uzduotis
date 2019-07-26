@@ -25,16 +25,6 @@ class WordHyphenationToolTest extends TestCase
             "Test failed: $word not hyphenated to $hyphenatedWord");
     }
 
-
-    public function provider(): array
-    {
-        return array(
-            array('mistranslate', 'mis-trans-late'),
-            array('catfish', 'cat-fish'),
-            array('network', 'net-work')
-        );
-    }
-
     /**
      * @dataProvider provider
      */
@@ -43,6 +33,17 @@ class WordHyphenationToolTest extends TestCase
         $hyphenationTool = new WordHyphenationTool($this->logger, $this->cache, $this->config);
         $this->assertNotEmpty($hyphenationTool->getFoundPatternsOfWord($word),
             "getFoundPatternsOfWord return empty array when given word is $word");
+    }
+
+    public function provider(): array
+    {
+        return array(
+            array('mistranslate', 'mis-trans-late'),
+            array('catfish', 'cat-fish'),
+            array('network', 'net-work'),
+            array('workshop', 'work-shop'),
+            array('forever', 'for-ever')
+        );
     }
 
     protected function setup(): void
@@ -58,5 +59,8 @@ class WordHyphenationToolTest extends TestCase
                 'root',
                 'Q1w5e9r7t5y3@',
                 $this->logger, true));
+        $this->config
+            ->method('isEnabledDbSource')
+            ->willReturn(true);
     }
 }
