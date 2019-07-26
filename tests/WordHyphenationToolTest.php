@@ -17,6 +17,8 @@ class WordHyphenationToolTest extends TestCase
 
     /**
      * @dataProvider provider
+     * @param string $word word
+     * @param string $hyphenatedWord hyphenated word
      */
     public function testHyphenateWord(string $word, string $hyphenatedWord): void
     {
@@ -27,6 +29,7 @@ class WordHyphenationToolTest extends TestCase
 
     /**
      * @dataProvider provider
+     * @param string $word
      */
     public function testGetFoundPatternsOfWord(string $word): void
     {
