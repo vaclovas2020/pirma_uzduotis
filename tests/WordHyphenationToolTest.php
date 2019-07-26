@@ -2,7 +2,6 @@
 
 
 use AppConfig\Config;
-use AppConfig\DbConfig;
 use Hyphenation\WordHyphenationTool;
 use Log\Logger;
 use PHPUnit\Framework\TestCase;
