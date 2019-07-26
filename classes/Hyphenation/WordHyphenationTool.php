@@ -72,9 +72,9 @@ class WordHyphenationTool
     {
         $words = [];
         $count = preg_match_all('/[a-zA-Z]+[.,!?;:]*/', $text, $words);
+        $words = $words[0];
         $currentWord = 1;
-        foreach ($words as $x => $y) {
-            foreach ($y as $word) {
+        foreach ($words as  $word) {
                 $this->logger->info("Processing word {current} / {total}", array(
                     'current' => $currentWord,
                     'total' => $count
@@ -84,7 +84,6 @@ class WordHyphenationTool
                 $text = str_replace($word, $hyphenatedWord, $text);
                 $currentWord++;
             }
-        }
         return $text;
     }
 
