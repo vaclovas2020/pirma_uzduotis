@@ -8,6 +8,10 @@ use RuntimeException;
 
 class DbQueryBuilder
 {
+
+    public const EXCEPTION_NO_ACTION_AND_TABLE_NAME = 'DbQueryBuilder: Please set action and tableName!';
+    public const EXCEPTION_MUST_HAVE_PARAM_LIST = 'DbQueryBuilder: Action %s must have paramList!';
+    public const EXCEPTION_NO_NEED_CONDITION_SENTENCE = 'DbQueryBuilder: Action %s no need condition sentence!';
     private $action;
     private $tableName;
     private $paramList;
@@ -178,17 +182,17 @@ class DbQueryBuilder
     private function throwIfDataIsMissing(): void
     {
         if (empty($this->action) && empty($this->tableName)) {
-            throw new RuntimeException('DbQueryBuilder: Please set action and tableName!');
+            throw new RuntimeException(self::EXCEPTION_NO_ACTION_AND_TABLE_NAME);
         }
         if (empty($this->paramList) &&
             ($this->action === DBQueryAction::INSERT_INTO || $this->action === DBQueryAction::REPLACE_INTO ||
                 $this->action === DBQueryAction::UPDATE)) {
-            throw new RuntimeException("DbQueryBuilder: Action {$this->action} must have paramList!");
+            throw new RuntimeException(sprintf(self::EXCEPTION_MUST_HAVE_PARAM_LIST, $this->action));
         }
         if (!empty($this->conditionSentence) &&
             ($this->action === DBQueryAction::TRUNCATE_TABLE || $this->action === DBQueryAction::REPLACE_INTO ||
                 $this->action === DBQueryAction::INSERT_INTO)) {
-            throw new RuntimeException("DbQueryBuilder: Action {$this->action} no need condition sentence!");
+            throw new RuntimeException(sprintf(self::EXCEPTION_NO_NEED_CONDITION_SENTENCE, $this->action));
         }
     }
 }
