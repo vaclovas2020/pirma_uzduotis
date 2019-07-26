@@ -11,10 +11,6 @@ use SimpleCache\CacheInterface;
 
 class App
 {
-    private $logger;
-    private $config;
-    private $cache;
-    private $userInput;
     public const DB_CONFIGURATION_ARGC = 6;
     public const CLI_MINIMUM_ARGC = 3;
     public const CLI_ACTION_ARGC = 1;
@@ -23,6 +19,10 @@ class App
     public const DB_NAME_ARGC = 3;
     public const DB_USER_ARGC = 4;
     public const DB_PASSWORD_ARGC = 5;
+    private $logger;
+    private $config;
+    private $cache;
+    private $userInput;
 
     public function __construct(LoggerInterface $logger, Config $config, CacheInterface $cache)
     {
