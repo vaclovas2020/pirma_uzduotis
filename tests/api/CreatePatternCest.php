@@ -10,7 +10,7 @@ class CreatePatternCest
     }
 
     // tests
-    public function tryToTest(ApiTester $I)
+    public function createNewPattern(ApiTester $I)
     {
         $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendPOST('/patterns/', ['pattern' => '.test']);
