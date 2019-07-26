@@ -3,8 +3,7 @@
 
 use Core\AppContainer;
 
-require_once($_SERVER['DOCUMENT_ROOT'] . '/classes/Core/AutoLoader.php');
-Core\AutoLoader::register(true);
+require_once($_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php');
 $container = new AppContainer(
     array(
         'document_root' => $_SERVER['DOCUMENT_ROOT'] . '/',
