@@ -2,11 +2,8 @@
 
 
 use AppConfig\Config;
-use AppConfig\DbConfig;
 use DB\DbPatterns;
 use Hyphenation\Pattern;
-use Hyphenation\PatternDataLoader;
-use IO\PatternFileIterator;
 use Log\Logger;
 use PHPUnit\Framework\TestCase;
 use SimpleCache\FileCache;
@@ -22,24 +19,26 @@ class PatternTest extends TestCase
     /**
      * @dataProvider provider
      * @param string $pattern
+     * @param int $count
      */
-    public function testGetPatternCharArray(string $pattern): void
+    public function testGetPatternCharArray(string $pattern, int $count): void
     {
         $patternObj = new Pattern($this->config, $this->dbPatterns, $pattern);
-        $matches = array();
-        preg_match_all('/[0-9]+/', $pattern, $matches);
-        $matchesCount = count($matches[0]);
         $patternChars = $patternObj->getPatternCharArray();
         $this->assertNotEmpty($patternChars);
-        $this->assertEquals($matchesCount, count($patternChars),
-            "Pattern $pattern must have $matchesCount patternChars array elements");
+        $this->assertEquals($count, count($patternChars),
+            "Pattern $pattern must have $count patternChars array elements");
     }
 
-    public function provider(): PatternFileIterator
+    public function provider(): array
     {
-        $fileName = (file_exists(PatternDataLoader::DEFAULT_FILENAME)) ?
-            PatternDataLoader::DEFAULT_FILENAME : '../' . PatternDataLoader::DEFAULT_FILENAME;
-        return new PatternFileIterator($fileName);
+        return [
+            ['ach4', 1],
+            ['ad4der', 1],
+            ['af1t', 1],
+            ['a2l3t', 2],
+            ['5at', 1]
+        ];
     }
 
     protected function setUp(): void
@@ -48,18 +47,10 @@ class PatternTest extends TestCase
         $this->logger = $this->createMock(Logger::class);
         $this->config = $this->createMock(Config::class);
         $this->cache = $this->createMock(FileCache::class);
-        $this->config
-            ->method('getDbConfig')
-            ->willReturn(DbConfig::getInstance(
-                'localhost',
-                'word_hyphenation_db',
-                'root',
-                'Q1w5e9r7t5y3@',
-                $this->logger, true));
+        $this->dbPatterns = $this->createMock(DbPatterns::class);
         $this->config
             ->method('isEnabledDbSource')
-            ->willReturn(true);
-        $this->dbPatterns = $this->createMock(DbPatterns::class);
+            ->willReturn(false);
     }
 
 }

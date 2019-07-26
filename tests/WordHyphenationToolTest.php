@@ -27,17 +27,6 @@ class WordHyphenationToolTest extends TestCase
             "Test failed: $word not hyphenated to $hyphenatedWord");
     }
 
-    /**
-     * @dataProvider provider
-     * @param string $word
-     */
-    public function testGetFoundPatternsOfWord(string $word): void
-    {
-        $hyphenationTool = new WordHyphenationTool($this->logger, $this->cache, $this->config);
-        $this->assertNotEmpty($hyphenationTool->getFoundPatternsOfWord($word),
-            "getFoundPatternsOfWord return empty array when given word is $word");
-    }
-
     public function testHyphenateAllText(): void
     {
         $text = '45 78 mistranslate and catfish 45,78! network forever is done.';
@@ -64,15 +53,7 @@ class WordHyphenationToolTest extends TestCase
         $this->cache = $this->createMock(FileCache::class);
         $this->config = $this->createMock(Config::class);
         $this->config
-            ->method('getDbConfig')
-            ->willReturn(DbConfig::getInstance(
-                'localhost',
-                'word_hyphenation_db',
-                'root',
-                'Q1w5e9r7t5y3@',
-                $this->logger, true));
-        $this->config
             ->method('isEnabledDbSource')
-            ->willReturn(true);
+            ->willReturn(false);
     }
 }
