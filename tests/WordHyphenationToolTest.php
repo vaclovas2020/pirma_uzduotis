@@ -11,43 +11,52 @@ use SimpleCache\FileCache;
 class WordHyphenationToolTest extends TestCase
 {
 
-    public function testHyphenateWord(): void
+    private $logger;
+    private $cache;
+    private $config;
+
+    /**
+     * @dataProvider provider
+     */
+    public function testHyphenateWord(string $word, string $hyphenatedWord): void
     {
-        $logger = $this->createMock(Logger::class);
-        $cache = $this->createMock(FileCache::class);
-        $config = $this->createMock(Config::class);
-        $config
-            ->method('getDbConfig')
-            ->willReturn(DbConfig::getInstance(
-                'localhost',
-                'word_hyphenation_db',
-                'root',
-                'Q1w5e9r7t5y3@',
-                $logger, true));
-        $hyphenationTool = new WordHyphenationTool($logger, $cache, $config);
-        $this->assertEquals('mis-trans-late', $hyphenationTool->hyphenateWord('mistranslate'),
-            "Test failed: mistranslate not hyphenated to mis-trans-late");
-        $this->assertEquals('net-work', $hyphenationTool->hyphenateWord('network'),
-            "Test failed: network not hyphenated to net-work");
-        $this->assertEquals('cat-fish', $hyphenationTool->hyphenateWord('catfish'),
-            "Test failed: catfish not hyphenated to cat-fish");
+        $hyphenationTool = new WordHyphenationTool($this->logger, $this->cache, $this->config);
+        $this->assertEquals($hyphenatedWord, $hyphenationTool->hyphenateWord($word),
+            "Test failed: $word not hyphenated to $hyphenatedWord");
     }
 
-    public function testGetFoundPatternsOfWord(): void
+
+    public function provider(): array
     {
-        $logger = $this->createMock(Logger::class);
-        $cache = $this->createMock(FileCache::class);
-        $config = $this->createMock(Config::class);
-        $config
+        return array(
+            array('mistranslate', 'mis-trans-late'),
+            array('catfish', 'cat-fish'),
+            array('network', 'net-work')
+        );
+    }
+
+    /**
+     * @dataProvider provider
+     */
+    public function testGetFoundPatternsOfWord(string $word): void
+    {
+        $hyphenationTool = new WordHyphenationTool($this->logger, $this->cache, $this->config);
+        $this->assertNotEmpty($hyphenationTool->getFoundPatternsOfWord($word),
+            "getFoundPatternsOfWord return empty array when given word is $word");
+    }
+
+    protected function setup(): void
+    {
+        $this->logger = $this->createMock(Logger::class);
+        $this->cache = $this->createMock(FileCache::class);
+        $this->config = $this->createMock(Config::class);
+        $this->config
             ->method('getDbConfig')
             ->willReturn(DbConfig::getInstance(
                 'localhost',
                 'word_hyphenation_db',
                 'root',
                 'Q1w5e9r7t5y3@',
-                $logger, true));
-        $hyphenationTool = new WordHyphenationTool($logger, $cache, $config);
-        $this->assertNotEmpty($hyphenationTool->getFoundPatternsOfWord('mistranslate'),
-            "getFoundPatternsOfWord return empty array");
+                $this->logger, true));
     }
 }
