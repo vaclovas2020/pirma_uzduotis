@@ -59,10 +59,7 @@ class PatternTest extends TestCase
         $this->config
             ->method('isEnabledDbSource')
             ->willReturn(true);
-        $this->dbPatterns = $this->getMockBuilder(DbPatterns::class)
-            ->enableOriginalConstructor()
-            ->setConstructorArgs(array($this->config, $this->logger, $this->cache))
-            ->getMock();
+        $this->dbPatterns = $this->createMock(DbPatterns::class);
     }
 
 }
