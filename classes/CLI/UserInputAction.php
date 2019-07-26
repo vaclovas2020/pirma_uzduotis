@@ -4,6 +4,7 @@
 namespace CLI;
 
 
+use Hyphenation\HyphenatedTextFileCache;
 use Hyphenation\WordHyphenationTool;
 use IO\FileReaderProxy;
 use Log\LoggerInterface;
@@ -38,19 +39,17 @@ class UserInputAction
     public function hyphenateFromTextFile(string $fileName, string &$resultStr): bool
     {
         $this->logger->info("Chosen hyphenate from text file '{filename}'", array('filename' => $fileName));
-        $fileReader = new FileReaderProxy($this->cache, $this->logger);
-        $status = $fileReader->readTextFromFile($fileName, $resultStr);
-        if ($status === false) {
-            return false;
-        }
-        if ($this->hyphenationTool->isHyphenatedTextFileCacheExist($fileName)) {
-            $resultStr = $this->hyphenationTool->getHyphenatedTextFileCache($fileName);
+        $fileCache = new HyphenatedTextFileCache($this->cache, $this->logger);
+        if ($fileCache->isHyphenatedTextFileCacheExist($fileName)) {
+            $resultStr = $fileCache->getHyphenatedTextFileCache($fileName);
             $this->logger->notice("Loaded hyphenated text from file '{fileName}' cache", array(
                 'fileName' => $fileName
             ));
         } else {
+            $fileReader = new FileReaderProxy($this->cache, $this->logger);
+            $fileReader->readTextFromFile($fileName, $resultStr);
             $resultStr = $this->hyphenationTool->hyphenateAllText($resultStr);
-            $this->hyphenationTool->saveHyphenatedTextFileToCache($fileName, $resultStr);
+            $fileCache->saveHyphenatedTextFileToCache($fileName, $resultStr);
         }
         return true;
     }
@@ -61,8 +60,7 @@ class UserInputAction
         if (!empty($foundPatterns)) {
             $this->logger->notice("Founded patterns of word '{word}': {patterns}",
                 array('word' => $word, 'patterns' => $foundPatterns));
-        }
-        else{
+        } else {
             $this->logger->warning("Word '{word}' patterns are not saved to database",
                 array('word' => $word));
         }
