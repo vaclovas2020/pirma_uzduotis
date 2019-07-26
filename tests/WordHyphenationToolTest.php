@@ -38,6 +38,15 @@ class WordHyphenationToolTest extends TestCase
             "getFoundPatternsOfWord return empty array when given word is $word");
     }
 
+    public function testHyphenateAllText(): void
+    {
+        $text = '45 78 mistranslate and catfish 45,78! network forever is done.';
+        $hyphenatedText = '45 78 mis-trans-late and cat-fish 45,78! net-work for-ever is done.';
+        $hyphenationTool = new WordHyphenationTool($this->logger, $this->cache, $this->config);
+        $this->assertEquals($hyphenatedText, $hyphenationTool->hyphenateAllText($text),
+            "Test failed: '$text' not hyphenated to '$hyphenatedText'");
+    }
+
     public function provider(): array
     {
         return array(
