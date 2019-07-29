@@ -54,5 +54,8 @@ class WordHyphenationToolTest extends TestCase
         $this->config
             ->method('isEnabledDbSource')
             ->willReturn(false);
+        $this->config
+            ->method('getPatternsFilePath')
+            ->willReturn('');
     }
 }

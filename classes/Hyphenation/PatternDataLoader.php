@@ -15,7 +15,11 @@ class PatternDataLoader
                                             string $fileName = self::DEFAULT_FILENAME): array
     {
         if (empty($fileName)) {
-            $fileName = self::DEFAULT_FILENAME;
+            if (file_exists(self::DEFAULT_FILENAME)) {
+                $fileName = self::DEFAULT_FILENAME;
+            } else {
+                $fileName = '../' . self::DEFAULT_FILENAME;
+            }
         }
         $patternData = [];
         $execCalc = new ExecDurationCalculator();
