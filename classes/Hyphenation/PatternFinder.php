@@ -6,6 +6,7 @@ namespace Hyphenation;
 
 use AppConfig\Config;
 use DB\DbPatterns;
+use DB\DbWord;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
 
@@ -17,6 +18,7 @@ class PatternFinder
     private $config;
     private $logger;
     private $dbPatterns;
+    private $dbWord;
 
     public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config,
                                 PatternLoaderInterface $patternLoader)
@@ -26,6 +28,7 @@ class PatternFinder
         $this->config = $config;
         $this->logger = $logger;
         $this->dbPatterns = new DbPatterns($config, $logger, $cache);
+        $this->dbWord = new DbWord($config);
     }
 
     /**
@@ -60,6 +63,16 @@ class PatternFinder
         }
         $this->printFoundedPatternsToLog($word);
         return $this->result;
+    }
+
+    public function getFoundPatternsOfWord(string $word): array
+    {
+        $foundPatterns = [];
+        if (!$this->dbWord->getFoundPatternsOfWord($word, $foundPatterns)) {
+            $this->logger->warning('Cannot get patterns of word `{word}` from database',
+                array('word' => $word));
+        }
+        return $foundPatterns;
     }
 
     private function isDotAtBegin(string $pattern): bool

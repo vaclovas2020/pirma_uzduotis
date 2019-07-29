@@ -11,21 +11,18 @@ class WordHyphenationTool
 {
 
     private $logger;
-    private $cache;
-    private $config;
-    private $dbWord;
     private $patternFinder;
     private $hyphenatedWordGetter;
+    private $hyphenatedWordSetter;
 
     public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config,
                                 PatternLoaderInterface $patternLoader)
     {
         $this->logger = $logger;
-        $this->cache = $cache;
-        $this->config = $config;
-        $this->dbWord = new DbWord($this->config);
+        $dbWord = new DbWord($config);
         $this->patternFinder = new PatternFinder($logger, $cache, $config, $patternLoader);
-        $this->hyphenatedWordGetter = new HyphenatedWordGetterProxy($this->dbWord, $this->cache, $this->config);
+        $this->hyphenatedWordGetter = new HyphenatedWordGetterProxy($dbWord, $cache, $config);
+        $this->hyphenatedWordSetter = new HyphenatedWordSetterProxy($dbWord, $cache, $config);
     }
 
     public function hyphenateWord(string $word): string
@@ -38,7 +35,7 @@ class WordHyphenationTool
                 'word' => $word,
                 'hyphenateWord' => $resultStr
             ));
-            $this->saveWordDataToDb($word, $resultStr, $this->patternFinder->getFoundPatternsAtWord());
+            $this->hyphenatedWordSetter->set($word, $resultStr, $this->patternFinder->getFoundPatternsAtWord());
         }
         $resultStr = substr($word, 0, 1) . substr($resultStr, 1);
         return $resultStr;
@@ -65,20 +62,7 @@ class WordHyphenationTool
 
     public function getFoundPatternsOfWord(string $word): array
     {
-        $foundPatterns = [];
-        $key = sha1($word . '_patterns');
-        $foundPatternsCache = $this->cache->get($key);
-        if ($foundPatternsCache === null) {
-            if ($this->dbWord->getFoundPatternsOfWord($word, $foundPatterns)) {
-                $this->cache->set($key, $foundPatterns);
-            } else {
-                $this->logger->warning('Cannot get patterns of word `{word}` from database',
-                    array('word' => $word));
-            }
-        } else {
-            $foundPatterns = $foundPatternsCache;
-        }
-        return $foundPatterns;
+        return $this->patternFinder->getFoundPatternsOfWord($word);
     }
 
     private function getResultStrFromResultArray(array &$result): string
@@ -88,14 +72,6 @@ class WordHyphenationTool
             $resultStr .= $charData;
         }
         return $resultStr;
-    }
-
-    private function saveWordDataToDb(string $word, string $hyphenatedWord, array $patternList): void
-    {
-        if ($this->dbWord->saveWordAndFoundPatterns($word, $hyphenatedWord, $patternList)) {
-            $this->logger->notice('Word `{word}`, hyphenation result `{hyphenatedWord}` 
-                    and founded patterns saved to database', array('word' => $word, 'hyphenatedWord' => $hyphenatedWord));
-        }
     }
 
 }
