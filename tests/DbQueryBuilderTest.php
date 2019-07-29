@@ -3,14 +3,15 @@
 
 use DB\DBQueryAction;
 use DB\DbQueryBuilder;
+use Exception\DbQueryBuilderException;
 use PHPUnit\Framework\TestCase;
 
-class DbQueryBuilderExceptionsTest extends TestCase
+class DbQueryBuilderTest extends TestCase
 {
     public function testNoActionAndTableNameException()
     {
         $queryBuilder = new DbQueryBuilder();
-        $this->expectExceptionMessage(DbQueryBuilder::EXCEPTION_NO_ACTION_AND_TABLE_NAME);
+        $this->expectExceptionMessage(DbQueryBuilderException::NO_ACTION_AND_TABLE_NAME);
         $queryBuilder->build();
     }
 
@@ -21,7 +22,7 @@ class DbQueryBuilderExceptionsTest extends TestCase
             ->truncateTable('test')
             ->setConditionSentence('test sentence');
         $this->expectExceptionMessage(sprintf(
-            DbQueryBuilder::EXCEPTION_NO_NEED_CONDITION_SENTENCE,
+            DbQueryBuilderException::NO_NEED_CONDITION_SENTENCE,
             DBQueryAction::TRUNCATE_TABLE));
         $queryBuilder->build();
     }
@@ -34,7 +35,7 @@ class DbQueryBuilderExceptionsTest extends TestCase
             ->addParam('test_param')
             ->setConditionSentence('test sentence');
         $this->expectExceptionMessage(sprintf(
-            DbQueryBuilder::EXCEPTION_NO_NEED_CONDITION_SENTENCE,
+            DbQueryBuilderException::NO_NEED_CONDITION_SENTENCE,
             DBQueryAction::INSERT_INTO));
         $queryBuilder->build();
     }
@@ -47,7 +48,7 @@ class DbQueryBuilderExceptionsTest extends TestCase
             ->addParam('test_param')
             ->setConditionSentence('test sentence');
         $this->expectExceptionMessage(sprintf(
-            DbQueryBuilder::EXCEPTION_NO_NEED_CONDITION_SENTENCE,
+            DbQueryBuilderException::NO_NEED_CONDITION_SENTENCE,
             DBQueryAction::REPLACE_INTO));
         $queryBuilder->build();
     }
@@ -58,7 +59,7 @@ class DbQueryBuilderExceptionsTest extends TestCase
         $queryBuilder
             ->insertInto('test');
         $this->expectExceptionMessage(sprintf(
-            DbQueryBuilder::EXCEPTION_MUST_HAVE_PARAM_LIST,
+            DbQueryBuilderException::MUST_HAVE_PARAM_LIST,
             DBQueryAction::INSERT_INTO));
         $queryBuilder->build();
     }
@@ -69,7 +70,7 @@ class DbQueryBuilderExceptionsTest extends TestCase
         $queryBuilder
             ->replaceInto('test');
         $this->expectExceptionMessage(sprintf(
-            DbQueryBuilder::EXCEPTION_MUST_HAVE_PARAM_LIST,
+            DbQueryBuilderException::MUST_HAVE_PARAM_LIST,
             DBQueryAction::REPLACE_INTO));
         $queryBuilder->build();
     }
@@ -80,7 +81,7 @@ class DbQueryBuilderExceptionsTest extends TestCase
         $queryBuilder
             ->updateTable('test');
         $this->expectExceptionMessage(sprintf(
-            DbQueryBuilder::EXCEPTION_MUST_HAVE_PARAM_LIST,
+            DbQueryBuilderException::MUST_HAVE_PARAM_LIST,
             DBQueryAction::UPDATE));
         $queryBuilder->build();
     }
