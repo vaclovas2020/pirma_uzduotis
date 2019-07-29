@@ -104,7 +104,7 @@ class DbQueryBuilder
 
     public function build(): string
     {
-        $this->throwIfDataIsMissing();
+        $this->validateData();
         $queryStr = "";
         $this->addActionToQueryStr($queryStr);
         $this->addTableNameToQueryStr($queryStr);
@@ -179,7 +179,7 @@ class DbQueryBuilder
         $queryStr .= implode(', ', $paramArr);
     }
 
-    private function throwIfDataIsMissing(): void
+    private function validateData(): void
     {
         if (empty($this->action) && empty($this->tableName)) {
             throw new RuntimeException(self::EXCEPTION_NO_ACTION_AND_TABLE_NAME);
