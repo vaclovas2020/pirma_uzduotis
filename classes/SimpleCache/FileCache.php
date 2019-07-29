@@ -10,10 +10,10 @@ class FileCache implements CacheInterface
 {
     private $defaultTtl;
     private $cachePath;
-    private const INVALID_KEY_MESSAGE = "Wrong cache key given. Key support only these characters [0-9A-Za-z_.]\n 
-    Key length must be not longer than 64 characters.";
+    private const INVALID_KEY_MESSAGE = 'Wrong cache key given. Key support only these characters [0-9A-Za-z_.]\n 
+    Key length must be not longer than 64 characters.';
 
-    public function __construct(string $cachePath = "cache", int $defaultTtl = 3600)
+    public function __construct(string $cachePath = 'cache', int $defaultTtl = 3600)
     {
         $this->cachePath = $cachePath;
         $this->defaultTtl = $defaultTtl;
@@ -29,12 +29,12 @@ class FileCache implements CacheInterface
         }
         $path = $this->getCacheFilePathByKey($key);
         if (file_exists($path)) {
-            $expiresAt = @filemtime($path);
+            $expiresAt = filemtime($path);
             if ($expiresAt === false) {
                 return $default;
             }
             if (time() >= $expiresAt) {
-                @unlink($path);
+                unlink($path);
                 return $default;
             }
             return unserialize(file_get_contents($this->cachePath . DIRECTORY_SEPARATOR . $key));
@@ -52,11 +52,11 @@ class FileCache implements CacheInterface
             $ttl = $this->defaultTtl;
         }
         $expiresAt = time() + $ttl;
-        if (@file_put_contents($path, $serializedValue) === false) {
+        if (file_put_contents($path, $serializedValue) === false) {
             return false;
         }
-        if (@touch($path, $expiresAt) === false) {
-            @unlink($path);
+        if (touch($path, $expiresAt) === false) {
+            unlink($path);
             return false;
         }
         return true;
@@ -69,7 +69,7 @@ class FileCache implements CacheInterface
         }
         $path = $this->getCacheFilePathByKey($key);
         if (file_exists($path)) {
-            return @unlink($path);
+            return unlink($path);
         } else return true;
     }
 
@@ -123,12 +123,12 @@ class FileCache implements CacheInterface
         }
         $path = $this->getCacheFilePathByKey($key);
         if (file_exists($path)) {
-            $expiresAt = @filemtime($path);
+            $expiresAt = filemtime($path);
             if ($expiresAt === false) {
                 return false;
             }
             if (time() >= $expiresAt) {
-                @unlink($path);
+                unlink($path);
                 return false;
             }
             return true;
