@@ -5,6 +5,7 @@ namespace CLI;
 
 
 use AppConfig\Config;
+use Hyphenation\PatternLoaderProxy;
 use Hyphenation\WordHyphenationTool;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
@@ -22,7 +23,8 @@ class UserInput
         $this->logger = $logger;
         $this->config = $config;
         $this->cache = $cache;
-        $hyphenationTool = new WordHyphenationTool($logger, $cache, $config);
+        $patternLoaderProxy = new PatternLoaderProxy($config,$logger, $cache);
+        $hyphenationTool = new WordHyphenationTool($logger, $cache, $config, $patternLoaderProxy);
         $this->userInputAction = new UserInputAction($hyphenationTool, $logger, $cache);
     }
 
