@@ -38,6 +38,7 @@ class PatternFinder
 
     public function findPatternsAndPushToWord(string $word): array
     {
+        $this->foundPatternsAtWord = [];
         $this->result = $this->createResultArray($word);
         foreach ($this->allPatterns as $pattern) {
             $noCounts = preg_replace('/[0-9]+/', '', $pattern);
