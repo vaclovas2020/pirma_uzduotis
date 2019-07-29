@@ -27,6 +27,7 @@ class CreatePatternCest
     public function createNewPatterns(ApiTester $I, Example $example)
     {
         // TODO: I want to test
+        $I->wantToTest('Create new pattern ' . $example['pattern']);
         $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendPOST('/patterns/', ['pattern' => $example['pattern']]);
         $I->seeResponseCodeIs(HttpCode::CREATED);
@@ -41,6 +42,7 @@ class CreatePatternCest
      */
     public function getPatternById(ApiTester $I, Example $example)
     {
+        $I->wantToTest('Get pattern with ID ' . $example['pattern_id']);
         $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendGET('/patterns/' . $example['pattern_id']);
         $I->seeResponseCodeIs(HttpCode::OK);
@@ -55,6 +57,7 @@ class CreatePatternCest
      */
     public function updatePatternById(ApiTester $I, Example $example)
     {
+        $I->wantToTest('Update pattern with ID ' . $example['pattern_id']);
         $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendPUT('/patterns/' . $example['pattern_id'], ['pattern' => $example['pattern']]);
         $I->seeResponseCodeIs(HttpCode::OK);
@@ -69,6 +72,7 @@ class CreatePatternCest
      */
     public function deletePatternById(ApiTester $I, Example $example)
     {
+        $I->wantToTest('Delete pattern with ID ' . $example['pattern_id']);
         $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendDELETE('/patterns/' . $example['pattern_id']);
         $I->seeResponseCodeIs(HttpCode::OK);
