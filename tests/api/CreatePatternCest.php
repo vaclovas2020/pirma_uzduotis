@@ -1,14 +1,13 @@
 <?php
 
 use Codeception\Util\HttpCode;
+use \Codeception\Example;
 
 class CreatePatternCest
 {
-    private $createdObjectsId;
 
     public function _before(ApiTester $I)
     {
-        $this->createdObjectsId = [];
     }
 
     public function getPatternsList(ApiTester $I)
@@ -28,8 +27,7 @@ class CreatePatternCest
         $I->sendPOST('/patterns/', ['pattern' => $example['pattern']]);
         $I->seeResponseCodeIs(HttpCode::CREATED);
         $I->seeResponseIsJson();
-        $json = $I->grabResponse();
-        array_push($this->createdObjectsId, json_decode($json, true)['pattern_id']);
+        $I->seeResponseContainsJson(['pattern' => $example['pattern']]);
     }
 
     /**
@@ -41,6 +39,7 @@ class CreatePatternCest
         $I->sendGET('/patterns/' . $example['pattern_id']);
         $I->seeResponseCodeIs(HttpCode::OK);
         $I->seeResponseIsJson();
+        $I->seeResponseContainsJson(['pattern_id' => $example['pattern_id']]);
     }
 
     /**
@@ -52,6 +51,7 @@ class CreatePatternCest
         $I->sendPUT('/patterns/' . $example['pattern_id'], ['pattern' => $example['pattern']]);
         $I->seeResponseCodeIs(HttpCode::OK);
         $I->seeResponseIsJson();
+        $I->seeResponseContainsJson(['pattern_id' => $example['pattern_id'], 'pattern' => $example['pattern']]);
     }
 
     /**
@@ -82,11 +82,12 @@ class CreatePatternCest
      */
     private function patternIdProvider(): array
     {
-        $patternsIdArray = [];
-        foreach ($this->createdObjectsId as $id) {
-            array_push($patternsIdArray, ['pattern_id' => $id]);
-        }
-        return $patternsIdArray;
+        return [
+            ['pattern_id' => 4448],
+            ['pattern_id' => 4449],
+            ['pattern_id' => 4450],
+            ['pattern_id' => 4451]
+        ];
     }
 
     /**
@@ -94,10 +95,11 @@ class CreatePatternCest
      */
     private function updatePatternProvider(): array
     {
-        $patternsArray = [];
-        foreach ($this->createdObjectsId as $id) {
-            array_push($patternsArray, ['pattern_id' => $id, 'pattern' => 'a' . rand(2, 9) . 'c' . rand(2, 9)]);
-        }
-        return $patternsArray;
+        return [
+            ['pattern_id' => 4448, 'pattern' => '.dsfdsfds4'],
+            ['pattern_id' => 4449, 'pattern' => 'dsffds4dsd7'],
+            ['pattern_id' => 4450, 'pattern' => 'd4sfs7df4'],
+            ['pattern_id' => 4451, 'pattern' => '.fghg4df4gdf7']
+        ];
     }
 }
