@@ -6,12 +6,13 @@ namespace DB;
 
 use AppConfig\Config;
 use Hyphenation\Pattern;
-use Hyphenation\PatternDataLoader;
+use Hyphenation\PatternFileLoader;
+use Hyphenation\PatternLoaderInterface;
 use Log\LoggerInterface;
 use PDO;
 use SimpleCache\CacheInterface;
 
-class DbPatterns
+class DbPatterns implements PatternLoaderInterface
 {
     private $config;
     private $logger;
@@ -26,7 +27,7 @@ class DbPatterns
 
     public function importFromFile(string $fileName): bool
     {
-        $patternsArray = PatternDataLoader::loadDataFromFile($this->cache, $this->logger, $fileName);
+        $patternsArray = (new PatternFileLoader($fileName))->getPatternsArray();
         $pdo = $this->config->getDbConfig()->getPdo();
         $pdo->beginTransaction();
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 0;');
