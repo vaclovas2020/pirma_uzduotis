@@ -29,7 +29,7 @@ class WordHyphenationToolTest extends TestCase
             ->willReturn($patterns);
         $hyphenationTool = new WordHyphenationTool($this->logger, $this->cache, $this->config, $this->patternLoader);
         $this->assertEquals($hyphenatedWord, $hyphenationTool->hyphenateWord($word),
-            "Test failed: $word not hyphenated to $hyphenatedWord");
+            'Test failed: `' . $word . '` not hyphenated to `' . $hyphenatedWord . '`');
     }
 
     public function testHyphenateAllText(): void
@@ -48,7 +48,7 @@ class WordHyphenationToolTest extends TestCase
             ->willReturn($patterns);
         $hyphenationTool = new WordHyphenationTool($this->logger, $this->cache, $this->config, $this->patternLoader);
         $this->assertEquals($hyphenatedText, $hyphenationTool->hyphenateAllText($text),
-            "Test failed: '$text' not hyphenated to '$hyphenatedText'");
+            'Test failed: `' . $text . '` not hyphenated to `' . $hyphenatedText . '`');
     }
 
     public function provider(): array

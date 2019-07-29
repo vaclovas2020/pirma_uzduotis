@@ -94,7 +94,7 @@ class PatternFinder
 
     private function printFoundedPatternsToLog(string $word): void
     {
-        $this->logger->notice("Founded patterns for word '{word}': {patterns}",
+        $this->logger->notice('Founded patterns for word `{word}`: {patterns}',
             array(
                 'patterns' => $this->foundPatternsAtWord,
                 'word' => $word

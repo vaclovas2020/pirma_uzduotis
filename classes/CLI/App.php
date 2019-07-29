@@ -51,7 +51,7 @@ class App
             $fileName = ($writeToFile) ? $argv[self::CLI_MINIMUM_ARGC] : '';
             $this->outputToUser($resultStr, $status, $fileName, $writeToFile);
             $execDuration = $execCalc->finishAndGetDuration();
-            $this->logger->notice("Program execution duration: {execDuration} seconds", array(
+            $this->logger->notice('Program execution duration: {execDuration} seconds', array(
                 'execDuration' => $execDuration
             ));
         } else if (!$checkConfigurationCli) {

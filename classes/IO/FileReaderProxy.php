@@ -36,12 +36,12 @@ class FileReaderProxy implements FileReaderInterface
                 $source = 'from cache';
             }
             $execDuration = $execCalc->finishAndGetDuration();
-            $this->logger->notice("Text read {from} time: {execDuration} seconds", array(
+            $this->logger->notice('Text read {from} time: {execDuration} seconds', array(
                 'execDuration' => $execDuration,
                 'from' => $source
             ));
         } else {
-            $this->logger->error("File '{fileName}' not found!", array('fileName' => $fileName));
+            $this->logger->error('File `{fileName}` not found!', array('fileName' => $fileName));
             return false;
         }
         return true;

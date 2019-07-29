@@ -27,7 +27,7 @@ class PatternTest extends TestCase
         $patternChars = $patternObj->getPatternCharArray();
         $this->assertNotEmpty($patternChars);
         $this->assertEquals($count, count($patternChars),
-            "Pattern $pattern must have $count patternChars array elements");
+            'Pattern ' . $pattern . ' must have ' . $count . ' patternChars array elements');
     }
 
     public function provider(): array

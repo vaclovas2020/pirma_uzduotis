@@ -25,7 +25,7 @@ class PatternsController implements ControllerInterface
     {
         $pageCount = $this->dbPatterns->getPatternsListPageCount($perPage);
         if ($page > $pageCount) {
-            throw new ApiException("Page number $page is higher than allowed $pageCount", 404);
+            throw new ApiException('Page number ' . $page . ' is higher than allowed ' . $pageCount, 404);
         }
         $list = $this->dbPatterns->getPatternsList($page, $perPage);
         $this->response->sendResponse(json_encode($list));
@@ -35,7 +35,7 @@ class PatternsController implements ControllerInterface
     {
         $pattern = $this->dbPatterns->getPattern($id);
         if (empty($pattern)) {
-            throw new ApiException("Pattern with ID $id not exist!", 404);
+            throw new ApiException('Pattern with ID ' . $id . ' not exist!', 404);
         }
         $this->response->sendResponse(json_encode($pattern));
     }
@@ -43,11 +43,11 @@ class PatternsController implements ControllerInterface
     public function add(array $data): void
     {
         if (empty($data['pattern'])) {
-            throw new ApiException("Please give required POST query field 'pattern'.");
+            throw new ApiException('Please give required POST query field `pattern`.');
         }
         $pattern = $data['pattern'];
         if (!Validator::validateValue('/[a-z0-9.]+/', $pattern)) {
-            throw new ApiException("Field 'pattern' must have only these characters a-z0-9.");
+            throw new ApiException('Field `pattern` must have only these characters a-z0-9.');
         }
         $patternId = $this->dbPatterns->getPatternIdByPatternStr($pattern);
         $created = false;
@@ -55,7 +55,7 @@ class PatternsController implements ControllerInterface
             $created = true;
             $patternId = $this->dbPatterns->addPattern($pattern);
             if ($patternId === -1) {
-                throw new ApiException("Cannot create Pattern resource.", 500);
+                throw new ApiException('Cannot create Pattern resource.', 500);
             }
         }
         $this->response->sendResponse(json_encode(array(
@@ -69,7 +69,7 @@ class PatternsController implements ControllerInterface
     {
         $patternStr = $this->dbPatterns->getPattern($id);
         if (empty($patternStr)) {
-            throw new ApiException("Pattern with ID $id not exist!", 404);
+            throw new ApiException('Pattern with ID ' . $id . ' not exist!', 404);
         }
         if (empty($data['pattern'])) {
             throw new ApiException('Please give required PUT query field `pattern`.');
@@ -90,10 +90,10 @@ class PatternsController implements ControllerInterface
     public function delete(int $id): void
     {
         if (empty($this->dbPatterns->getPattern($id))) {
-            throw new ApiException("Pattern with ID $id not exist!", 404);
+            throw new ApiException('Pattern with ID ' . $id . ' not exist!', 404);
         }
         if (!$this->dbPatterns->deletePattern($id)) {
-            throw new ApiException("Cannot delete Pattern with ID $id from database!", 500);
+            throw new ApiException('Cannot delete Pattern with ID ' . $id . ' from database!', 500);
         }
         $this->response->sendStatusCode(200);
     }

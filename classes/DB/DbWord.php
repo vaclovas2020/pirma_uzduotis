@@ -22,7 +22,7 @@ class DbWord
         $queryStr = (new DbQueryBuilder())
             ->selectFrom('hyphenated_words')
             ->addSelectField('word_id')
-            ->setConditionSentence("WHERE `word` = LOWER(:word)")
+            ->setConditionSentence('WHERE `word` = LOWER(:word)')
             ->build();
         $query = $pdo->prepare($queryStr);
         if (!$query->execute(array('word' => $word))) {
@@ -37,7 +37,7 @@ class DbWord
         $queryStr = (new DbQueryBuilder())
             ->selectFrom('hyphenated_words')
             ->addSelectField('hyphenated_word')
-            ->setConditionSentence("WHERE `word` = LOWER(:word)")
+            ->setConditionSentence('WHERE `word` = LOWER(:word)')
             ->build();
         $query = $pdo->prepare($queryStr);
         if (!$query->execute(array('word' => $word))) {
@@ -57,7 +57,7 @@ class DbWord
             ->addSelectField('word_id')
             ->addSelectField('word')
             ->addSelectField('hyphenated_word')
-            ->setConditionSentence("WHERE `word_id` = :id")
+            ->setConditionSentence('WHERE `word_id` = :id')
             ->build();
         $query = $pdo->prepare($queryStr);
         if (!$query->execute(array('id' => $id))) {
@@ -75,7 +75,7 @@ class DbWord
         $queryStr = (new DbQueryBuilder())
             ->selectFrom('hyphenated_words')
             ->addSelectField('word_id')
-            ->setConditionSentence("WHERE `word` = :word")
+            ->setConditionSentence('WHERE `word` = :word')
             ->build();
         $query = $pdo->prepare($queryStr);
         if (!$query->execute(array('word' => $word))) {
@@ -94,7 +94,7 @@ class DbWord
             ->updateTable('hyphenated_words')
             ->addParam('word')
             ->addParam('hyphenated_word')
-            ->setConditionSentence("WHERE `word_id` = :id")
+            ->setConditionSentence('WHERE `word_id` = :id')
             ->build();
         $query = $pdo->prepare($queryStr);
         if (!$query->execute(array(
@@ -116,7 +116,7 @@ class DbWord
             ->addSelectField('word_id')
             ->addSelectField('word')
             ->addSelectField('hyphenated_word')
-            ->setConditionSentence("LIMIT $begin, $perPage")
+            ->setConditionSentence('LIMIT ' . $begin . ', ' . $perPage)
             ->build();
         $query = $pdo->prepare($queryStr);
         if (!$query->execute()) {
@@ -130,7 +130,7 @@ class DbWord
         $pdo = $this->dbConfig->getPdo();
         $queryStr = (new DbQueryBuilder())
             ->deleteFrom('hyphenated_words')
-            ->setConditionSentence("WHERE `word_id` = :id")
+            ->setConditionSentence('WHERE `word_id` = :id')
             ->build();
         $query = $pdo->prepare($queryStr);
         $query->bindParam(':id', $id);
@@ -204,7 +204,7 @@ class DbWord
         $queryStr = (new DbQueryBuilder())
             ->replaceInto('hyphenated_word_patterns')
             ->addParam('word_id')
-            ->addParamValue('pattern_id', "($patternIdQueryStr)")
+            ->addParamValue('pattern_id', '('.$patternIdQueryStr.')')
             ->build();
         $sql2 = $pdo->prepare($queryStr);
         foreach ($patternList as $pattern) {

@@ -23,7 +23,7 @@ class DbQueryBuilder
         $this->paramList = [];
         $this->paramListValues = [];
         $this->selectList = [];
-        $this->innerJoinStr = "";
+        $this->innerJoinStr = '';
     }
 
     public function insertInto(string $tableName): DbQueryBuilder
@@ -70,7 +70,7 @@ class DbQueryBuilder
 
     public function addInnerJoin(string $joinTable, string $leftField, string $rightField): DbQueryBuilder
     {
-        $this->innerJoinStr .= " INNER JOIN `$joinTable` ON $leftField = $rightField";
+        $this->innerJoinStr .= ' INNER JOIN `' . $joinTable . '` ON ' . $leftField . ' = ' . $rightField;
         return $this;
     }
 
@@ -90,7 +90,7 @@ class DbQueryBuilder
     public function addSelectField(string $fieldName, string $beforeAndAfter = '`'): DbQueryBuilder
     {
         array_push($this->selectList, (!empty($beforeAndAfter)) ?
-            "$beforeAndAfter$fieldName$beforeAndAfter" : $fieldName);
+            $beforeAndAfter . $fieldName . $beforeAndAfter : $fieldName);
         return $this;
     }
 
@@ -103,7 +103,7 @@ class DbQueryBuilder
     public function build(): string
     {
         $this->validateData();
-        $queryStr = "";
+        $queryStr = '';
         $this->addActionToQueryStr($queryStr);
         $this->addTableNameToQueryStr($queryStr);
         switch ($this->action) {
@@ -128,14 +128,14 @@ class DbQueryBuilder
     private function addInnerJoinToQueryStr(string &$queryStr): void
     {
         if (!empty($this->innerJoinStr)) {
-            $queryStr .= " {$this->innerJoinStr}";
+            $queryStr .= ' ' . $this->innerJoinStr;
         }
     }
 
     private function addConditionSentenceToQueryStr(string &$queryStr): void
     {
         if (!empty($this->conditionSentence)) {
-            $queryStr .= " {$this->conditionSentence}";
+            $queryStr .= ' ' . $this->conditionSentence;
         }
     }
 
@@ -154,7 +154,7 @@ class DbQueryBuilder
         $queryStr .= '(`' . implode('`,`', $this->paramList) . '`)';
         $queryStr .= ' VALUES(:' . implode(',:', $this->paramList) . ')';
         foreach ($this->paramListValues as $param => $value) {
-            $queryStr = str_replace(":$param", $value, $queryStr);
+            $queryStr = str_replace(':' . $param, $value, $queryStr);
         }
     }
 
@@ -172,7 +172,7 @@ class DbQueryBuilder
         $queryStr .= ' SET ';
         $paramArr = [];
         foreach ($this->paramList as $param) {
-            array_push($paramArr, "`$param` = :$param");
+            array_push($paramArr, '`' . $param . '` = :' . $param);
         }
         $queryStr .= implode(', ', $paramArr);
     }

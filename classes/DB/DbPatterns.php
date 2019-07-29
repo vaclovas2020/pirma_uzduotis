@@ -101,7 +101,7 @@ class DbPatterns implements PatternLoaderInterface
             ->selectFrom('hyphenation_patterns')
             ->addSelectField('pattern_id')
             ->addSelectField('pattern')
-            ->setConditionSentence("LIMIT $begin, $perPage")
+            ->setConditionSentence('LIMIT ' . $begin . ', ' . $perPage)
             ->build();
         $result = $pdo->query($queryStr);
         if ($result) {
@@ -117,7 +117,7 @@ class DbPatterns implements PatternLoaderInterface
             ->selectFrom('hyphenation_patterns')
             ->addSelectField('pattern_id')
             ->addSelectField('pattern')
-            ->setConditionSentence("WHERE `pattern_id` = :id")
+            ->setConditionSentence('WHERE `pattern_id` = :id')
             ->build();
         $query = $pdo->prepare($queryStr);
         if (!$query->execute(array('id' => $id))) {
@@ -135,7 +135,7 @@ class DbPatterns implements PatternLoaderInterface
         $queryStr = (new DbQueryBuilder())
             ->selectFrom('hyphenation_patterns')
             ->addSelectField('pattern_id')
-            ->setConditionSentence("WHERE `pattern` = :pattern")
+            ->setConditionSentence('WHERE `pattern` = :pattern')
             ->build();
         $query = $pdo->prepare($queryStr);
         if ($query->execute(array('pattern' => $pattern))) {
@@ -151,7 +151,7 @@ class DbPatterns implements PatternLoaderInterface
         $pdo = $this->config->getDbConfig()->getPdo();
         $queryStr = (new DbQueryBuilder())
             ->deleteFrom('hyphenation_patterns')
-            ->setConditionSentence("WHERE `pattern_id` = :id")
+            ->setConditionSentence('WHERE `pattern_id` = :id')
             ->build();
         $query = $pdo->prepare($queryStr);
         if ($query->execute(array('id' => $id))) {
@@ -188,7 +188,7 @@ class DbPatterns implements PatternLoaderInterface
             ->updateTable('hyphenation_patterns')
             ->addParam('pattern')
             ->addParam('pattern_chars')
-            ->setConditionSentence("WHERE `pattern_id` = :id")
+            ->setConditionSentence('WHERE `pattern_id` = :id')
             ->build();
         $query = $pdo->prepare($queryStr);
         $patternObj = new Pattern($this->config, $this, str_replace('.', '', $pattern));
@@ -233,26 +233,26 @@ class DbPatterns implements PatternLoaderInterface
             $queryStr = (new DbQueryBuilder())
                 ->selectFrom('hyphenation_patterns')
                 ->addSelectField('pattern_chars')
-                ->setConditionSentence("WHERE `pattern` = :pattern")
+                ->setConditionSentence('WHERE `pattern` = :pattern')
                 ->build();
             $sql = $pdo->prepare($queryStr);
             $sql->bindParam(':pattern', $pattern);
             if ($sql->execute()) {
                 $patternCharsArray = unserialize($sql->fetch(PDO::FETCH_ASSOC)['pattern_chars']);
                 $this->cache->set($key, $patternCharsArray);
-                $this->logger->notice("Loaded pattern '{pattern}' chars from database and saved to cache.",
+                $this->logger->notice('Loaded pattern `{pattern}` chars from database and saved to cache.',
                     array(
                         'pattern' => $pattern
                     ));
             } else {
-                $this->logger->critical("Cannot get pattern '{pattern}' chars from database!",
+                $this->logger->critical('Cannot get pattern `{pattern}` chars from database!',
                     array(
                         'pattern' => $pattern
                     ));
             }
         } else {
             $patternCharsArray = $patternCharsCache;
-            $this->logger->notice("Loaded pattern '{pattern}' chars from cache.",
+            $this->logger->notice('Loaded pattern `{pattern}` chars from cache.',
                 array(
                     'pattern' => $pattern
                 ));

@@ -35,14 +35,14 @@ class HyphenatedTextFileCache
     {
         $key = @sha1_file($fileName) . '_hyphenated';
         if ($this->cache->set($key, $hyphenatedText)) {
-            $this->logger->notice("Saved hyphenated text file '{fileName}' to cache", array(
+            $this->logger->notice('Saved hyphenated text file {fileName} to cache', array(
                 'fileName' => $fileName
             ));
         } else {
-            $this->logger->error("Cannot save hyphenated text file '{fileName}' to cache", array(
+            $this->logger->error('Cannot save hyphenated text file {fileName} to cache', array(
                 'fileName' => $fileName
             ));
-            throw new Error("Cannot save hyphenated text file '{$fileName}' to cache");
+            throw new Error('Cannot save hyphenated text file ' . $fileName . ' to cache');
         }
     }
 }

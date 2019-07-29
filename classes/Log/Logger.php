@@ -143,7 +143,7 @@ class Logger implements LoggerInterface
         $levelUpperCase = strtoupper($level);
         $dateTimeStr = (new DateTime())->format('Y-m-d H:i:s,u');
         $message = $this->interpolate($message, $context);
-        return "$dateTimeStr [$levelUpperCase]: $message\n";
+        return $dateTimeStr . '[' . $levelUpperCase . ']: ' . $message . PHP_EOL;
     }
 
     private function interpolate(string $message, array $context = []): string
@@ -151,8 +151,7 @@ class Logger implements LoggerInterface
         foreach ($context as $key => $value) {
             if (!is_array($value) && !is_object($value) || method_exists($value, '__toString')) {
                 $message = str_replace('{' . $key . '}', $value, $message);
-            }
-            else{
+            } else {
                 $message = str_replace('{' . $key . '}', print_r($value, true), $message);
             }
         }

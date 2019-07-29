@@ -26,23 +26,23 @@ class UserInputAction
 
     public function hyphenateOneWord(string $word, string &$resultStr): void
     {
-        $this->logger->info("Chosen hyphenate one word '{word}'", array('word' => $word));
+        $this->logger->info('Chosen hyphenate one word `{word}`', array('word' => $word));
         $resultStr = $this->hyphenationTool->hyphenateWord($word);
     }
 
     public function hyphenateParagraph(string $text, string &$resultStr): void
     {
-        $this->logger->info("Chosen hyphenate paragraph /sentence '{text}'", array('text' => $text));
+        $this->logger->info('Chosen hyphenate paragraph /sentence `{text}`', array('text' => $text));
         $resultStr = $this->hyphenationTool->hyphenateAllText($text);
     }
 
     public function hyphenateFromTextFile(string $fileName, string &$resultStr): bool
     {
-        $this->logger->info("Chosen hyphenate from text file '{filename}'", array('filename' => $fileName));
+        $this->logger->info('Chosen hyphenate from text file `{filename}`', array('filename' => $fileName));
         $fileCache = new HyphenatedTextFileCache($this->cache, $this->logger);
         if ($fileCache->isHyphenatedTextFileCacheExist($fileName)) {
             $resultStr = $fileCache->getHyphenatedTextFileCache($fileName);
-            $this->logger->notice("Loaded hyphenated text from file '{fileName}' cache", array(
+            $this->logger->notice('Loaded hyphenated text from file `{fileName}` cache', array(
                 'fileName' => $fileName
             ));
         } else {
@@ -58,10 +58,10 @@ class UserInputAction
     {
         $foundPatterns = $this->hyphenationTool->getFoundPatternsOfWord($word);
         if (!empty($foundPatterns)) {
-            $this->logger->notice("Founded patterns of word '{word}': {patterns}",
+            $this->logger->notice('Founded patterns of word `{word}`: {patterns}',
                 array('word' => $word, 'patterns' => $foundPatterns));
         } else {
-            $this->logger->warning("Word '{word}' patterns are not saved to database",
+            $this->logger->warning('Word `{word}` patterns are not saved to database',
                 array('word' => $word));
         }
     }

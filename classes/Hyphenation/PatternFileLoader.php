@@ -25,7 +25,7 @@ class PatternFileLoader implements PatternLoaderInterface
         if ($fileCached === null) {
             $file = new SplFileObject($this->fileName, 'r');
             while (!$file->eof()) {
-                array_push($patternData, str_replace("\n", '', $file->fgets()));
+                array_push($patternData, str_replace(PHP_EOL, '', $file->fgets()));
             }
             $file = null;
             $this->cache->set($sha1, $patternData);

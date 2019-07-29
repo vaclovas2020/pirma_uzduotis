@@ -26,7 +26,6 @@ class CreatePatternCest
      */
     public function createNewPatterns(ApiTester $I, Example $example)
     {
-        // TODO: I want to test
         $I->wantToTest('Create new pattern ' . $example['pattern']);
         $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendPOST('/patterns/', ['pattern' => $example['pattern']]);

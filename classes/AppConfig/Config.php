@@ -17,21 +17,21 @@ class Config
     private $cachePath = 'cache';
     private $cacheDefaultTtl = 2592000;
     private $patternsFilePath = PatternFileLoader::DEFAULT_FILENAME;
-    private $dbHost = "";
-    private $dbName = "";
-    private $dbUser = "";
-    private $dbPassword = "";
+    private $dbHost = '';
+    private $dbName = '';
+    private $dbUser = '';
+    private $dbPassword = '';
     private $enabledDbSource = false;
     private $logger;
     private $dbConfig;
 
-    public function __construct(LoggerInterface $logger, string $thisFileName = "app_config.json")
+    public function __construct(LoggerInterface $logger, string $thisFileName = 'app_config.json')
     {
         $this->logger = $logger;
         $thisStr = @file_get_contents($thisFileName);
         if ($thisStr !== false) {
             $configData = json_decode($thisStr, true);
-            if (!$this->applyConfigFileData($configData, array(
+            if (!$this->applyConfigFileData($configData, [
                 'logPrintToScreen',
                 'logWriteToFile',
                 'logFilePath',
@@ -42,7 +42,7 @@ class Config
                 'dbName',
                 'dbUser',
                 'dbPassword',
-                'enabledDbSource'))) {
+                'enabledDbSource'])) {
                 $this->createConfigFile($thisFileName);
             }
         } else {
@@ -87,9 +87,9 @@ class Config
         return $this->patternsFilePath;
     }
 
-    public function createConfigFile(string $thisFileName = "app_config.json"): bool
+    public function createConfigFile(string $thisFileName = 'app_config.json'): bool
     {
-        $jsonConfig = array(
+        $jsonConfig = [
             'logPrintToScreen' => $this->logPrintToScreen,
             'logWriteToFile' => $this->logWriteToFile,
             'logFilePath' => $this->logFilePath,
@@ -101,7 +101,7 @@ class Config
             'dbUser' => $this->dbUser,
             'dbPassword' => $this->dbPassword,
             'enabledDbSource' => $this->enabledDbSource
-        );
+        ];
         if (!(new FileWriter())->writeToFile($thisFileName, json_encode($jsonConfig))) {
             return false;
         }

@@ -10,7 +10,7 @@ class Pattern
 {
     private $dbPatterns;
     private $config;
-    private $pattern = "";
+    private $pattern = '';
     private $positionAtWord = 0;
 
     public function __construct(Config $config, DbPatterns $dbPatterns, string $pattern, int $positionAtWord = 0)

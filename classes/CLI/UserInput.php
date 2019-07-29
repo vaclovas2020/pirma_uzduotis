@@ -23,7 +23,7 @@ class UserInput
         $this->logger = $logger;
         $this->config = $config;
         $this->cache = $cache;
-        $patternLoaderProxy = new PatternLoaderProxy($config,$logger, $cache);
+        $patternLoaderProxy = new PatternLoaderProxy($config, $logger, $cache);
         $hyphenationTool = new WordHyphenationTool($logger, $cache, $config, $patternLoaderProxy);
         $this->userInputAction = new UserInputAction($hyphenationTool, $logger, $cache);
     }
@@ -46,7 +46,7 @@ class UserInput
                 }
                 break;
             default:
-                $this->logger->warning("Unknown storage named '{input}'.", array('input' => $storageName));
+                $this->logger->warning('Unknown storage named `{input}`.', array('input' => $storageName));
                 break;
         }
     }
@@ -70,18 +70,18 @@ class UserInput
                 if ($this->config->isEnabledDbSource()) {
                     $this->userInputAction->getFoundPatternsOfWord($input);
                 } else {
-                    $this->logger->warning("Cannot get patterns list of word '{word}' because 
-                    database source is not enabled.", array('word' => $input));
+                    $this->logger->warning('Cannot get patterns list of word `{word}` because 
+                    database source is not enabled.', array('word' => $input));
                 }
                 return false;
                 break;
             default:
-                $this->logger->warning("Unknown {choice} parameter.", array('choice' => $choice));
+                $this->logger->warning('Unknown {choice} parameter.', array('choice' => $choice));
                 return false;
                 break;
         }
         $execDuration = $execCalc->finishAndGetDuration();
-        $this->logger->info("Text hyphenation algorithm execution duration: {execDuration} seconds", array(
+        $this->logger->info('Text hyphenation algorithm execution duration: {execDuration} seconds', array(
             'execDuration' => $execDuration
         ));
         return true;

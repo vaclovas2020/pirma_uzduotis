@@ -69,7 +69,7 @@ class AppContainer
         if (class_exists($className)) {
             return new $className($this->getLogger(), $this->getCache(), $this->getConfig(), $this->getRouter()->getResponse());
         } else {
-            throw new RuntimeException("AppContainer: Class $className not exist!");
+            throw new RuntimeException('AppContainer: Class ' . $className . ' not exist!');
         }
     }
 

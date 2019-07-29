@@ -38,7 +38,7 @@ class DbConfig
         $this->pdo->beginTransaction();
         foreach ($queriesArr as $query) {
             if (!$this->pdo->exec($query) === false) {
-                $this->logger->critical("Cannot execute SQL query: '{sql}' Rollback changes.", array('sql' => $query));
+                $this->logger->critical('Cannot execute SQL query: `{sql}` Rollback changes.', array('sql' => $query));
                 $this->pdo->rollBack();
                 return false;
             }
@@ -52,7 +52,7 @@ class DbConfig
     {
         $this->logger = $logger;
         if ($isDbEnabled) {
-            $dsn = "mysql:dbname={$dbName};host={$dbHost};charset=utf8";
+            $dsn = 'mysql:dbname=' . $dbName . ';host=' . $dbHost . ';charset=utf8';
             try {
                 $this->pdo = new PDO($dsn, $dbUser, $dbPassword);
             } catch (PDOException $e) {
