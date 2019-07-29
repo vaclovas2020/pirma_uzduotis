@@ -20,6 +20,8 @@ class CreatePatternCest
 
     /**
      * @dataProvider patternProvider
+     * @param ApiTester $I
+     * @param Example $example
      */
     public function createNewPatterns(ApiTester $I, Example $example)
     {
@@ -32,6 +34,8 @@ class CreatePatternCest
 
     /**
      * @dataProvider patternIdProvider
+     * @param ApiTester $I
+     * @param Example $example
      */
     public function getPatternById(ApiTester $I, Example $example)
     {
@@ -44,6 +48,8 @@ class CreatePatternCest
 
     /**
      * @dataProvider updatePatternProvider
+     * @param ApiTester $I
+     * @param Example $example
      */
     public function updatePatternById(ApiTester $I, Example $example)
     {
@@ -56,6 +62,8 @@ class CreatePatternCest
 
     /**
      * @dataProvider patternIdProvider
+     * @param ApiTester $I
+     * @param Example $example
      */
     public function deletePatternById(ApiTester $I, Example $example)
     {
