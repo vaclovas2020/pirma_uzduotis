@@ -4,7 +4,7 @@
 namespace AppConfig;
 
 
-use Hyphenation\PatternDataLoader;
+use Hyphenation\PatternFileLoader;
 use IO\FileWriter;
 use Log\Logger;
 use Log\LoggerInterface;
@@ -16,7 +16,7 @@ class Config
     private $logFilePath = 'word_hyphenation.log';
     private $cachePath = 'cache';
     private $cacheDefaultTtl = 2592000;
-    private $patternsFilePath = PatternDataLoader::DEFAULT_FILENAME;
+    private $patternsFilePath = PatternFileLoader::DEFAULT_FILENAME;
     private $dbHost = "";
     private $dbName = "";
     private $dbUser = "";
