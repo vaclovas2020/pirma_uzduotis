@@ -12,6 +12,7 @@ class CreatePatternCest
 
     public function getPatternsList(ApiTester $I)
     {
+        $I->wantToTest('Get all patterns');
         $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendGET('/patterns', ['page' => 1, 'per_page' => 25]);
         $I->seeResponseCodeIs(HttpCode::OK);
@@ -25,6 +26,7 @@ class CreatePatternCest
      */
     public function createNewPatterns(ApiTester $I, Example $example)
     {
+        // TODO: I want to test
         $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
         $I->sendPOST('/patterns/', ['pattern' => $example['pattern']]);
         $I->seeResponseCodeIs(HttpCode::CREATED);
