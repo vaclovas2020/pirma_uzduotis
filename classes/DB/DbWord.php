@@ -4,21 +4,21 @@
 namespace DB;
 
 
-use AppConfig\DbConfig;
+use AppConfig\Config;
 use PDO;
 
 class DbWord
 {
-    private $dbConfig;
+    private $config;
 
-    public function __construct(DbConfig $dbConfig)
+    public function __construct(Config $config)
     {
-        $this->dbConfig = $dbConfig;
+        $this->config = $config;
     }
 
     public function isWordSavedToDb(string $word): bool
     {
-        $pdo = $this->dbConfig->getPdo();
+        $pdo = $this->config->getDbConfig()->getPdo();
         $queryStr = (new DbQueryBuilder())
             ->selectFrom('hyphenated_words')
             ->addSelectField('word_id')
@@ -33,25 +33,29 @@ class DbWord
 
     public function getHyphenatedWordFromDb(string $word): string
     {
-        $pdo = $this->dbConfig->getPdo();
-        $queryStr = (new DbQueryBuilder())
-            ->selectFrom('hyphenated_words')
-            ->addSelectField('hyphenated_word')
-            ->setConditionSentence('WHERE `word` = LOWER(:word)')
-            ->build();
-        $query = $pdo->prepare($queryStr);
-        if (!$query->execute(array('word' => $word))) {
-            return '';
+        $result = '';
+        if ($this->config->isEnabledDbSource()) {
+            $pdo = $this->config->getDbConfig()->getPdo();
+            $queryStr = (new DbQueryBuilder())
+                ->selectFrom('hyphenated_words')
+                ->addSelectField('hyphenated_word')
+                ->setConditionSentence('WHERE `word` = LOWER(:word)')
+                ->build();
+            $query = $pdo->prepare($queryStr);
+            if (!$query->execute(array('word' => $word))) {
+                return $result;
+            }
+            if ($query->rowCount() == 0) {
+                return $result;
+            }
+            $result = $query->fetch(PDO::FETCH_ASSOC)['hyphenated_word'];
         }
-        if ($query->rowCount() == 0) {
-            return '';
-        }
-        return $query->fetch(PDO::FETCH_ASSOC)['hyphenated_word'];
+        return $result;
     }
 
     public function getWordById(int $id): array
     {
-        $pdo = $this->dbConfig->getPdo();
+        $pdo = $this->config->getDbConfig()->getPdo();
         $queryStr = (new DbQueryBuilder())
             ->selectFrom('hyphenated_words')
             ->addSelectField('word_id')
@@ -71,7 +75,7 @@ class DbWord
 
     public function getWordId(string $word): int
     {
-        $pdo = $this->dbConfig->getPdo();
+        $pdo = $this->config->getDbConfig()->getPdo();
         $queryStr = (new DbQueryBuilder())
             ->selectFrom('hyphenated_words')
             ->addSelectField('word_id')
@@ -89,7 +93,7 @@ class DbWord
 
     public function updateWord(string $word, string $hyphenatedWord, int $id): bool
     {
-        $pdo = $this->dbConfig->getPdo();
+        $pdo = $this->config->getDbConfig()->getPdo();
         $queryStr = (new DbQueryBuilder())
             ->updateTable('hyphenated_words')
             ->addParam('word')
@@ -109,7 +113,7 @@ class DbWord
 
     public function getHyphenatedWordsListFromDb(int $page, int $perPage): array
     {
-        $pdo = $this->dbConfig->getPdo();
+        $pdo = $this->config->getDbConfig()->getPdo();
         $begin = ($page - 1) * $perPage;
         $queryStr = (new DbQueryBuilder())
             ->selectFrom('hyphenated_words')
@@ -127,7 +131,7 @@ class DbWord
 
     public function deleteWord(int $id): bool
     {
-        $pdo = $this->dbConfig->getPdo();
+        $pdo = $this->config->getDbConfig()->getPdo();
         $queryStr = (new DbQueryBuilder())
             ->deleteFrom('hyphenated_words')
             ->setConditionSentence('WHERE `word_id` = :id')
@@ -142,7 +146,7 @@ class DbWord
 
     public function getHyphenatedWordsListPageCount(int $perPage): int
     {
-        $pdo = $this->dbConfig->getPdo();
+        $pdo = $this->config->getDbConfig()->getPdo();
         $queryStr = (new DbQueryBuilder())
             ->selectFrom('hyphenated_words')
             ->addSelectField('COUNT(`word_id`) AS `count`', '')
@@ -161,7 +165,7 @@ class DbWord
 
     public function getFoundPatternsOfWord(string $word, array &$patterns): bool
     {
-        $pdo = $this->dbConfig->getPdo();
+        $pdo = $this->config->getDbConfig()->getPdo();
         $queryStr = (new DbQueryBuilder())
             ->selectFrom('hyphenated_word_patterns')
             ->addInnerJoin('hyphenation_patterns',
@@ -183,39 +187,42 @@ class DbWord
 
     public function saveWordAndFoundPatterns(string $word, string $hyphenatedWord, array & $patternList): bool
     {
-        $pdo = $this->dbConfig->getPdo();
-        $pdo->beginTransaction();
-        $queryStr = (new DbQueryBuilder())
-            ->replaceInto('hyphenated_words')
-            ->addParam('word')
-            ->addParam('hyphenated_word')
-            ->build();
-        $sql1 = $pdo->prepare($queryStr);
-        if (!$sql1->execute(array('word' => strtolower($word), 'hyphenated_word' => strtolower($hyphenatedWord)))) {
-            $pdo->rollBack();
-            return false;
-        }
-        $wordId = $pdo->lastInsertId();
-        $patternIdQueryStr = (new DbQueryBuilder())
-            ->selectFrom('hyphenation_patterns')
-            ->addSelectField('pattern_id')
-            ->setConditionSentence('WHERE `pattern` = :pattern')
-            ->build();
-        $queryStr = (new DbQueryBuilder())
-            ->replaceInto('hyphenated_word_patterns')
-            ->addParam('word_id')
-            ->addParamValue('pattern_id', '('.$patternIdQueryStr.')')
-            ->build();
-        $sql2 = $pdo->prepare($queryStr);
-        foreach ($patternList as $pattern) {
-            if (!empty($pattern)) {
-                if (!$sql2->execute(array('word_id' => $wordId, 'pattern' => $pattern))) {
-                    $pdo->rollBack();
-                    return false;
+        if ($this->config->isEnabledDbSource() && !$this->isWordSavedToDb($word)) {
+            $pdo = $this->config->getDbConfig()->getPdo();
+            $pdo->beginTransaction();
+            $queryStr = (new DbQueryBuilder())
+                ->replaceInto('hyphenated_words')
+                ->addParam('word')
+                ->addParam('hyphenated_word')
+                ->build();
+            $sql1 = $pdo->prepare($queryStr);
+            if (!$sql1->execute(array('word' => strtolower($word), 'hyphenated_word' => strtolower($hyphenatedWord)))) {
+                $pdo->rollBack();
+                return false;
+            }
+            $wordId = $pdo->lastInsertId();
+            $patternIdQueryStr = (new DbQueryBuilder())
+                ->selectFrom('hyphenation_patterns')
+                ->addSelectField('pattern_id')
+                ->setConditionSentence('WHERE `pattern` = :pattern')
+                ->build();
+            $queryStr = (new DbQueryBuilder())
+                ->replaceInto('hyphenated_word_patterns')
+                ->addParam('word_id')
+                ->addParamValue('pattern_id', '(' . $patternIdQueryStr . ')')
+                ->build();
+            $sql2 = $pdo->prepare($queryStr);
+            foreach ($patternList as $pattern) {
+                if (!empty($pattern)) {
+                    if (!$sql2->execute(array('word_id' => $wordId, 'pattern' => $pattern))) {
+                        $pdo->rollBack();
+                        return false;
+                    }
                 }
             }
+            $pdo->commit();
+            return true;
         }
-        $pdo->commit();
-        return true;
+        return false;
     }
 }

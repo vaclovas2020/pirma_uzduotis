@@ -20,7 +20,7 @@ class WordsController implements ControllerInterface
 
     public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config, ApiResponse $response)
     {
-        $this->dbWord = new DbWord($config->getDbConfig());
+        $this->dbWord = new DbWord($config);
         $this->hyphenationTool = new WordHyphenationTool($logger, $cache, $config);
         $this->response = $response;
     }
