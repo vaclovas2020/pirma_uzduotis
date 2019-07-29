@@ -3,7 +3,6 @@
 namespace Hyphenation;
 
 use AppConfig\Config;
-use DB\DbPatterns;
 use DB\DbWord;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
@@ -15,32 +14,29 @@ class WordHyphenationTool
     private $cache;
     private $config;
     private $dbWord;
-    private $dbPatterns;
-    private $allPatterns = null;
+    private $patternFinder;
 
-    public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config)
+    public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config,
+                                PatternLoaderInterface $patternLoader)
     {
         $this->logger = $logger;
         $this->cache = $cache;
         $this->config = $config;
         $this->dbWord = new DbWord($this->config->getDbConfig());
-        $this->dbPatterns = new DbPatterns($this->config, $logger, $cache);
+        $this->patternFinder = new PatternFinder($logger, $cache, $config, $patternLoader);
     }
 
     public function hyphenateWord(string $word): string
     {
-        if ($this->allPatterns === null) {
-            $this->allPatterns = $this->getPatternsArray();
-        }
+        //TODO: proxy and private methods
         $hash = sha1(strtolower($word));
         $wordSavedToDb = ($this->config->isEnabledDbSource()) ?
             $this->dbWord->isWordSavedToDb($word) : false;
         $resultCache = $this->cache->get($hash);
         $resultStr = '';
-        $patternList = [];
         if (($resultCache === null && !$wordSavedToDb) ||
             ($this->config->isEnabledDbSource() && !$wordSavedToDb)) {
-            $result = $this->findPatternsAndPushToWord(strtolower($word), $patternList);
+            $result = $this->patternFinder->findPatternsAndPushToWord(strtolower($word));
             $resultStr = $this->getResultStrFromResultArray($result);
             $this->logger->info("Word '{word}' hyphenated to '{hyphenateWord}'", array(
                 'word' => $word,
@@ -48,7 +44,7 @@ class WordHyphenationTool
             ));
             $this->cache->set($hash, $resultStr);
             if ($this->config->isEnabledDbSource()) {
-                $this->saveWordDataToDb($word, $resultStr, $patternList);
+                $this->saveWordDataToDb($word, $resultStr, $this->patternFinder->getFoundPatternsAtWord());
             }
         } else if ($resultCache !== null) {
             $resultStr = $resultCache;
@@ -74,16 +70,16 @@ class WordHyphenationTool
         $count = preg_match_all('/[a-zA-Z]+[.,!?;:]*/', $text, $words);
         $words = $words[0];
         $currentWord = 1;
-        foreach ($words as  $word) {
-                $this->logger->info("Processing word {current} / {total}", array(
-                    'current' => $currentWord,
-                    'total' => $count
-                ));
-                $word = preg_replace('/[.,!?;:]+/', '', $word);
-                $hyphenatedWord = $this->hyphenateWord($word);
-                $text = str_replace($word, $hyphenatedWord, $text);
-                $currentWord++;
-            }
+        foreach ($words as $word) {
+            $this->logger->info("Processing word {current} / {total}", array(
+                'current' => $currentWord,
+                'total' => $count
+            ));
+            $word = preg_replace('/[.,!?;:]+/', '', $word);
+            $hyphenatedWord = $this->hyphenateWord($word);
+            $text = str_replace($word, $hyphenatedWord, $text);
+            $currentWord++;
+        }
         return $text;
     }
 
@@ -104,80 +100,6 @@ class WordHyphenationTool
         return $foundPatterns;
     }
 
-    private function isDotAtBegin(string $pattern): bool
-    {
-        return preg_match('/^[.]{1}/', $pattern) === 1;
-    }
-
-    private function isDotAtEnd(string $pattern): bool
-    {
-        return preg_match('/[.]{1}$/', $pattern) === 1;
-    }
-
-    private function isPatternAtWordBegin(string $word, string $noCounts): bool
-    {
-        $pos = strpos($word, substr($noCounts, 1));
-        return $pos === 0;
-    }
-
-    private function isPatternAtWordEnd(string $word, string $noCounts): bool
-    {
-        $pos = strpos($word, substr($noCounts, 0, strlen($noCounts) - 1));
-        return $pos === strlen($word) - strlen($noCounts) + 1;
-    }
-
-    private function findPatternPositionAtWord(string $word, string $noCounts): int
-    {
-        $pos = strpos($word, str_replace('.', '', $noCounts));
-        if ($pos === false) {
-            return -1; // pattern is not at word
-        }
-        return $pos;
-    }
-
-    private function findPatternsAndPushToWord(string $word, array & $patternsList): array
-    {
-        $result = $this->createResultArray($word);
-        foreach ($this->allPatterns as $pattern) {
-            $noCounts = preg_replace('/[0-9]+/', '', $pattern);
-            $pos = $this->findPatternPositionAtWord($word, $noCounts);
-            if ($this->isDotAtBegin($pattern)) {
-                if ($this->isPatternAtWordBegin($word, $noCounts)) {
-                    $this->pushPatternDataToWord($result, $pattern, $pos);
-                    array_push($patternsList, $pattern);
-                }
-            } else if ($this->isDotAtEnd($pattern)) {
-                if ($this->isPatternAtWordEnd($word, $noCounts)) {
-                    $this->pushPatternDataToWord($result, $pattern, $pos);
-                    array_push($patternsList, $pattern);
-                }
-            } else if ($pos !== -1) {
-                $this->pushPatternDataToWord($result, $pattern, $pos);
-                array_push($patternsList, $pattern);
-            }
-        }
-        $this->printFoundedPatternsToLog($patternsList, $word);
-        return $result;
-    }
-
-    private function printFoundedPatternsToLog(array & $patternsList, string $word): void
-    {
-
-        $this->logger->notice("Founded patterns for word '{word}': {patterns}",
-            array(
-                'patterns' => $patternsList,
-                'word' => $word
-            ));
-    }
-
-    private function pushPatternDataToWord(array &$result, string $pattern, int $positionAtWord): void
-    {
-        $patternObj = new Pattern($this->config, $this->dbPatterns,
-            ($this->config->isEnabledDbSource()) ? $pattern :
-                str_replace('.', '', $pattern), $positionAtWord);
-        $patternObj->pushPatternToWord($result);
-    }
-
     private function getResultStrFromResultArray(array &$result): string
     {
         $resultStr = "";
@@ -187,16 +109,7 @@ class WordHyphenationTool
         return $resultStr;
     }
 
-    private function createResultArray(string $word): array
-    {
-        $result = [];
-        for ($i = 0; $i < strlen($word); $i++) {
-            array_push($result, new WordChar(substr($word, $i, 1), 0, $i));
-        }
-        return $result;
-    }
-
-    private function saveWordDataToDb(string $word, string $hyphenatedWord, array & $patternList): void
+    private function saveWordDataToDb(string $word, string $hyphenatedWord, array $patternList): void
     {
         if ($this->dbWord->saveWordAndFoundPatterns($word, $hyphenatedWord, $patternList)) {
             $this->logger->notice("Word '{word}', hyphenation result '{hyphenatedWord}' 
@@ -205,25 +118,6 @@ class WordHyphenationTool
             $this->logger->error("Cannot save word '{word}', hyphenation result '{hyphenatedWord}' 
                     and founded patterns to database", array('word' => $word, 'hyphenatedWord' => $hyphenatedWord));
         }
-    }
-
-    private function getPatternsArray(): array
-    {
-        $allPatterns = ($this->config->isEnabledDbSource()) ?
-            $this->dbPatterns->getPatternsArray() :
-            PatternDataLoader::loadDataFromFile(
-                $this->cache, $this->logger, $this->config->getPatternsFilePath());
-        if ($this->config->isEnabledDbSource() && empty($allPatterns)) {
-            if ($this->dbPatterns->importFromFile($this->config->getPatternsFilePath())) {
-                $this->logger->notice("Patterns database table was empty, so the app imported 
-                patterns from file '{fileName}'.", array('fileName' => $this->config->getPatternsFilePath()));
-                $allPatterns = $this->dbPatterns->getPatternsArray();
-            } else {
-                $this->logger->notice("Patterns database table was empty, so the app importing 
-                patterns from file '{fileName} 'but error occurred.", array('fileName' => $this->config->getPatternsFilePath()));
-            }
-        }
-        return $allPatterns;
     }
 
 }
