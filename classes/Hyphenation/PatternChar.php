@@ -9,7 +9,7 @@ class PatternChar extends HyphenationChar
     public function __construct(string $patternPart, int $charNum = 0)
     {
         $char = preg_replace('/[0-9]+/', '', $patternPart);
-        $count = intval(preg_replace('/[a-z]{1}/', '', $patternPart));
+        $count = intval(preg_replace('/[a-z]/', '', $patternPart));
         parent::__construct($char, $count);
         $this->charNum = $charNum;
     }
