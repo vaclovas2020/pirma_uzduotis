@@ -36,7 +36,7 @@ class PatternTest extends TestCase
             ['ach4', 1],
             ['ad4der', 1],
             ['af1t', 1],
-            ['a2l3t', 2],
+            ['a3t2l', 2],
             ['5at', 1]
         ];
     }
@@ -48,9 +48,6 @@ class PatternTest extends TestCase
         $this->config = $this->createMock(Config::class);
         $this->cache = $this->createMock(FileCache::class);
         $this->dbPatterns = $this->createMock(DbPatterns::class);
-        $this->config
-            ->method('isEnabledDbSource')
-            ->willReturn(false);
     }
 
 }
