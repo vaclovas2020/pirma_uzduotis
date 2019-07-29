@@ -9,7 +9,7 @@ use SplFileObject;
 
 class PatternDataLoader
 {
-    public const DEFAULT_FILENAME = 'tex-hyphenation-patterns.txt';
+    public const DEFAULT_FILENAME = 'data/tex-hyphenation-patterns.txt';
 
     public static function loadDataFromFile(CacheInterface $cache, LoggerInterface $logger,
                                             string $fileName = self::DEFAULT_FILENAME): array
