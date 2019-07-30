@@ -19,15 +19,15 @@
         });
         $('button#modal-btn-delete').click(function (e) {
             e.preventDefault();
+            $('#deleteConfirmationModal').modal('hide');
             var id = $(this).attr('data-id');
             $.ajax('/api/patterns/' + id, {
                 method: 'DELETE'
             }).done(function (data) {
                 $('#toast .toast-body').html('<div class="alert alert-success" ' +
                     'role="alert">Pattern with ID ' + id + ' deleted!</div>');
-                $('#deleteConfirmationModal').modal('hide');
                 $('#toast').toast('show');
-                window.loadPatternList(window.page, window.perPage, window.not_found_callback);
+                loadPatternList(page, perPage, not_found_callback);
             }).fail(function (jqxhr, textStatus, error) {
                 if (error === 'Not Found') {
                     $('#toast .toast-body').html('<div class="alert alert-danger" ' +
@@ -37,7 +37,6 @@
                     $('#toast .toast-body').html('<div class="alert alert-danger" ' +
                         'role="alert">Bad API Request</div>');
                 }
-                $('#deleteConfirmationModal').modal('hide');
                 $('#toast').toast('show');
             });
         });

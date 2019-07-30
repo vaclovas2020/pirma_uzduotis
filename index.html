@@ -31,8 +31,14 @@
         </ul>
     </div>
 </nav>
+<div class="loader-container">
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border m-5" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+</div>
 <div class="container">
-    <div class="toast-container"></div>
     <div id="toast" class="toast fade hide" role="alert" aria-live="assertive" data-delay="5000" aria-atomic="true">
         <div class="toast-header">
             <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
@@ -53,6 +59,7 @@
         <tbody id="pattern-table-body"></tbody>
     </table>
     <nav aria-label="Page navigation">
+        <p>Page <span id="page_num">1</span></p>
         <ul class="pagination justify-content-center">
             <li id="prev-li" class="page-item disabled"><a class="page-link" id="prev" href="#prev">Previous</a></li>
             <li id="next-li" class="page-item"><a class="page-link" id="next" href="#next">Next</a></li>
@@ -81,7 +88,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog"
+         aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">

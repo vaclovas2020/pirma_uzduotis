@@ -1,3 +1,17 @@
-div.new-pattern-form-container {
-    padding: 1em 0;
+body, div.container, .table {
+    background-color: rgba(120, 120, 120, 0.05);
+}
+
+div.container {
+    padding-bottom: 1em;
+}
+
+div.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: white;
+    z-index: 10000000000000000000;
 }
