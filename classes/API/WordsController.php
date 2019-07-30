@@ -7,6 +7,7 @@ namespace API;
 use AppConfig\Config;
 use DB\DbWord;
 use Exception\ApiException;
+use Hyphenation\PatternLoaderProxy;
 use Hyphenation\WordHyphenationTool;
 use Log\LoggerInterface;
 use SimpleCache\CacheInterface;
@@ -21,7 +22,8 @@ class WordsController implements ControllerInterface
     public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config, ApiResponse $response)
     {
         $this->dbWord = new DbWord($config);
-        $this->hyphenationTool = new WordHyphenationTool($logger, $cache, $config);
+        $patternLoaderProxy = new PatternLoaderProxy($config, $logger, $cache);
+        $this->hyphenationTool = new WordHyphenationTool($logger, $cache, $config, $patternLoaderProxy);
         $this->response = $response;
     }
 
@@ -29,7 +31,7 @@ class WordsController implements ControllerInterface
     {
         $pageCount = $this->dbWord->getHyphenatedWordsListPageCount($perPage);
         if ($page > $pageCount) {
-            throw new ApiException('Page number '.$page.' is higher than allowed $pageCount', 404);
+            throw new ApiException('Page number ' . $page . ' is higher than allowed $pageCount', 404);
         }
         $list = $this->dbWord->getHyphenatedWordsListFromDb($page, $perPage);
         $this->response->sendResponse(json_encode($list));
@@ -39,7 +41,7 @@ class WordsController implements ControllerInterface
     {
         $pattern = $this->dbWord->getWordById($id);
         if (empty($pattern)) {
-            throw new ApiException('Word with ID '.$id.' not exist!', 404);
+            throw new ApiException('Word with ID ' . $id . ' not exist!', 404);
         }
         $this->response->sendResponse(json_encode($pattern));
     }
@@ -71,7 +73,7 @@ class WordsController implements ControllerInterface
     {
         $word = $this->dbWord->getWordById($id);
         if (empty($word)) {
-            throw new ApiException('Word with ID '.$id.' not exist!', 404);
+            throw new ApiException('Word with ID ' . $id . ' not exist!', 404);
         }
         if (empty($data['word']) || empty($data['hyphenated_word'])) {
             throw new ApiException('Please give required PUT query fields `word` and `hyphenated_word`.');
@@ -97,10 +99,10 @@ class WordsController implements ControllerInterface
     public function delete(int $id): void
     {
         if (empty($this->dbWord->getWordById($id))) {
-            throw new ApiException('Word with ID '.$id.' not exist!', 404);
+            throw new ApiException('Word with ID ' . $id . ' not exist!', 404);
         }
         if (!$this->dbWord->deleteWord($id)) {
-            throw new ApiException('Cannot delete Word with ID '.$id.' from database!', 500);
+            throw new ApiException('Cannot delete Word with ID ' . $id . ' from database!', 500);
         }
         $this->response->sendStatusCode(200);
     }
