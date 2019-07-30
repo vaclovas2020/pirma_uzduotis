@@ -2,6 +2,7 @@
 
 
 use AppConfig\Config;
+use Hyphenation\PatternLoaderProxy;
 use Hyphenation\WordHyphenationTool;
 use Log\Logger;
 use PHPUnit\Framework\TestCase;
@@ -73,7 +74,7 @@ class WordHyphenationToolTest extends TestCase
         $this->logger = $this->createMock(Logger::class);
         $this->cache = $this->createMock(FileCache::class);
         $this->config = $this->createMock(Config::class);
-        $this->patternLoader = $this->createMock(\Hyphenation\PatternLoaderProxy::class);
+        $this->patternLoader = $this->createMock(PatternLoaderProxy::class);
         $this->config
             ->expects($this->any())
             ->method('isEnabledDbSource')
