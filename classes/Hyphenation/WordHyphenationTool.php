@@ -2,7 +2,10 @@
 
 namespace Hyphenation;
 
+use AppConfig\Config;
+use DB\DbWord;
 use Log\LoggerInterface;
+use SimpleCache\CacheInterface;
 
 class WordHyphenationTool
 {
@@ -12,14 +15,14 @@ class WordHyphenationTool
     private $hyphenatedWordGetter;
     private $hyphenatedWordSetter;
 
-    public function __construct(LoggerInterface $logger, PatternFinder $patternFinder,
-                                HyphenatedWordGetterInterface $hyphenatedWordGetter,
-                                HyphenatedWordSetterInterface $hyphenatedWordSetter)
+    public function __construct(LoggerInterface $logger, CacheInterface $cache, Config $config,
+                                PatternLoaderInterface $patternLoader)
     {
         $this->logger = $logger;
-        $this->patternFinder = $patternFinder;
-        $this->hyphenatedWordGetter = $hyphenatedWordGetter;
-        $this->hyphenatedWordSetter = $hyphenatedWordSetter;
+        $dbWord = new DbWord($config);
+        $this->patternFinder = new PatternFinder($logger, $cache, $config, $patternLoader);
+        $this->hyphenatedWordGetter = new HyphenatedWordGetterProxy($dbWord, $cache, $config);
+        $this->hyphenatedWordSetter = new HyphenatedWordSetterProxy($dbWord, $cache, $config);
     }
 
     public function hyphenateWord(string $word): string
