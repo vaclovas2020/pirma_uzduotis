@@ -1,0 +1,49 @@
+!function () {
+    function loadPatternList(page, perPage, not_found_callback) {
+        $.getJSON("/api/patterns", {page: page, per_page: perPage})
+            .done(function (json) {
+                var html = '';
+                for (var x in json) {
+                    html += '<tr>' +
+                        '<th scope="row">' + json[x]['pattern_id'] + '</th>' +
+                        '<td>' + json[x]['pattern'] + '</td>' +
+                        '</tr>'
+                }
+                $('#pattern-table-body').html(html);
+            })
+            .fail(function (jqxhr, textStatus, error) {
+                if (error === "Not Found") {
+                    not_found_callback();
+                }
+            });
+    }
+
+    $(document).ready(function () {
+        var page = 1;
+        var perPage = 25;
+
+        function not_found_callback() {
+            $('li#next-li').addClass('disabled');
+            if (page > 1) {
+                page--;
+            }
+        }
+
+        loadPatternList(page, perPage, not_found_callback);
+        $('a#prev').click(function (e) {
+            e.preventDefault();
+            $('li#next-li').removeClass('disabled');
+            page--;
+            loadPatternList(page, perPage, not_found_callback);
+            if (page === 1) {
+                $('li#prev-li').addClass('disabled');
+            }
+        });
+        $('a#next').click(function (e) {
+            e.preventDefault();
+            $('li#prev-li').removeClass('disabled');
+            page++;
+            loadPatternList(page, perPage, not_found_callback);
+        });
+    });
+}();
