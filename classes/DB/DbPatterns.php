@@ -27,7 +27,7 @@ class DbPatterns implements PatternLoaderInterface
 
     public function importFromFile(string $fileName): bool
     {
-        $patternsArray = (new PatternFileLoader($fileName))->getPatternsArray();
+        $patternsArray = (new PatternFileLoader($this->cache, $fileName))->getPatternsArray();
         $pdo = $this->config->getDbConfig()->getPdo();
         $pdo->beginTransaction();
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 0;');
@@ -101,7 +101,7 @@ class DbPatterns implements PatternLoaderInterface
             ->selectFrom('hyphenation_patterns')
             ->addSelectField('pattern_id')
             ->addSelectField('pattern')
-            ->setConditionSentence('LIMIT ' . $begin . ', ' . $perPage)
+            ->setConditionSentence('ORDER BY `hyphenation_patterns`.`pattern_id` ASC LIMIT ' . $begin . ', ' . $perPage)
             ->build();
         $result = $pdo->query($queryStr);
         if ($result) {
