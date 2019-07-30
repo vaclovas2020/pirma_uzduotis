@@ -5,6 +5,10 @@ namespace CLI;
 
 
 use AppConfig\Config;
+use DB\DbWord;
+use Hyphenation\HyphenatedWordGetterProxy;
+use Hyphenation\HyphenatedWordSetterProxy;
+use Hyphenation\PatternFinder;
 use Hyphenation\PatternLoaderProxy;
 use Hyphenation\WordHyphenationTool;
 use Log\LoggerInterface;
@@ -24,7 +28,11 @@ class UserInput
         $this->config = $config;
         $this->cache = $cache;
         $patternLoaderProxy = new PatternLoaderProxy($config, $logger, $cache);
-        $hyphenationTool = new WordHyphenationTool($logger, $cache, $config, $patternLoaderProxy);
+        $dbWord = new DbWord($config);
+        $patternFinder = new PatternFinder($logger, $cache, $config, $patternLoaderProxy);
+        $hyphenatedWordGetter = new HyphenatedWordGetterProxy($dbWord, $cache, $config);
+        $hyphenatedWordSetter = new HyphenatedWordSetterProxy($dbWord, $cache, $config);
+        $hyphenationTool = new WordHyphenationTool($logger, $patternFinder, $hyphenatedWordGetter, $hyphenatedWordSetter);
         $this->userInputAction = new UserInputAction($hyphenationTool, $logger, $cache);
     }
 
