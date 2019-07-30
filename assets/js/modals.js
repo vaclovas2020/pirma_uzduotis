@@ -15,28 +15,30 @@
             var button = $(event.relatedTarget);
             var id = button.data('id');
             modal.find('.modal-body span#delete-confirmation-id').html(id);
-            modal.find('.modal-footer button#modal-btn-delete').click(function (e) {
-                e.preventDefault();
-                $.ajax('/api/patterns/' + id, {
-                    method: 'DELETE'
-                }).done(function (data) {
-                    $('#toast .toast-body').html('<div class="alert alert-success" ' +
-                        'role="alert">Pattern with ID ' + id + ' deleted!</div>');
-                    modal.modal('hide');
-                    $('#toast').toast('show');
-                    window.loadPatternList(window.page, window.perPage, window.not_found_callback);
-                }).fail(function (jqxhr, textStatus, error) {
-                    if (error === 'Not Found') {
-                        $('#toast .toast-body').html('<div class="alert alert-danger" ' +
-                            'role="alert">Pattern not found.</div>');
-                    }
-                    if (error === 'Bad Request') {
-                        $('#toast .toast-body').html('<div class="alert alert-danger" ' +
-                            'role="alert">Bad API Request</div>');
-                    }
-                    modal.modal('hide');
-                    $('#toast').toast('show');
-                });
+            modal.find('.modal-footer button#modal-btn-delete').attr('data-id', id);
+        });
+        $('button#modal-btn-delete').click(function (e) {
+            e.preventDefault();
+            var id = $(this).attr('data-id');
+            $.ajax('/api/patterns/' + id, {
+                method: 'DELETE'
+            }).done(function (data) {
+                $('#toast .toast-body').html('<div class="alert alert-success" ' +
+                    'role="alert">Pattern with ID ' + id + ' deleted!</div>');
+                $('#deleteConfirmationModal').modal('hide');
+                $('#toast').toast('show');
+                window.loadPatternList(window.page, window.perPage, window.not_found_callback);
+            }).fail(function (jqxhr, textStatus, error) {
+                if (error === 'Not Found') {
+                    $('#toast .toast-body').html('<div class="alert alert-danger" ' +
+                        'role="alert">Pattern not found.</div>');
+                }
+                if (error === 'Bad Request') {
+                    $('#toast .toast-body').html('<div class="alert alert-danger" ' +
+                        'role="alert">Bad API Request</div>');
+                }
+                $('#deleteConfirmationModal').modal('hide');
+                $('#toast').toast('show');
             });
         });
     });
