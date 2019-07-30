@@ -25,6 +25,15 @@ class WordHyphenationTool
         $this->hyphenatedWordSetter = new HyphenatedWordSetterProxy($dbWord, $cache, $config);
     }
 
+    /**
+     * @return PatternFinder
+     */
+    public function getPatternFinder(): PatternFinder
+    {
+        return $this->patternFinder;
+    }
+
+
     public function hyphenateWord(string $word): string
     {
         $resultStr = $this->hyphenatedWordGetter->get($word);
@@ -58,11 +67,6 @@ class WordHyphenationTool
             $currentWord++;
         }
         return $text;
-    }
-
-    public function getFoundPatternsOfWord(string $word): array
-    {
-        return $this->patternFinder->getFoundPatternsOfWord($word);
     }
 
     private function getResultStrFromResultArray(array &$result): string

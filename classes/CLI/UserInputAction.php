@@ -17,7 +17,8 @@ class UserInputAction
     private $cache;
     private $hyphenationTool;
 
-    public function __construct(WordHyphenationTool $hyphenationTool, LoggerInterface $logger, CacheInterface $cache)
+    public function __construct(WordHyphenationTool $hyphenationTool, LoggerInterface $logger,
+                                CacheInterface $cache)
     {
         $this->logger = $logger;
         $this->cache = $cache;
@@ -56,7 +57,7 @@ class UserInputAction
 
     public function getFoundPatternsOfWord(string $word): void
     {
-        $foundPatterns = $this->hyphenationTool->getFoundPatternsOfWord($word);
+        $foundPatterns = $this->hyphenationTool->getPatternFinder()->getFoundPatternsOfWord($word);
         if (!empty($foundPatterns)) {
             $this->logger->notice('Founded patterns of word `{word}`: {patterns}',
                 array('word' => $word, 'patterns' => $foundPatterns));
